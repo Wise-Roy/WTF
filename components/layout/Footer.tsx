@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { BRAND, FOOTER_COLUMNS } from "@/lib/constants";
 import { Input } from "@/components/common";
 
@@ -59,8 +60,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            <Link href="/" className="font-heading text-2xl uppercase tracking-wider text-[#F5F5F5]">
-              {BRAND.shortName}
+            <Link href="/">
+              <Image src="/logo.png" alt="Worship The Fumes" width={48} height={48} className="h-10 w-auto" />
             </Link>
             <p className="mt-4 text-sm text-[#F5F5F5]/50">{BRAND.motto}</p>
           </div>

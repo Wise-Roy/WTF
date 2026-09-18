@@ -56,12 +56,12 @@ export const NAV_LINKS: NavLink[] = [
 ];
 
 export const PRODUCTS: Product[] = [
-  { id: "1", name: "The Rat King", dropLabel: "Drop 01", number: "#01", price: 89, image: "/products/01.jpg", category: "Hoodies" },
-  { id: "2", name: "Fume Walker", dropLabel: "Drop 01", number: "#02", price: 59, image: "/products/02.jpg", category: "Tees" },
-  { id: "3", name: "Acid Drip", dropLabel: "Drop 01", number: "#03", price: 65, image: "/products/03.jpg", category: "Tees" },
-  { id: "4", name: "Neon Decay", dropLabel: "Drop 01", number: "#04", price: 72, image: "/products/04.jpg", category: "Hoodies" },
-  { id: "5", name: "Cult Classic", dropLabel: "Drop 01", number: "#05", price: 55, image: "/products/05.jpg", category: "Tees" },
-  { id: "6", name: "Smoke Signal", dropLabel: "Drop 01", number: "#06", price: 68, image: "/products/06.jpg", category: "Accessories" },
+  { id: "1", name: "Acid Rain", dropLabel: "Drop 01", number: "#01", price: 89, image: "/eg.jpg", category: "Hoodies" },
+  { id: "2", name: "Static", dropLabel: "Drop 01", number: "#02", price: 59, image: "/eg.jpg", category: "Tees" },
+  { id: "3", name: "Gutter Glory", dropLabel: "Drop 01", number: "#03", price: 65, image: "/eg.jpg", category: "Tees" },
+  { id: "4", name: "Fever Dream", dropLabel: "Drop 01", number: "#04", price: 72, image: "/eg.jpg", category: "Hoodies" },
+  { id: "5", name: "Low Battery", dropLabel: "Drop 01", number: "#05", price: 55, image: "/eg.jpg", category: "Tees" },
+  { id: "6", name: "Rat King", dropLabel: "Drop 01", number: "#06", price: 68, image: "/eg.jpg", category: "Hoodies" },
 ];
 
 export const REVIEWS: Review[] = [

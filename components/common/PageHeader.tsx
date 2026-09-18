@@ -13,7 +13,7 @@ export default function PageHeader({
   description,
 }: PageHeaderProps) {
   return (
-    <div className="bg-[#0A0A0A] text-[#F5F5F5] py-32 px-6 md:px-12 lg:px-20">
+    <div className="bg-[#0A0A0A] text-[#F5F5F5] pt-32 pb-20 px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-7xl">
         <Tagline>{tagline}</Tagline>
         <SectionHeading className="mt-6">{heading}</SectionHeading>

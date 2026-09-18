@@ -6,7 +6,7 @@ function ReviewCard({ review }: { review: Review }) {
   return (
     <div className="border border-white/10 p-8">
       <StarRating rating={review.rating} />
-      <p className="mt-4 text-[#F5F5F5]/80 leading-relaxed">{review.text}</p>
+      <p className="mt-4 font-body text-lg md:text-xl text-[#F5F5F5]/80 leading-relaxed">{review.text}</p>
       <div className="mt-6 flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-[#111111] flex items-center justify-center text-sm font-bold text-[#C6FF00]">
           {review.name.charAt(0)}
