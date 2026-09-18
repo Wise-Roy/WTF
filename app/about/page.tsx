@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { Lightbulb, Flame, Users } from "lucide-react";
 import { SectionWrapper, SectionHeading, Tagline, Button } from "@/components/common";
+import { useImageParallax } from "@/hooks";
 
 const CREED = [
   {
@@ -24,6 +27,8 @@ const CREED = [
 ];
 
 export default function AboutPage() {
+  const imgRef = useImageParallax<HTMLDivElement>(0.18);
+
   return (
     <>
       {/* About Header — dark, card style, centered */}
@@ -61,14 +66,23 @@ export default function AboutPage() {
             </Button>
           </div>
 
-          {/* Portrait photo */}
-          <div className="aspect-[3/4] relative overflow-hidden border border-black/10">
-            <Image
-              src="/eg.jpg"
-              alt="WTF origin"
-              fill
-              className="object-cover object-center"
-            />
+          {/* Portrait photo — parallax frame */}
+          <div
+            data-parallax-frame
+            className="aspect-[3/4] relative overflow-hidden border border-black/10"
+          >
+            <div
+              ref={imgRef}
+              className="absolute -inset-[12%] will-change-transform"
+              style={{ transform: "translate3d(0, 0, 0)" }}
+            >
+              <Image
+                src="/eg.jpg"
+                alt="WTF origin"
+                fill
+                className="object-cover object-center"
+              />
+            </div>
           </div>
         </div>
       </SectionWrapper>

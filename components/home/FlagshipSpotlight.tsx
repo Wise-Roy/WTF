@@ -1,7 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import { SectionWrapper, Tagline, Button } from "@/components/common";
+import { useImageParallax } from "@/hooks";
 
 export default function FlagshipSpotlight() {
+  const imgRef = useImageParallax<HTMLDivElement>(0.18);
+
   return (
     <SectionWrapper scheme="acid">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -21,14 +26,23 @@ export default function FlagshipSpotlight() {
           </Button>
         </div>
 
-        {/* Media — right, portrait ratio */}
-        <div className="aspect-[3/4] relative overflow-hidden border border-black/10">
-          <Image
-            src="/eg.jpg"
-            alt="The Rat King hoodie"
-            fill
-            className="object-cover object-center"
-          />
+        {/* Media — parallax frame */}
+        <div
+          data-parallax-frame
+          className="aspect-[3/4] relative overflow-hidden border border-black/10"
+        >
+          <div
+            ref={imgRef}
+            className="absolute -inset-[12%] will-change-transform"
+            style={{ transform: "translate3d(0, 0, 0)" }}
+          >
+            <Image
+              src="/eg.jpg"
+              alt="The Rat King hoodie"
+              fill
+              className="object-cover object-center"
+            />
+          </div>
         </div>
       </div>
     </SectionWrapper>
