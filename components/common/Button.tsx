@@ -23,9 +23,9 @@ export default function Button({
     "inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-200";
 
   const variants = {
-    primary: "bg-[#C6FF00] text-[#0A0A0A] hover:bg-[#d4ff33]",
+    primary: "bg-[#C6FF00] text-[#1a1a1a] hover:bg-[#d4ff33]",
     secondary:
-      "border border-white/20 text-[#F5F5F5] hover:border-[#C6FF00] hover:text-[#C6FF00]",
+      "border border-[#1a1a1a]/20 text-[#1a1a1a] hover:border-[#88AF00] hover:text-[#88AF00]",
   };
 
   const classes = `${base} ${variants[variant]} ${className}`;

@@ -17,7 +17,7 @@ export default function JoinCult() {
 
   return (
     <SectionWrapper scheme="pink" id="join" className="text-center">
-      <Tagline className="bg-white text-[#0A0A0A]">Join the Cult</Tagline>
+      <Tagline className="bg-white text-[#1a1a1a]">Join the Cult</Tagline>
       <SectionHeading className="mt-6">Never miss a drop</SectionHeading>
 
       {submitted ? (
@@ -40,7 +40,7 @@ export default function JoinCult() {
           />
           <button
             type="submit"
-            className="bg-[#C6FF00] text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
+            className="bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 text-sm font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
           >
             Get early access
           </button>

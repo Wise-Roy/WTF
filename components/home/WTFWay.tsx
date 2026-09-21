@@ -24,12 +24,12 @@ export default function WTFWay() {
           return (
             <div key={prop.title} className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-[#C6FF00] mb-6">
-                <Icon size={28} strokeWidth={1.5} className="text-[#0A0A0A]" />
+                <Icon size={28} strokeWidth={1.5} className="text-[#1a1a1a]" />
               </div>
               <h3 className="font-heading text-xl uppercase tracking-wider font-bold">
                 {prop.title}
               </h3>
-              <p className="mt-4 text-[#0A0A0A]/70 leading-relaxed">
+              <p className="mt-4 text-[#1a1a1a]/70 leading-relaxed">
                 {prop.description}
               </p>
             </div>

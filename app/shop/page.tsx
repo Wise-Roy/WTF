@@ -20,7 +20,7 @@ export default function ShopPage() {
         description="Every piece is numbered, limited, and never restocked. Once it's gone, it's gone."
       />
 
-      <section className="bg-[#0A0A0A] px-6 md:px-12 lg:px-20 pb-24">
+      <section className="bg-[#FFF9D6] px-6 md:px-12 lg:px-20 pb-24">
         <div className="mx-auto max-w-7xl">
           {/* Category filter */}
           <div className="flex flex-wrap gap-3 mb-12">
@@ -30,8 +30,8 @@ export default function ShopPage() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-5 py-2 text-sm font-bold uppercase tracking-wider border transition-colors ${
                   activeCategory === cat
-                    ? "bg-[#C6FF00] text-[#0A0A0A] border-[#C6FF00]"
-                    : "border-white/20 text-[#F5F5F5]/70 hover:border-[#C6FF00] hover:text-[#C6FF00]"
+                    ? "bg-[#C6FF00] text-[#1a1a1a] border-[#C6FF00]"
+                    : "border-[#1a1a1a]/20 text-[#1a1a1a]/70 hover:border-[#C6FF00] hover:text-[#88AF00]"
                 }`}
               >
                 {cat}
@@ -47,17 +47,17 @@ export default function ShopPage() {
           </div>
 
           {filtered.length === 0 && (
-            <p className="text-center text-[#F5F5F5]/50 py-20 text-lg">
+            <p className="text-center text-[#1a1a1a]/50 py-20 text-lg">
               No designs in this category yet. Stay tuned.
             </p>
           )}
 
           {/* CTA */}
-          <div className="mt-16 text-center border border-white/10 py-16 px-6">
-            <h3 className="font-heading text-3xl md:text-4xl uppercase tracking-wider text-[#F5F5F5] font-bold">
+          <div className="mt-16 text-center border border-[#1a1a1a]/10 py-16 px-6">
+            <h3 className="font-heading text-3xl md:text-4xl uppercase tracking-wider text-[#1a1a1a] font-bold">
               Drop 02 is coming
             </h3>
-            <p className="mt-4 text-[#F5F5F5]/50 max-w-lg mx-auto">
+            <p className="mt-4 text-[#1a1a1a]/50 max-w-lg mx-auto">
               Join the cult to get early access to our next collection before it sells out.
             </p>
             <Button href="/#join" className="mt-8">

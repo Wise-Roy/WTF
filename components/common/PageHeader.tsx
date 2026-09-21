@@ -13,12 +13,12 @@ export default function PageHeader({
   description,
 }: PageHeaderProps) {
   return (
-    <div className="bg-[#0A0A0A] text-[#F5F5F5] pt-32 pb-20 px-6 md:px-12 lg:px-20">
+    <div className="bg-[#FFF9D6] text-[#1a1a1a] pt-32 pb-20 px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-7xl">
         <Tagline>{tagline}</Tagline>
         <SectionHeading className="mt-6">{heading}</SectionHeading>
         {description && (
-          <p className="mt-6 max-w-2xl text-lg text-[#F5F5F5]/70">
+          <p className="mt-6 max-w-2xl text-lg text-[#1a1a1a]/70">
             {description}
           </p>
         )}

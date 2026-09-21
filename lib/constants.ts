@@ -9,35 +9,35 @@ export const BRAND = {
 } as const;
 
 export const COLORS = {
-  neutral: "#0A0A0A",
+  neutral: "#FFF9D6",
   acid: "#C6FF00",
   toxic: "#FF2E88",
   violet: "#7C3AED",
   white: "#F5F5F5",
-  surface: "#111111",
+  surface: "#FFF3B0",
 } as const;
 
 export const SCHEMES: Record<ColorScheme, SchemeConfig> = {
   dark: {
-    bg: "bg-[#0A0A0A]",
-    secondaryBg: "bg-[#111111]",
-    text: "text-[#F5F5F5]",
-    accent: "text-[#C6FF00]",
-    border: "border-white/10",
+    bg: "bg-[#FFF9D6]",
+    secondaryBg: "bg-[#FFF3B0]",
+    text: "text-[#1a1a1a]",
+    accent: "text-[#88AF00]",
+    border: "border-[#1a1a1a]/10",
   },
   light: {
-    bg: "bg-white",
-    secondaryBg: "bg-[#F5F5F5]",
-    text: "text-[#0A0A0A]",
+    bg: "bg-[#FFF9D6]",
+    secondaryBg: "bg-[#FFF3B0]",
+    text: "text-[#1a1a1a]",
     accent: "text-[#88AF00]",
-    border: "border-black/10",
+    border: "border-[#1a1a1a]/10",
   },
   acid: {
     bg: "bg-[#88AF00]",
     secondaryBg: "bg-[#6F8E00]",
-    text: "text-[#0A0A0A]",
-    accent: "text-[#0A0A0A]",
-    border: "border-black/10",
+    text: "text-[#1a1a1a]",
+    accent: "text-[#1a1a1a]",
+    border: "border-[#1a1a1a]/10",
   },
   pink: {
     bg: "bg-[#DF2877]",

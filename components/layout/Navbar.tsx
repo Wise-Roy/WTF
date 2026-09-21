@@ -28,7 +28,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
         showSolid
-          ? "bg-[#0A0A0A] border-b border-white/10"
+          ? "bg-[#DF2877] border-b border-white/10"
           : "bg-transparent border-b border-transparent"
       }`}
     >
@@ -43,7 +43,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm uppercase tracking-wider text-[#F5F5F5]/70 hover:text-[#C6FF00] transition-colors"
+              className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
             >
               {link.label}
             </Link>
@@ -56,7 +56,7 @@ export default function Navbar() {
         {/* Mobile toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-[#F5F5F5]"
+          className="md:hidden text-white"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -65,13 +65,13 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#0A0A0A] border-t border-white/10 px-6 py-6 space-y-4">
+        <div className="md:hidden bg-[#DF2877] border-t border-white/10 px-6 py-6 space-y-4">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="block text-sm uppercase tracking-wider text-[#F5F5F5]/70 hover:text-[#C6FF00] transition-colors"
+              className="block text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
             >
               {link.label}
             </Link>

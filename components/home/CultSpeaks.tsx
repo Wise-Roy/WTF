@@ -4,16 +4,16 @@ import { Review } from "@/types";
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <div className="border border-white/10 p-8">
+    <div className="border border-[#1a1a1a]/10 p-8">
       <StarRating rating={review.rating} />
-      <p className="mt-4 font-body text-lg md:text-xl text-[#F5F5F5]/80 leading-relaxed">{review.text}</p>
+      <p className="mt-4 font-body text-lg md:text-xl text-[#1a1a1a]/80 leading-relaxed">{review.text}</p>
       <div className="mt-6 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-[#111111] flex items-center justify-center text-sm font-bold text-[#C6FF00]">
+        <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center text-sm font-bold text-[#C6FF00]">
           {review.name.charAt(0)}
         </div>
         <div>
-          <p className="text-sm font-bold text-[#F5F5F5]">{review.name}</p>
-          <p className="text-xs text-[#F5F5F5]/50">
+          <p className="text-sm font-bold text-[#1a1a1a]">{review.name}</p>
+          <p className="text-xs text-[#1a1a1a]/50">
             {review.dropLabel} &middot; Verified buyer
           </p>
         </div>

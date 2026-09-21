@@ -51,11 +51,11 @@ export default function MarqueeBand() {
   return (
     <div
       ref={bandRef}
-      className="bg-[#C6FF00] overflow-hidden py-4 border-y border-[#0A0A0A]/10"
+      className="bg-[#C6FF00] overflow-hidden py-4 border-y border-[#1a1a1a]/10"
     >
       <div
         ref={innerRef}
-        className="whitespace-nowrap will-change-transform font-heading text-2xl md:text-3xl uppercase tracking-[0.12em] text-[#0A0A0A] select-none"
+        className="whitespace-nowrap will-change-transform font-heading text-2xl md:text-3xl uppercase tracking-[0.12em] text-[#1a1a1a] select-none"
         style={{ transform: "translate3d(0, 0, 0)" }}
       >
         {repeatedText}

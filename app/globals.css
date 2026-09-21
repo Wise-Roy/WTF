@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-neutral: #0A0A0A;
+  --color-neutral: #FFF9D6;
   --color-acid: #C6FF00;
   --color-toxic: #FF2E88;
   --color-violet: #7C3AED;
-  --color-surface: #111111;
+  --color-surface: #FFF3B0;
   --font-heading: "Anton", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
 }
@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  background: #0A0A0A;
-  color: #F5F5F5;
+  background: #FFF9D6;
+  color: #1a1a1a;
   font-family: var(--font-body);
 }

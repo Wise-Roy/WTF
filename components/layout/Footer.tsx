@@ -55,7 +55,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#0A0A0A] border-t border-white/10 py-16 px-6 md:px-12 lg:px-20">
+    <footer className="bg-[#FFF9D6] border-t border-[#1a1a1a]/10 py-16 px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -63,13 +63,13 @@ export default function Footer() {
             <Link href="/">
               <Image src="/logo.png" alt="Worship The Fumes" width={48} height={48} className="h-10 w-auto" />
             </Link>
-            <p className="mt-4 text-sm text-[#F5F5F5]/50">{BRAND.motto}</p>
+            <p className="mt-4 text-sm text-[#1a1a1a]/50">{BRAND.motto}</p>
           </div>
 
           {/* Link columns */}
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-sm font-bold uppercase tracking-wider text-[#F5F5F5]">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-[#1a1a1a]">
                 {col.title}
               </h4>
               <ul className="mt-4 space-y-3">
@@ -77,7 +77,7 @@ export default function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-[#F5F5F5]/50 hover:text-[#C6FF00] transition-colors"
+                      className="text-sm text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -89,7 +89,7 @@ export default function Footer() {
 
           {/* Signup */}
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-[#F5F5F5]">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-[#1a1a1a]">
               Join the cult
             </h4>
             {subscribed ? (
@@ -107,7 +107,7 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className="bg-[#C6FF00] text-[#0A0A0A] px-4 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
+                  className="bg-[#C6FF00] text-[#1a1a1a] px-4 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
                 >
                   Sign me up
                 </button>
@@ -117,25 +117,25 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-12 pt-8 border-t border-[#1a1a1a]/10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            <a href="#" className="text-[#F5F5F5]/50 hover:text-[#C6FF00] transition-colors" aria-label="Instagram">
+            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="Instagram">
               <InstagramIcon size={20} />
             </a>
-            <a href="#" className="text-[#F5F5F5]/50 hover:text-[#C6FF00] transition-colors" aria-label="TikTok">
+            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="TikTok">
               <TikTokIcon size={20} />
             </a>
-            <a href="#" className="text-[#F5F5F5]/50 hover:text-[#C6FF00] transition-colors" aria-label="X">
+            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="X">
               <XIcon size={20} />
             </a>
-            <a href="#" className="text-[#F5F5F5]/50 hover:text-[#C6FF00] transition-colors" aria-label="YouTube">
+            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="YouTube">
               <YouTubeIcon size={20} />
             </a>
           </div>
-          <a href={`mailto:${BRAND.email}`} className="text-sm text-[#F5F5F5]/50 hover:text-[#C6FF00] transition-colors">
+          <a href={`mailto:${BRAND.email}`} className="text-sm text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors">
             {BRAND.email}
           </a>
-          <p className="text-sm text-[#F5F5F5]/30">&copy; {BRAND.copyright}</p>
+          <p className="text-sm text-[#1a1a1a]/30">&copy; {BRAND.copyright}</p>
         </div>
       </div>
     </footer>
