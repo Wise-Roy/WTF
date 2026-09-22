@@ -10,7 +10,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function WTFWay() {
   return (
-    <SectionWrapper scheme="light">
+    <SectionWrapper scheme="grey">
       <div className="text-center">
         <Tagline>The WTF Way</Tagline>
         <SectionHeading className="mt-6">

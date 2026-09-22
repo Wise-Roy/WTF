@@ -12,7 +12,7 @@ export default function FlagshipSpotlight() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Content — left, vertically centered */}
         <div>
-          <Tagline className="bg-[#1a1a1a] text-[#FFF9D6]">Flagship Drop</Tagline>
+          <Tagline className="bg-[#1a1a1a] text-black">Flagship Drop</Tagline>
           <h2 className="mt-6 font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-[0.08em] leading-[0.95]">
             The &ldquo;Rat King&rdquo; hoodie
           </h2>
@@ -21,7 +21,7 @@ export default function FlagshipSpotlight() {
             carries its own identity — this is the one that started the cult.
             Limited to 200 units worldwide.
           </p>
-          <Button href="/shop" className="mt-8 bg-[#1a1a1a] text-[#FFF9D6] hover:bg-[#333]">
+          <Button href="/shop" className="mt-8 bg-[#1a1a1a] text-black hover:bg-[#333]">
             Get the Rat King
           </Button>
         </div>

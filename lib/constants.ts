@@ -46,6 +46,13 @@ export const SCHEMES: Record<ColorScheme, SchemeConfig> = {
     accent: "text-[#C6FF00]",
     border: "border-white/20",
   },
+  grey:{
+    bg: "bg-[#A7A7A2]",
+    secondaryBg: "bg-[#FFF3B0]",
+    text: "text-[#1a1a1a]",
+    accent: "text-[#88AF00]",
+    border: "border-[#1a1a1a]/10",
+  }
 };
 
 export const NAV_LINKS: NavLink[] = [

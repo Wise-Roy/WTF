@@ -9,6 +9,9 @@ export interface Product {
   dropLabel: string;
   number: string;
   price: number;
+  salePrice?: number;
+  isSoldOut?: boolean;
+  currency?: string;
   image: string;
   category: string;
 }
@@ -34,7 +37,7 @@ export interface FooterColumn {
   links: NavLink[];
 }
 
-export type ColorScheme = "dark" | "light" | "acid" | "pink";
+export type ColorScheme = "dark" | "light" | "acid" | "pink" | "grey";
 
 export interface SchemeConfig {
   bg: string;

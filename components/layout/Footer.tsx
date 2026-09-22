@@ -61,7 +61,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="/">
-              <Image src="/logo.png" alt="Worship The Fumes" width={48} height={48} className="h-10 w-auto" />
+              <Image src="/clean_logo.png" alt="Worship The Fumes" width={48} height={48} className="h-10 w-auto" />
             </Link>
             <p className="mt-4 text-sm text-[#1a1a1a]/50">{BRAND.motto}</p>
           </div>
@@ -87,33 +87,6 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Signup */}
-          <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-[#1a1a1a]">
-              Join the cult
-            </h4>
-            {subscribed ? (
-              <p className="mt-4 text-sm text-[#C6FF00]">You&apos;re in. Welcome to the cult.</p>
-            ) : (
-              <form onSubmit={handleSubscribe} className="mt-4 flex gap-2">
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="you@weird.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="text-sm py-2"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#C6FF00] text-[#1a1a1a] px-4 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
-                >
-                  Sign me up
-                </button>
-              </form>
-            )}
-          </div>
         </div>
 
         {/* Bottom */}

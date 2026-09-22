@@ -7,12 +7,16 @@ import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { Button } from "@/components/common";
+import { useAuth } from "@/context/AuthContext";
+import { useBag } from "@/context/BagContext";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const { user } = useAuth();
+  const { openBag, itemCount } = useBag();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 360);
@@ -21,7 +25,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Transparent over hero on home, solid everywhere else or after scroll
   const showSolid = !isHome || scrolled;
 
   return (
@@ -34,7 +37,14 @@ export default function Navbar() {
     >
       <div className="mx-auto max-w-7xl flex items-center justify-between px-6 md:px-12 lg:px-20 h-16">
         <Link href="/">
-          <Image src="/logo.png" alt="Worship The Fumes" width={48} height={48} className="h-10 w-auto" />
+          <Image
+            id="navbar-logo"
+            src="/white_logo.png"
+            alt="Worship The Fumes"
+            width={48}
+            height={48}
+            className="h-10 w-auto text-white"
+          />
         </Link>
 
         {/* Desktop nav */}
@@ -48,8 +58,14 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Button href="/shop" className="text-xs py-2 px-5">
-            Shop the Drop
+          <Link
+            href={user ? "/profile" : "/sign-in"}
+            className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
+          >
+            {user ? "Profile" : "Sign In"}
+          </Link>
+          <Button onClick={openBag} className="text-xs py-2 px-5">
+            Cart ({itemCount})
           </Button>
         </div>
 
@@ -76,8 +92,15 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Button href="/shop" className="w-full text-xs py-2 mt-4">
-            Shop the Drop
+          <Link
+            href={user ? "/profile" : "/sign-in"}
+            onClick={() => setMobileOpen(false)}
+            className="block text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
+          >
+            {user ? "Profile" : "Sign In"}
+          </Link>
+          <Button onClick={() => { setMobileOpen(false); openBag(); }} className="w-full text-xs py-2 mt-4">
+            Cart ({itemCount})
           </Button>
         </div>
       )}

@@ -19,3 +19,9 @@ body {
   color: #1a1a1a;
   font-family: var(--font-body);
 }
+
+@keyframes march {
+  to {
+    background-position: 6px 0;
+  }
+}

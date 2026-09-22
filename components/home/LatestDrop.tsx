@@ -18,7 +18,7 @@ export default function LatestDrop() {
       <div ref={headerRef} className="text-left">
         <Tagline>The Latest Drop</Tagline>
         <SectionHeading className="mt-6">Fresh out the fumes</SectionHeading>
-        <p className="mt-6 max-w-2xl text-lg text-[#F5F5F5]/70 leading-relaxed">
+        <p className="mt-6 max-w-2xl text-lg text-black/70 leading-relaxed">
           Six new designs. Hand-drawn, numbered, and never restocked. Drop 01 is
           live — grab yours before they vanish into the fumes.
         </p>

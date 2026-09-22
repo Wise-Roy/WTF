@@ -51,19 +51,6 @@ export default function ShopPage() {
               No designs in this category yet. Stay tuned.
             </p>
           )}
-
-          {/* CTA */}
-          <div className="mt-16 text-center border border-[#1a1a1a]/10 py-16 px-6">
-            <h3 className="font-heading text-3xl md:text-4xl uppercase tracking-wider text-[#1a1a1a] font-bold">
-              Drop 02 is coming
-            </h3>
-            <p className="mt-4 text-[#1a1a1a]/50 max-w-lg mx-auto">
-              Join the cult to get early access to our next collection before it sells out.
-            </p>
-            <Button href="/#join" className="mt-8">
-              Get early access
-            </Button>
-          </div>
         </div>
       </section>
     </>

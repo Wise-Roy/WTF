@@ -102,7 +102,7 @@ export default function Hero() {
 
         {/* Main headline with rotating word */}
         <h1
-          className="mt-8 font-heading text-5xl md:text-7xl lg:text-[6rem] xl:text-[7.5rem] font-bold uppercase tracking-[0.04em] text-[#F5F5F5] leading-[1]"
+          className="mt-8 font-heading text-3xl md:text-5xl lg:text-[4rem] xl:text-[5.5rem] font-bold uppercase tracking-[0.04em] text-[#F5F5F5] leading-[1]"
           aria-label={`Worship The ${currentWord}`}
         >
           {/* Desktop: all on one line | Mobile: rotating word on second line, centered */}

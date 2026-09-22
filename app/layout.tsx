@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Anton, Space_Grotesk } from "next/font/google";
 import { Navbar, Footer } from "@/components/layout";
+import { AuthProvider } from "@/context/AuthContext";
+import { BagProvider } from "@/context/BagContext";
+import { BagDrawer } from "@/components/layout";
 import "./globals.css";
 
 const anton = Anton({
@@ -26,9 +29,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${anton.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen flex flex-col antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <BagProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <BagDrawer />
+          </BagProvider>
+        </AuthProvider>
       </body>
     </html>
   );
