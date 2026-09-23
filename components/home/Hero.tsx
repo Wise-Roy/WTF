@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import Image from "next/image";
 import { Button } from "@/components/common";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
@@ -73,18 +72,19 @@ export default function Hero() {
       ref={sectionRef}
       className="relative h-screen flex items-end justify-center pb-40 bg-[#FFF9D6] overflow-hidden"
     >
-      {/* Parallax image layer */}
+      {/* Parallax video layer */}
       <div
         ref={imageRef}
         className="absolute -inset-[15%] z-0 will-change-transform"
         style={{ transform: "translate3d(0, 0, 0) scale(1.1)" }}
       >
-        <Image
-          src="/hero_bg.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-top"
+        <video
+          src="/into.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="h-full w-full object-cover object-top"
         />
       </div>
 
@@ -134,7 +134,7 @@ export default function Hero() {
                       duration: 0.6,
                       ease: [0.22, 1, 0.36, 1],
                     },
-                    opacity: { duration: 0.35, ease: "easeInOut" },
+                    opacity: { duration: 0.25, ease: "easeInOut" },
                   }}
                 >
                   {currentWord}
@@ -150,7 +150,7 @@ export default function Hero() {
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-          <Button href="/shop">Shop the Drop</Button>
+          <Button href="/shop">Shop</Button>
           <Button href="/about" variant="secondary" className="border-[#F5F5F5]/30 text-[#F5F5F5] hover:border-[#C6FF00] hover:text-[#C6FF00]">
             Our Story
           </Button>

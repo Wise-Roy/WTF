@@ -6,3 +6,4 @@ export { default as StarRating } from "./StarRating";
 export { default as Input } from "./Input";
 export { default as ProductCard } from "./ProductCard";
 export { default as PageHeader } from "./PageHeader";
+export { default as ProductSkeleton } from "./ProductSkeleton";

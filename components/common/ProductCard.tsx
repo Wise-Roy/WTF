@@ -1,118 +1,165 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
-import { Product } from "@/types";
+import Link from "next/link";
+import { DbProduct } from "@/types";
+import { useBag } from "@/context/BagContext";
 
 interface ProductCardProps {
-  product: Product;
+  product: DbProduct;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const {
-    name,
-    price,
-    salePrice,
-    isSoldOut,
-    currency = "INR",
-    image,
-    dropLabel,
-    number,
-  } = product;
+  const { id, image, prod_name, prod_price, prod_quantity } = product;
 
-  const isOnSale = salePrice !== undefined && salePrice < price && !isSoldOut;
-  const displayPrice = isOnSale ? salePrice : price;
-  const priceStr = `₹${displayPrice.toLocaleString()}`;
-  const longPrice = priceStr.length > 5;
+  const imgLayersRef = useRef<(HTMLDivElement | null)[]>([null, null, null]);
+  const buttonsRef = useRef<HTMLDivElement>(null);
+  const priceRef = useRef<HTMLDivElement>(null);
+  const activeIdx = useRef(0);
+
+  const [tapped, setTapped] = useState(false);
+
+  const { addItem } = useBag();
+
+  const isSoldOut = prod_quantity <= 0;
+  const priceStr = `₹${prod_price.toLocaleString()}`;
+  const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+  const imgs = [
+    image?.[0] || "/eg.jpg",
+    image?.[1] || image?.[0] || "/eg.jpg",
+    image?.[2] || image?.[0] || "/eg.jpg",
+  ];
+
+  const showImage = useCallback((idx: number) => {
+    for (let i = 0; i < 3; i++) {
+      const el = imgLayersRef.current[i];
+      if (el) el.style.opacity = i === idx ? "1" : "0";
+    }
+  }, []);
+
+  const handlePointerEnter = useCallback(() => {
+    if (isTouch) return;
+    const next = (activeIdx.current + 1) % 3;
+    activeIdx.current = next;
+    showImage(next);
+    if (buttonsRef.current) {
+      buttonsRef.current.style.opacity = "1";
+      buttonsRef.current.style.pointerEvents = "auto";
+    }
+    if (priceRef.current) {
+      priceRef.current.style.transform = "rotate(-20deg) scale(1.05)";
+    }
+  }, [isTouch, showImage]);
+
+  const handlePointerLeave = useCallback(() => {
+    if (isTouch) return;
+    if (buttonsRef.current) {
+      buttonsRef.current.style.opacity = "0";
+      buttonsRef.current.style.pointerEvents = "none";
+    }
+    if (priceRef.current) {
+      priceRef.current.style.transform = "rotate(0deg) scale(1)";
+    }
+  }, [isTouch]);
+
+  const handleTap = useCallback(() => {
+    if (!isTouch || isSoldOut) return;
+    setTapped((prev) => !prev);
+  }, [isTouch, isSoldOut]);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isSoldOut) return;
+    addItem({ id, name: prod_name, price: prod_price, image: imgs[0] });
+  };
 
   return (
     <div
-      className={`group relative rounded-xl border border-black/[0.06] bg-white overflow-visible transition-all duration-200 ease-out ${
+      tabIndex={0}
+      role="article"
+      aria-label={`${prod_name}, ₹${prod_price}${isSoldOut ? ", sold out" : ""}`}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      onClick={handleTap}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleTap(); }}}
+      className={`group relative rounded-xl border border-black/[0.06] bg-white overflow-visible transition-all duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-[#C6FF00] ${
         isSoldOut
-          ? "cursor-default"
+          ? "cursor-default opacity-70"
           : "cursor-pointer hover:-translate-y-1 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_rgba(0,0,0,0.10)]"
       }`}
-      style={{
-        boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)",
-      }}
+      style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)" }}
     >
-      {/* Card inner with clipped corners */}
       <div className="rounded-xl overflow-hidden">
-        {/* TOP ZONE — Product image */}
-        <div className="relative aspect-[4/5] overflow-hidden">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            className={`object-cover object-center ${
-              isSoldOut ? "grayscale" : ""
-            }`}
-          />
-          {/* Drop number pill */}
-          <div className="absolute top-3 left-3 z-10 bg-[#DFFF1C] text-black text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-            {number}
-          </div>
+        <div className="relative aspect-[4/5] overflow-hidden select-none">
+          {imgs.map((src, i) => (
+            <div
+              key={i}
+              ref={(el) => { imgLayersRef.current[i] = el; }}
+              className="absolute inset-0 transition-opacity duration-500 ease-in-out"
+              style={{ opacity: i === 0 ? 1 : 0 }}
+            >
+              <Image
+                src={src}
+                alt={`${prod_name} — image ${i + 1}`}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                loading={i === 0 ? "eager" : "lazy"}
+                className={`object-cover object-center ${isSoldOut ? "grayscale" : ""}`}
+              />
+            </div>
+          ))}
+
+          {!isSoldOut && (
+            <div
+              ref={buttonsRef}
+              className="absolute inset-0 flex items-center justify-center gap-3 z-10 transition-opacity duration-200"
+              style={{ opacity: isTouch && tapped ? 1 : 0, pointerEvents: isTouch && tapped ? "auto" : "none" }}
+            >
+              <Link
+                href={`/get/${id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white/90 backdrop-blur-sm text-[#1a1a1a] text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-[#C6FF00] hover:text-[#1a1a1a] transition-colors"
+              >
+                View
+              </Link>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="bg-[#C6FF00] text-[#1a1a1a] text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-[#1a1a1a] hover:text-white transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
+          )}
+
+          {isSoldOut && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10">
+              <span className="text-white text-xl font-extrabold uppercase tracking-wider">Sold Out</span>
+            </div>
+          )}
         </div>
 
-        {/* PERFORATION DIVIDER */}
-        <div className="relative h-0">
-          {/* Dashed line — marching ants on hover */}
-          <div
-            className="absolute inset-x-3 top-0 h-[2px] group-hover:animate-[march_800ms_linear_infinite]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #D9D4B8 2px, transparent 2px)",
-              backgroundSize: "6px 2px",
-            }}
-          />
-          {/* Left notch */}
-          <div
-            className="absolute -left-[6px] -top-[6px] w-3 h-3 rounded-full bg-[#FBF6D9] z-10"
-          />
-          {/* Right notch */}
-          <div
-            className="absolute -right-[6px] -top-[6px] w-3 h-3 rounded-full bg-[#FBF6D9] z-10"
-          />
-        </div>
-
-        {/* BOTTOM ZONE — Stub */}
         <div className="bg-white p-5 max-sm:p-4 flex items-center justify-between gap-4">
-          {/* Left column */}
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#8A8676]">
-              {dropLabel} &middot; {number}
-            </p>
-            <h3 className="mt-1 text-xl max-sm:text-lg font-bold text-[#111] leading-[1.15] line-clamp-2">
-              {name}
+            <h3 className="text-lg max-sm:text-base font-bold text-[#111] leading-[1.15] line-clamp-2">
+              {prod_name}
             </h3>
-          </div>
-
-          {/* Right column */}
-          <div className="text-right shrink-0 min-w-[90px]">
-            {isSoldOut ? (
-              <span className="text-xl font-extrabold text-[#7A2E2E]">
-                SOLD OUT
+            {product.prod_label && (
+              <span className="inline-block mt-1 text-[10px] font-semibold uppercase tracking-widest text-[#888] bg-[#f5f5f5] px-2 py-0.5 rounded">
+                {product.prod_label}
               </span>
-            ) : (
-              <>
-                {isOnSale && (
-                  <p className="text-sm text-[#8A8676] line-through">
-                    ₹{price.toLocaleString()}
-                  </p>
-                )}
-                <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-[#8A8676]">
-                  {currency}
-                </p>
-                <p
-                  className={`font-extrabold font-mono tabular-nums leading-none ${
-                    longPrice
-                      ? "text-[26px] max-sm:text-[22px]"
-                      : "text-[32px] max-sm:text-[28px]"
-                  } ${isOnSale ? "text-[#DFFF1C]" : "text-[#111]"}`}
-                >
-                  {priceStr}
-                </p>
-              </>
             )}
+          </div>
+          <div
+            ref={priceRef}
+            className="shrink-0 bg-[#C6FF00] rounded-full px-4 py-2 transition-transform duration-500 ease-in-out"
+          >
+            <p className="font-extrabold font-mono tabular-nums leading-none text-[22px] max-sm:text-[18px] text-[#111]">
+              {priceStr}
+            </p>
           </div>
         </div>
       </div>

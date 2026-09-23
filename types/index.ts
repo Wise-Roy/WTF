@@ -46,3 +46,17 @@ export interface SchemeConfig {
   accent: string;
   border: string;
 }
+
+/** Database product — matches the `products` table */
+export interface DbProduct {
+  id: string;
+  image: string[];          // exactly 3 URLs
+  prod_name: string;
+  prod_price: number;
+  prod_quantity: number;
+  prod_description: string;
+  prod_label: string;
+  prod_rank: number;
+  created_at: string;
+  updated_at: string;
+}
