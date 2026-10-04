@@ -25,3 +25,72 @@ body {
     background-position: 6px 0;
   }
 }
+
+.star-cursor-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.star-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 18px;
+  line-height: 1;
+  color: #FFC94D;
+  text-shadow:
+    0 0 6px rgba(255, 201, 77, 0.8),
+    0 0 14px rgba(255, 201, 77, 0.4),
+    0 0 24px rgba(255, 201, 77, 0.15);
+  opacity: 0;
+  will-change: transform;
+  transition: opacity 0.15s ease;
+}
+
+/* Hide native cursor globally — navbar is an exception */
+html,
+html *,
+html *::before,
+html *::after {
+  cursor: none !important;
+}
+
+nav,
+nav *,
+nav *::before,
+nav *::after {
+  cursor: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html *,
+  html *::before,
+  html *::after {
+    cursor: auto !important;
+  }
+  .star-cursor-canvas,
+  .star-cursor {
+    display: none !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  html,
+  html *,
+  html *::before,
+  html *::after {
+    cursor: auto !important;
+  }
+  .star-cursor-canvas,
+  .star-cursor {
+    display: none !important;
+  }
+}

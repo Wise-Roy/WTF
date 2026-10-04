@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -156,7 +157,13 @@ function SignInContent() {
 
 export default function SignInPage() {
   return (
-    <section className="min-h-screen bg-[#FFF9D6] flex items-center justify-center px-4 py-24">
+    <section className="relative min-h-screen bg-[#FFF9D6] flex items-center justify-center px-4 py-24 overflow-hidden">
+      <div
+        className="absolute pointer-events-none select-none opacity-[0.07]"
+        style={{ top: "-55%", right: "-15%", width: "500px", height: "500px", transform: "rotate(-15deg)" }}
+      >
+        <Image src="/clean_logo.png" alt="" fill className="object-contain" aria-hidden="true" />
+      </div>
       <Suspense
         fallback={
           <p className="text-sm uppercase tracking-wider text-[#1a1a1a]/50 animate-pulse">

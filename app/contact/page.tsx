@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PageHeader, SectionWrapper, Input, Button } from "@/components/common";
+import Image from "next/image";
+import { SectionWrapper, Input, Button, Tagline, SectionHeading } from "@/components/common";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -25,11 +26,36 @@ export default function ContactPage() {
 
   return (
     <>
-      <PageHeader
-        tagline="Get in touch"
-        heading="Contact us"
-        description="Got a question, collab idea, or just want to talk weird? We're listening."
-      />
+      {/* Header with peeking WTF logo */}
+      <div className="relative bg-[#FFF9D6] text-[#1a1a1a] pt-32 pb-20 px-6 md:px-12 lg:px-20 overflow-hidden">
+        {/* Big tilted WTF logo — only ~25% visible, rest hidden behind top-right corner */}
+        <div
+          className="absolute pointer-events-none select-none opacity-[0.07]"
+          style={{
+            top: "-55%",
+            right: "-15%",
+            width: "500px",
+            height: "500px",
+            transform: "rotate(-15deg)",
+          }}
+        >
+          <Image
+            src="/clean_logo.png"
+            alt=""
+            fill
+            className="object-contain"
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className="mx-auto max-w-7xl relative z-10">
+          <Tagline>Get in touch</Tagline>
+          <SectionHeading className="mt-6">Contact us</SectionHeading>
+          <p className="mt-6 max-w-2xl text-lg text-[#1a1a1a]/70">
+            Got a question, collab idea, or just want to talk weird? We&apos;re listening.
+          </p>
+        </div>
+      </div>
 
       <SectionWrapper scheme="dark">
         <div className="max-w-2xl mx-auto">
@@ -38,7 +64,7 @@ export default function ContactPage() {
               <h3 className="font-heading text-3xl uppercase tracking-wider text-[#C6FF00] font-bold">
                 Message sent.
               </h3>
-              <p className="mt-4 text-[#F5F5F5]/70">
+              <p className="mt-4 text-[#1a1a1a]/70">
                 We&apos;ll get back to you faster than a drop sells out.
               </p>
               <Button
@@ -55,7 +81,7 @@ export default function ContactPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold uppercase tracking-wider text-[#F5F5F5] mb-2">
+                <label className="block text-sm font-bold uppercase tracking-wider text-[#1a1a1a] mb-2">
                   Name
                 </label>
                 <Input
@@ -64,10 +90,11 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
+                  className="!text-[#1a1a1a] !border-[#1a1a1a]/20 !placeholder:text-[#1a1a1a]/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold uppercase tracking-wider text-[#F5F5F5] mb-2">
+                <label className="block text-sm font-bold uppercase tracking-wider text-[#1a1a1a] mb-2">
                   Email
                 </label>
                 <Input
@@ -77,10 +104,11 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  className="!text-[#1a1a1a] !border-[#1a1a1a]/20 !placeholder:text-[#1a1a1a]/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold uppercase tracking-wider text-[#F5F5F5] mb-2">
+                <label className="block text-sm font-bold uppercase tracking-wider text-[#1a1a1a] mb-2">
                   Message
                 </label>
                 <textarea
@@ -90,7 +118,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   required
                   rows={6}
-                  className="w-full border border-white/20 bg-transparent px-4 py-3 text-base text-white placeholder:text-white/50 outline-none focus:border-[#C6FF00] transition-colors resize-none"
+                  className="w-full border border-[#1a1a1a]/20 bg-transparent px-4 py-3 text-base text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 outline-none focus:border-[#C6FF00] transition-colors resize-none"
                 />
               </div>
               <Button type="submit" className="w-full">

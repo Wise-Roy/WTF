@@ -4,6 +4,7 @@ import { Navbar, Footer } from "@/components/layout";
 import { AuthProvider } from "@/context/AuthContext";
 import { BagProvider } from "@/context/BagContext";
 import { BagDrawer } from "@/components/layout";
+import { StarCursorEffect } from "@/components/effects";
 import "./globals.css";
 
 const anton = Anton({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${anton.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen flex flex-col antialiased">
+        <StarCursorEffect />
         <AuthProvider>
           <BagProvider>
             <Navbar />

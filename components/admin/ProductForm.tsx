@@ -132,7 +132,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       return;
     }
 
-    router.push("/admin/products");
+    router.push("/admin");
   };
 
   const inputClass =
@@ -262,7 +262,7 @@ export default function ProductForm({ product }: ProductFormProps) {
         </button>
         <button
           type="button"
-          onClick={() => router.push("/admin/products")}
+          onClick={() => router.push("/admin")}
           className="border border-white/20 text-white/60 px-8 py-3 text-sm uppercase tracking-wider rounded hover:border-white/40 transition"
         >
           Cancel

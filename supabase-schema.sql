@@ -103,3 +103,31 @@ BEGIN
     AND (exclude_id IS NULL OR id != exclude_id);
 END;
 $$ LANGUAGE plpgsql;
+
+-- About sections (max 3, admin-controlled)
+CREATE TABLE IF NOT EXISTS about_sections (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  position integer NOT NULL CHECK (position >= 1 AND position <= 3) UNIQUE,
+  tagline text NOT NULL DEFAULT 'Our Story',
+  heading text NOT NULL DEFAULT '',
+  body text NOT NULL DEFAULT '',
+  images jsonb NOT NULL DEFAULT '[]',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE about_sections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all on about_sections" ON about_sections FOR ALL USING (true) WITH CHECK (true);
+
+-- Hero settings (single row for hero video)
+CREATE TABLE IF NOT EXISTS hero_settings (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  video_url text NOT NULL DEFAULT '/into.mp4',
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE hero_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all on hero_settings" ON hero_settings FOR ALL USING (true) WITH CHECK (true);
+
+-- Seed default hero row
+INSERT INTO hero_settings (video_url) VALUES ('/into.mp4') ON CONFLICT DO NOTHING;

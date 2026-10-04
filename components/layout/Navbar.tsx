@@ -44,6 +44,9 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Hide navbar on admin routes
+  if (pathname.startsWith("/admin")) return null;
+
   const showSolid = !isHome || scrolled;
 
   const openMega = () => {

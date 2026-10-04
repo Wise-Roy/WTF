@@ -14,6 +14,17 @@ export default function Hero() {
   const prefersReducedMotion = useReducedMotion();
 
   const [wordIndex, setWordIndex] = useState(0);
+  const [videoUrl, setVideoUrl] = useState("/into.mp4");
+
+  // Fetch hero video URL
+  useEffect(() => {
+    fetch("/api/hero")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data?.video_url) setVideoUrl(d.data.video_url);
+      })
+      .catch(() => {});
+  }, []);
 
   // Rotate words
   useEffect(() => {
@@ -79,7 +90,8 @@ export default function Hero() {
         style={{ transform: "translate3d(0, 0, 0) scale(1.1)" }}
       >
         <video
-          src="/into.mp4"
+          key={videoUrl}
+          src={videoUrl}
           autoPlay
           loop
           muted

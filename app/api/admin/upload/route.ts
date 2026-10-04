@@ -6,9 +6,14 @@ import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
-const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif"];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+const ALLOWED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif"];
+const ALLOWED_VIDEO_EXTENSIONS = [".mp4", ".webm"];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
+const ALLOWED_EXTENSIONS = [...ALLOWED_IMAGE_EXTENSIONS, ...ALLOWED_VIDEO_EXTENSIONS];
 
 export async function POST(req: NextRequest) {
   if (!(await isAdmin())) {
@@ -25,7 +30,7 @@ export async function POST(req: NextRequest) {
   // Validate type
   if (!ALLOWED_TYPES.includes(file.type)) {
     return NextResponse.json(
-      { success: false, message: `Invalid file type. Allowed: JPG, PNG, WebP, AVIF, GIF` },
+      { success: false, message: `Invalid file type. Allowed: JPG, PNG, WebP, AVIF, GIF, MP4, WebM` },
       { status: 400 }
     );
   }
@@ -39,16 +44,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Determine if video or image
+  const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
+  const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
+
   // Validate size
-  if (file.size > MAX_SIZE) {
+  if (file.size > maxSize) {
     return NextResponse.json(
-      { success: false, message: "File too large. Maximum size is 10 MB" },
+      { success: false, message: `File too large. Maximum size is ${isVideo ? "100" : "10"} MB` },
       { status: 400 }
     );
   }
 
-  // Save to public/products/
-  const uploadDir = path.join(process.cwd(), "public", "products");
+  // Save to appropriate directory
+  const subDir = isVideo ? "videos" : "products";
+  const uploadDir = path.join(process.cwd(), "public", subDir);
   await mkdir(uploadDir, { recursive: true });
 
   const uniqueName = `${crypto.randomUUID()}${ext}`;
@@ -57,7 +67,7 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(filePath, buffer);
 
-  const url = `/products/${uniqueName}`;
+  const url = `/${subDir}/${uniqueName}`;
 
   return NextResponse.json({ success: true, data: { url } });
 }

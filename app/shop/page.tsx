@@ -2,7 +2,8 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { PageHeader, ProductCard, ProductSkeleton } from "@/components/common";
+import Image from "next/image";
+import { PageHeader, ProductCard, ProductSkeleton, Tagline, SectionHeading } from "@/components/common";
 import { DbProduct } from "@/types";
 
 function useFetchProducts(label: string) {
@@ -106,11 +107,21 @@ function ShopContent() {
 export default function ShopPage() {
   return (
     <>
-      <PageHeader
-        tagline="The Collection"
-        heading="Shop the drop"
-        description="Every piece is numbered, limited, and never restocked. Once it's gone, it's gone."
-      />
+      <div className="relative bg-[#FFF9D6] text-[#1a1a1a] pt-32 pb-20 px-6 md:px-12 lg:px-20 overflow-hidden">
+        <div
+          className="absolute pointer-events-none select-none opacity-[0.07]"
+          style={{ top: "-55%", right: "-15%", width: "500px", height: "500px", transform: "rotate(-15deg)" }}
+        >
+          <Image src="/clean_logo.png" alt="" fill className="object-contain" aria-hidden="true" />
+        </div>
+        <div className="mx-auto max-w-7xl relative z-10">
+          <Tagline>The Collection</Tagline>
+          <SectionHeading className="mt-6">Shop the drop</SectionHeading>
+          <p className="mt-6 max-w-2xl text-lg text-[#1a1a1a]/70">
+            Every piece is numbered, limited, and never restocked. Once it&apos;s gone, it&apos;s gone.
+          </p>
+        </div>
+      </div>
       <Suspense
         fallback={
           <section className="bg-[#FFF9D6] px-6 md:px-12 lg:px-20 pb-24">
