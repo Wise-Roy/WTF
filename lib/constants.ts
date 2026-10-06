@@ -1,11 +1,11 @@
 import { NavLink, Product, Review, ValueProp, FooterColumn, SchemeConfig, ColorScheme } from "@/types";
 
 export const BRAND = {
-  name: "Worship The Fumes",
+  name: "Wxrship The Fumes",
   shortName: "WTF",
   motto: "Weird is a choice.",
-  email: "hello@worshipthefumes.com",
-  copyright: "2026 Worship The Fumes. Weird is a choice.",
+  email: "hello@wxrshipthefumes.com",
+  copyright: "2026 Wxrship The Fumes. Weird is a choice.",
 } as const;
 
 export const COLORS = {
@@ -104,17 +104,17 @@ export const REVIEWS: Review[] = [
 export const VALUE_PROPS: ValueProp[] = [
   {
     icon: "Flame",
-    title: "Limited drops",
+    title: "Slow Fashion",
     description: "Every piece is part of a numbered drop. When it's gone, it's gone. No restocks, no regrets.",
   },
   {
     icon: "Brush",
-    title: "Original art",
+    title: "One of a Kind",
     description: "Every design is original — drawn, not templated. You won't see this anywhere else.",
   },
   {
     icon: "Users",
-    title: "A cult, not a customer base",
+    title: "Cult, not Customer",
     description: "We don't have customers. We have believers. Join the movement or watch from the outside.",
   },
 ];

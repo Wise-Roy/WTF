@@ -48,6 +48,8 @@ export default function MarqueeBand() {
     .map(() => TEXT)
     .join(SEPARATOR);
 
+  const fullStrip = `${SEPARATOR}${repeatedText}`;
+
   return (
     <div
       ref={bandRef}
@@ -56,9 +58,11 @@ export default function MarqueeBand() {
       <div
         ref={innerRef}
         className="whitespace-nowrap will-change-transform font-heading text-2xl md:text-3xl uppercase tracking-[0.12em] text-[#1a1a1a] select-none"
-        style={{ transform: "translate3d(0, 0, 0)" }}
+        style={{ transform: "translate3d(0, 0, 0)", marginLeft: "-50%" }}
       >
-        {repeatedText}
+        {fullStrip}
+        {fullStrip}
+        {fullStrip}
       </div>
     </div>
   );

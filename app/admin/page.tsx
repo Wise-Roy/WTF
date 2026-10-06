@@ -3,16 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Film, Users } from "lucide-react";
+import { Package, FileText, Film, Users, Globe } from "lucide-react";
 import { DbProduct } from "@/types";
 
-type Tab = "products" | "about" | "hero" | "users";
+type Tab = "products" | "about" | "hero" | "users" | "footer";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
   { key: "about", label: "About Us", icon: FileText },
   { key: "hero", label: "Hero", icon: Film },
   { key: "users", label: "Users", icon: Users },
+  { key: "footer", label: "Footer", icon: Globe },
 ];
 
 /* ─────────────── PRODUCTS TAB ─────────────── */
@@ -731,6 +732,97 @@ function UsersPanel() {
   );
 }
 
+/* ─────────────── FOOTER TAB ─────────────── */
+function FooterPanel() {
+  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "" });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/footer")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data?.footer) setLinks(d.data.footer);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/footer", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(links),
+      });
+      if (res.ok) showToast("Footer links saved");
+      else showToast("Save failed");
+    } catch {
+      showToast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const fields = [
+    { key: "instagram" as const, label: "Instagram", placeholder: "https://instagram.com/yourpage" },
+    { key: "twitter" as const, label: "Twitter / X", placeholder: "https://x.com/yourhandle" },
+    { key: "spotify" as const, label: "Spotify", placeholder: "https://open.spotify.com/artist/..." },
+    { key: "facebook" as const, label: "Facebook", placeholder: "https://facebook.com/yourpage" },
+  ];
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-xl font-bold">Footer Social Links</h2>
+        <button
+          onClick={handleSave}
+          disabled={saving || loading}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save"}
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-12 bg-white/5 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-6 max-w-lg">
+          {fields.map((f) => (
+            <div key={f.key}>
+              <label className="block text-sm font-medium text-white/60 mb-2">{f.label}</label>
+              <input
+                type="url"
+                value={links[f.key]}
+                onChange={(e) => setLinks((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                placeholder={f.placeholder}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#C6FF00]/50 transition-colors"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────── MAIN ADMIN PAGE ─────────────── */
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("products");
@@ -767,6 +859,7 @@ export default function AdminPage() {
         {activeTab === "about" && <AboutPanel />}
         {activeTab === "hero" && <HeroPanel />}
         {activeTab === "users" && <UsersPanel />}
+        {activeTab === "footer" && <FooterPanel />}
       </main>
     </div>
   );

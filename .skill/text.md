@@ -1,10 +1,10 @@
-Update the homepage hero section of the **Worship the Fumes** website with a bold, immersive typography animation.
+Update the homepage hero section of the **Wxrship the Fumes** website with a bold, immersive typography animation.
 
 ### Hero Text
 
 Display the main headline as:
 
-**WORSHIP THE [FUMES]**
+**WxRSHIP THE [FUMES]**
 
 The word inside the brackets should be an animated rotating word sequence:
 
@@ -14,7 +14,7 @@ The words should continuously transition one after another using a **vertical sl
 
 ### Animation Behavior
 
-* Keep **“WORSHIP THE”** completely static.
+* Keep **“WxRSHIP THE”** completely static.
 * Only the final word should animate.
 * The changing word should slide **upward and out of view**.
 * Simultaneously, the next word should enter **from below**.
@@ -78,16 +78,16 @@ The animation must:
 
 The final result should feel like the phrase itself is continuously evolving:
 
-**WORSHIP THE FUMES**
+**WxRSHIP THE FUMES**
 ↓
-**WORSHIP THE NOISE**
+**WxRSHIP THE NOISE**
 ↓
-**WORSHIP THE CHAOS**
+**WxRSHIP THE CHAOS**
 ↓
-**WORSHIP THE RHYTHM**
+**WxRSHIP THE RHYTHM**
 ↓
-**WORSHIP THE ENERGY**
+**WxRSHIP THE ENERGY**
 ↓
-**WORSHIP THE VIBE**
+**WxRSHIP THE VIBE**
 
 The transition should feel like a **physical vertical displacement of typography**, integrated into the overall parallax experience rather than a simple text-changing animation.

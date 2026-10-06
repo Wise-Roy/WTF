@@ -9,21 +9,22 @@ import { Button } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
 import { useBag } from "@/context/BagContext";
 
-const NAV_ITEMS = ["Shop", "About", "Contact", "Profile"] as const;
+const NAV_ITEMS = ["Shop", "About", "Contact", "More"] as const;
+
 
 const DROPDOWN: Record<string, { label: string; href: string }[]> = {
   Shop: [
     { label: "Collections", href: "/shop?view=collections" },
-    { label: "Products", href: "/shop" },
+    { label: "All Silhouettes", href: "/shop" },
   ],
   About: [
-    { label: "Artists", href: "/about#artists" },
+    { label: "Designs", href: "/about#artists" },
+    { label: "Designers", href: "/about#artists" },
+    { label: "Musicians", href: "/about#artists" },
   ],
   Contact: [
     { label: "Contact", href: "/contact" },
-    { label: "FAQ", href: "#faq" },
   ],
-  Profile: [], // dynamic, filled at render
 };
 
 export default function Navbar() {
@@ -58,12 +59,21 @@ export default function Navbar() {
     megaTimeout.current = setTimeout(() => setMegaOpen(false), 150);
   };
 
-  const profileLinks = user
-    ? [{ label: "Profile", href: "/profile" }]
-    : [
-        { label: "Sign In", href: "/sign-in" },
-        { label: "Sign Up", href: "/sign-up" },
-      ];
+  const moreLinks = [
+    ...(user
+      ? [{ label: "Profile", href: "/profile" }]
+      : [
+          { label: "Sign In", href: "/sign-in" },
+          { label: "Sign Up", href: "/sign-up" },
+        ]),
+    { label: "FAQ", href: "/faq" },
+    { label: "Sizing", href: "/sizing" },
+  ];
+
+  const getDropdownLinks = (item: string) => {
+    if (item === "More") return moreLinks;
+    return DROPDOWN[item] ?? [];
+  };
 
   return (
     <nav
@@ -73,12 +83,16 @@ export default function Navbar() {
           : "bg-transparent border-b border-transparent"
       }`}
     >
+      <style>{`
+        nav, nav * { cursor: auto !important; }
+        nav a, nav button, nav span { cursor: pointer !important; }
+      `}</style>
       <div className="mx-auto max-w-7xl flex items-center justify-between px-6 md:px-12 lg:px-20 h-16">
         <Link href="/">
           <Image
             id="navbar-logo"
             src="/white_logo.png"
-            alt="Worship The Fumes"
+            alt="Wxrship The Fumes"
             width={48}
             height={48}
             className="h-10 w-auto text-white"
@@ -94,7 +108,7 @@ export default function Navbar() {
             {NAV_ITEMS.map((item) => (
               <span
                 key={item}
-                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors cursor-pointer"
+                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
               >
                 {item}
               </span>
@@ -104,68 +118,27 @@ export default function Navbar() {
               Cart ({itemCount})
             </Button>
 
-            {/* Mega dropdown — full width of nav + cart */}
+            {/* Mega dropdown — columns aligned under nav links */}
             {megaOpen && (
-              <div className="absolute top-full left-0 right-0 mt-3 bg-black/40 backdrop-blur-md rounded-lg shadow-lg py-5 grid grid-cols-4 divide-x divide-white/20">
-                {/* Shop */}
-                <ul className="px-4 space-y-2">
-                  {DROPDOWN.Shop.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setMegaOpen(false)}
-                        className="text-sm text-white/80 hover:text-[#C6FF00] transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* About */}
-                <ul className="px-4 space-y-2">
-                  {DROPDOWN.About.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setMegaOpen(false)}
-                        className="text-sm text-white/80 hover:text-[#C6FF00] transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Contact */}
-                <ul className="px-4 space-y-2">
-                  {DROPDOWN.Contact.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setMegaOpen(false)}
-                        className="text-sm text-white/80 hover:text-[#C6FF00] transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Profile */}
-                <ul className="px-4 space-y-2">
-                  {profileLinks.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setMegaOpen(false)}
-                        className="text-sm text-white/80 hover:text-[#C6FF00] transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+              <div className="absolute top-full -left-2 right-0 mt-3 bg-[#C6FF00]/60 text-[#1a1a1a] backdrop-blur-md rounded-lg shadow-lg py-5 grid grid-cols-4 divide-x divide-white/20">
+                {NAV_ITEMS.map((item) => {
+                  const links = getDropdownLinks(item);
+                  return (
+                    <ul key={item} className="px-4 space-y-2">
+                      {links.map((link) => (
+                        <li key={link.href}>
+                          <Link
+                            href={link.href}
+                            onClick={() => setMegaOpen(false)}
+                            className="text-sm cursor-pointer hover:text-black transition-colors"
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })}
               </div>
             )}
         </div>
@@ -185,8 +158,8 @@ export default function Navbar() {
         <div className={`md:hidden border-t border-white/10 px-6 py-6 space-y-5 transition-colors duration-300 ${
           showSolid ? "bg-[#DF2877]" : "bg-black/40 backdrop-blur-md"
         }`}>
-          {(["Shop", "About", "Contact", "Profile"] as const).map((section) => {
-            const links = section === "Profile" ? profileLinks : DROPDOWN[section];
+          {(["Shop", "About", "Contact", "More"] as const).map((section) => {
+            const links = getDropdownLinks(section);
             const isOpen = mobileSection === section;
             return (
               <div key={section}>

@@ -2,7 +2,7 @@ edesign the product card component on the shop grid to a "ticket-stub" style.
 Reference image: https://static.prod-images.emergentagent.com/jobs/e66d0fa9-c135-47ae-8591-e297e0c39d93/images/d3c18c93c66f3be16e4f849c15416b94ff9e846c45977b0750b067554427de39.jpeg
 
 CONTEXT
-- Brand: "WTF — Worship The Fumes", Gen-Z streetwear drop brand.
+- Brand: "WTF — Wxrship The Fumes", Gen-Z streetwear drop brand.
 - Page background is cream (#FBF6D9).
 - Existing CTA accent color is neon yellow-green (#DFFF1C).
 - Cards render in a responsive grid (3 cols desktop, 2 tablet, 1 mobile).

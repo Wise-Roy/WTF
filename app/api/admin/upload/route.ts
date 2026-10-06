@@ -6,7 +6,7 @@ import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20 MB
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm"];
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   // Validate size
   if (file.size > maxSize) {
     return NextResponse.json(
-      { success: false, message: `File too large. Maximum size is ${isVideo ? "100" : "10"} MB` },
+      { success: false, message: `File too large. Maximum size is ${isVideo ? "100" : "20"} MB` },
       { status: 400 }
     );
   }

@@ -115,11 +115,11 @@ export default function Hero() {
         {/* Main headline with rotating word */}
         <h1
           className="mt-8 font-heading text-3xl md:text-5xl lg:text-[4rem] xl:text-[5.5rem] font-bold uppercase tracking-[0.04em] text-[#F5F5F5] leading-[1]"
-          aria-label={`Worship The ${currentWord}`}
+          aria-label={`Wxrship The ${currentWord}`}
         >
           {/* Desktop: all on one line | Mobile: rotating word on second line, centered */}
           <span className="flex flex-col items-center md:flex-row md:justify-center md:gap-[0.3em]">
-            <span className="whitespace-nowrap">WORSHIP THE</span>
+            <span className="whitespace-nowrap">WXRSHIP THE</span>
             <span
               className="relative inline-flex justify-center overflow-hidden translate-y-[0.08em]"
               style={{ height: "1.15em", width: "7.5ch" }}
@@ -157,14 +157,14 @@ export default function Hero() {
         </h1>
 
         <p className="mt-6 font-body text-base md:text-lg text-[#F5F5F5]/70 max-w-[55ch] leading-normal">
-          Worship The Fumes is streetwear for the ones who chose to stand out.
+          Wxrship The Fumes is streetwear for the ones who chose to stand out.
           Limited drops. Original art. No restocks. Join the cult or stay normal.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-          <Button href="/shop">Shop</Button>
+          <Button href="/shop">Fumes</Button>
           <Button href="/about" variant="secondary" className="border-[#F5F5F5]/30 text-[#F5F5F5] hover:border-[#C6FF00] hover:text-[#C6FF00]">
-            Our Story
+            Designers
           </Button>
         </div>
       </div>

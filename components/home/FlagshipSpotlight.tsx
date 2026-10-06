@@ -12,7 +12,7 @@ export default function FlagshipSpotlight() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Content — left, vertically centered */}
         <div>
-          <Tagline className="bg-[#1a1a1a] text-black">Flagship Drop</Tagline>
+          <Tagline className="bg-[#1a1a1a] text-black">Main Character</Tagline>
           <h2 className="mt-6 font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-[0.08em] leading-[0.95]">
             The &ldquo;Rat King&rdquo; hoodie
           </h2>

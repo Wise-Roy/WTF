@@ -62,12 +62,6 @@ html *::after {
   cursor: none !important;
 }
 
-nav,
-nav *,
-nav *::before,
-nav *::after {
-  cursor: auto !important;
-}
 
 @media (prefers-reduced-motion: reduce) {
   html,

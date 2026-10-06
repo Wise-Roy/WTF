@@ -115,7 +115,6 @@ export function useStarCursor(enabled: boolean) {
     const onMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
 
-      // Check if cursor is over the navbar
       const target = e.target as HTMLElement;
       const isOverNav = !!target.closest("nav");
 
@@ -132,12 +131,10 @@ export function useStarCursor(enabled: boolean) {
           if (cursorRef.current) cursorRef.current.style.opacity = "1";
         }
 
-        // Update cursor position directly
         if (cursorRef.current) {
           cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
         }
 
-        // Spawn particles based on distance traveled
         const dx = e.clientX - lastPosRef.current.x;
         const dy = e.clientY - lastPosRef.current.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -149,7 +146,6 @@ export function useStarCursor(enabled: boolean) {
           lastPosRef.current = { x: e.clientX, y: e.clientY };
         }
       } else {
-        // Keep position updated so cursor doesn't jump when leaving nav
         if (cursorRef.current) {
           cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
         }

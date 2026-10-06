@@ -26,7 +26,7 @@ export default function CultSpeaks() {
   return (
     <SectionWrapper scheme="dark">
       <div className="text-center">
-        <Tagline>The Cult Speaks</Tagline>
+        <Tagline>From Our Cult</Tagline>
         <SectionHeading className="mt-6">
           Don&apos;t take our word for it
         </SectionHeading>

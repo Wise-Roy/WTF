@@ -1,4 +1,4 @@
-Build a multi-page streetwear ecommerce website for "Worship The Fumes"
+Build a multi-page streetwear ecommerce website for "Wxrship The Fumes"
 (WTF), a GenZ direct-to-consumer clothing brand. Site-wide motto and voice:
 "Weird is a choice." Voice is bold, confident, anti-mainstream, playful —
 never corporate. Design should feel edgy, high-impact and unmistakable.
@@ -76,7 +76,7 @@ acid (flagship) → dark (cult) → pink (CTA/join).
 - Footer: grouped menu + signup, dark. Columns "Shop" (Shop the Drop,
   FAQ) and "Company" (About, Contact). Signup "Join the cult" /
   "Sign me up", email field. Socials Instagram, TikTok, X, YouTube.
-  Contact hello@worshipthefumes.com. Copyright "© 2026 Worship The Fumes.
+  Contact hello@wxrshipthefumes.com. Copyright "© 2026 Wxrship The Fumes.
   Weird is a choice."
 
 ## Imagery

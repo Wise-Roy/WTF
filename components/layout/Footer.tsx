@@ -1,19 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { BRAND, FOOTER_COLUMNS } from "@/lib/constants";
-import { Input } from "@/components/common";
-
-function TikTokIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-    </svg>
-  );
-}
 
 function InstagramIcon({ size = 20 }: { size?: number }) {
   return (
@@ -21,15 +12,6 @@ function InstagramIcon({ size = 20 }: { size?: number }) {
       <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
       <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-    </svg>
-  );
-}
-
-function YouTubeIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
-      <path d="m10 15 5-3-5-3z" />
     </svg>
   );
 }
@@ -43,76 +25,125 @@ function XIcon({ size = 20 }: { size?: number }) {
   );
 }
 
+function SpotifyIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+    </svg>
+  );
+}
+
+function FacebookIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
+interface SocialLinks {
+  instagram: string;
+  twitter: string;
+  spotify: string;
+  facebook: string;
+}
+
 export default function Footer() {
   const pathname = usePathname();
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({
+    instagram: "",
+    twitter: "",
+    spotify: "",
+    facebook: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/footer")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data?.footer) setSocialLinks(d.data.footer);
+      })
+      .catch(() => {});
+  }, []);
 
   if (pathname.startsWith("/admin")) return null;
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail("");
-    }
-  };
+  const socials = [
+    { key: "instagram", icon: InstagramIcon, label: "Instagram", hoverColor: "hover:text-[#E1306C]", link: socialLinks.instagram },
+    { key: "twitter", icon: XIcon, label: "Twitter", hoverColor: "hover:text-[#000000]", link: socialLinks.twitter },
+    { key: "spotify", icon: SpotifyIcon, label: "Spotify", hoverColor: "hover:text-[#1DB954]", link: socialLinks.spotify },
+    { key: "facebook", icon: FacebookIcon, label: "Facebook", hoverColor: "hover:text-[#1877F2]", link: socialLinks.facebook },
+  ];
 
   return (
-    <footer className="bg-[#FFF9D6] border-t border-[#1a1a1a]/10 py-16 px-6 md:px-12 lg:px-20">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Brand */}
-          <div>
-            <Link href="/">
-              <Image src="/clean_logo.png" alt="Worship The Fumes" width={48} height={48} className="h-10 w-auto" />
-            </Link>
-            <p className="mt-4 text-sm text-[#1a1a1a]/50">{BRAND.motto}</p>
-          </div>
-
-          {/* Link columns */}
-          {FOOTER_COLUMNS.map((col) => (
-            <div key={col.title}>
-              <h4 className="text-sm font-bold uppercase tracking-wider text-[#1a1a1a]">
-                {col.title}
-              </h4>
-              <ul className="mt-4 space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+    <footer>
+      {/* Top section */}
+      <div className="bg-[#FFF9D6] border-t border-[#1a1a1a]/10 py-16 px-6 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            {/* Brand */}
+            <div>
+              <Link href="/">
+                <Image src="/clean_logo.png" alt="Wxrship The Fumes" width={80} height={80} className="h-16 w-auto" />
+              </Link>
+              <p className="mt-4 text-sm text-[#1a1a1a]/50">{BRAND.motto}</p>
             </div>
-          ))}
 
-        </div>
-
-        {/* Bottom */}
-        <div className="mt-12 pt-8 border-t border-[#1a1a1a]/10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="Instagram">
-              <InstagramIcon size={20} />
-            </a>
-            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="TikTok">
-              <TikTokIcon size={20} />
-            </a>
-            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="X">
-              <XIcon size={20} />
-            </a>
-            <a href="#" className="text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors" aria-label="YouTube">
-              <YouTubeIcon size={20} />
-            </a>
+            {/* Link columns */}
+            {FOOTER_COLUMNS.map((col) => (
+              <div key={col.title}>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-[#1a1a1a]">
+                  {col.title}
+                </h4>
+                <ul className="mt-4 space-y-3">
+                  {col.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-          <a href={`mailto:${BRAND.email}`} className="text-sm text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors">
+        </div>
+      </div>
+
+      {/* Bottom section */}
+      <div className="bg-[#C6FF00] px-6 md:px-12 lg:px-20 py-6">
+        <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            {socials.map((s) => {
+              const Icon = s.icon;
+              if (!s.link) {
+                return (
+                  <span key={s.key} className="text-[#1a1a1a] hover:scale-110 transition-all duration-200" aria-label={s.label}>
+                    <Icon size={20} />
+                  </span>
+                );
+              }
+              return (
+                <a
+                  key={s.key}
+                  href={s.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`text-[#1a1a1a] ${s.hoverColor} hover:scale-110 transition-all duration-200`}
+                  aria-label={s.label}
+                >
+                  <Icon size={20} />
+                </a>
+              );
+            })}
+          </div>
+          <a href={`mailto:${BRAND.email}`} className="text-sm text-[#1a1a1a] hover:text-[#1a1a1a]/70 transition-colors">
             {BRAND.email}
           </a>
-          <p className="text-sm text-[#1a1a1a]/30">&copy; {BRAND.copyright}</p>
+          <p className="text-sm text-[#1a1a1a]/60">&copy; {BRAND.copyright}</p>
         </div>
       </div>
     </footer>

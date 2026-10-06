@@ -42,7 +42,7 @@ const FALLBACK_SECTIONS: AboutSection[] = [
     position: 1,
     tagline: "Our Story",
     heading: "Born in the back of a garage",
-    body: "Worship The Fumes started in 2026 with a marker, a blank hoodie, and zero intention of playing it safe. No business plan, no investors \u2014 just a belief that streetwear had lost its edge and someone needed to bring the weird back. Every design since has been hand-drawn, limited-run, and numbered. We don\u2019t do restocks because scarcity is part of the art. When you wear WTF, you\u2019re not wearing a logo \u2014 you\u2019re wearing a statement.",
+    body: "Wxrship The Fumes started in 2026 with a marker, a blank hoodie, and zero intention of playing it safe. No business plan, no investors \u2014 just a belief that streetwear had lost its edge and someone needed to bring the weird back. Every design since has been hand-drawn, limited-run, and numbered. We don\u2019t do restocks because scarcity is part of the art. When you wear WTF, you\u2019re not wearing a logo \u2014 you\u2019re wearing a statement.",
     images: ["/eg.jpg"],
   },
 ];
@@ -176,7 +176,7 @@ export default function AboutPage() {
             Weird is a choice.
           </h1>
           <p className="mt-8 font-body text-lg md:text-xl text-[#1a1a1a]/70 leading-relaxed max-w-2xl mx-auto">
-            Worship The Fumes exists for the ones who&apos;d rather be themselves
+            Wxrship The Fumes exists for the ones who&apos;d rather be themselves
             than be liked. This is our story.
           </p>
         </div>

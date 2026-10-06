@@ -18,7 +18,7 @@ export default function JoinCult() {
   return (
     <SectionWrapper scheme="pink" id="join" className="text-center">
       <Tagline className="bg-white text-[#1a1a1a]">Join the Cult</Tagline>
-      <SectionHeading className="mt-6">Never miss a drop</SectionHeading>
+      <SectionHeading className="mt-6">Zero FOMO</SectionHeading>
 
       {submitted ? (
         <p className="mt-8 text-xl font-bold text-[#C6FF00]">
@@ -42,12 +42,12 @@ export default function JoinCult() {
             type="submit"
             className="bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 text-sm font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
           >
-            Get early access
+            Subscribe
           </button>
         </form>
       )}
 
-      <p className="mt-4 text-sm text-white/60">No spam. Just drops.</p>
+      <p className="mt-4 text-sm text-white/60">We Promise, No spam.</p>
     </SectionWrapper>
   );
 }

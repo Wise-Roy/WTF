@@ -12,7 +12,7 @@ export default function WTFWay() {
   return (
     <SectionWrapper scheme="grey">
       <div className="text-center">
-        <Tagline>The WTF Way</Tagline>
+        <Tagline>WTF Codes</Tagline>
         <SectionHeading className="mt-6">
           Why we&apos;re weird on purpose
         </SectionHeading>
