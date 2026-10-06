@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Film, Users, Globe } from "lucide-react";
+import { Package, FileText, Users, Globe } from "lucide-react";
 import { DbProduct } from "@/types";
 
-type Tab = "products" | "about" | "hero" | "users" | "footer";
+type Tab = "products" | "about" | "users" | "footer";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
   { key: "about", label: "About Us", icon: FileText },
-  { key: "hero", label: "Hero", icon: Film },
   { key: "users", label: "Users", icon: Users },
   { key: "footer", label: "Footer", icon: Globe },
 ];
@@ -525,122 +524,6 @@ function AboutPanel() {
   );
 }
 
-/* ─────────────── HERO TAB ─────────────── */
-function HeroPanel() {
-  const [videoUrl, setVideoUrl] = useState("/into.mp4");
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    fetch("/api/admin/hero")
-      .then((r) => r.json())
-      .then((d) => setVideoUrl(d.data?.hero?.video_url || "/into.mp4"))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const handleUpload = async (file: File) => {
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok) {
-        const newUrl = data.data.url;
-        setVideoUrl(newUrl);
-        setSaving(true);
-        await fetch("/api/admin/hero", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ video_url: newUrl }),
-        });
-        showToast("Hero video updated");
-      } else {
-        showToast(data.message || "Upload failed");
-      }
-    } catch {
-      showToast("Upload failed");
-    } finally {
-      setUploading(false);
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div>
-      {toast && (
-        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
-          {toast}
-        </div>
-      )}
-
-      <h2 className="text-xl font-bold mb-2">Hero Section</h2>
-      <p className="text-white/40 text-sm mb-6">
-        Change homepage hero background video. Max 100 MB. MP4 or WebM.
-      </p>
-
-      {loading ? (
-        <div className="h-64 bg-white/5 rounded animate-pulse" />
-      ) : (
-        <div className="space-y-6 max-w-2xl">
-          <div className="border border-white/10 rounded-lg overflow-hidden">
-            <div className="aspect-video relative bg-black">
-              <video
-                key={videoUrl}
-                src={videoUrl}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
-              {(uploading || saving) && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="h-8 w-8 border-2 border-[#C6FF00] border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-white/60 text-sm mt-3">
-                      {uploading ? "Uploading..." : "Saving..."}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="p-4 bg-white/5">
-              <p className="text-white/40 text-xs font-mono truncate">{videoUrl}</p>
-            </div>
-          </div>
-
-          <label className="block border-2 border-dashed border-white/20 rounded-lg px-6 py-10 text-center cursor-pointer hover:border-[#C6FF00]/50 transition-colors">
-            <div className="text-white/40 text-sm">
-              <p className="font-bold text-white/60 mb-1">Click to upload new video</p>
-              <p>MP4 or WebM, max 100 MB</p>
-            </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="video/mp4,video/webm"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleUpload(file);
-              }}
-            />
-          </label>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ─────────────── USERS TAB ─────────────── */
 interface UserProfile {
   user_id: string;
@@ -857,7 +740,6 @@ export default function AdminPage() {
       <main className="flex-1 pl-8 py-6 min-w-0">
         {activeTab === "products" && <ProductsPanel />}
         {activeTab === "about" && <AboutPanel />}
-        {activeTab === "hero" && <HeroPanel />}
         {activeTab === "users" && <UsersPanel />}
         {activeTab === "footer" && <FooterPanel />}
       </main>
