@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
-import { writeFile, mkdir } from "fs/promises";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import path from "path";
 import crypto from "crypto";
 
@@ -15,6 +15,9 @@ const ALLOWED_VIDEO_EXTENSIONS = [".mp4", ".webm"];
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 const ALLOWED_EXTENSIONS = [...ALLOWED_IMAGE_EXTENSIONS, ...ALLOWED_VIDEO_EXTENSIONS];
 
+const VALID_BUCKETS = ["products", "about"] as const;
+type BucketName = (typeof VALID_BUCKETS)[number];
+
 export async function POST(req: NextRequest) {
   if (!(await isAdmin())) {
     return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
@@ -22,6 +25,14 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
+  const bucket = (formData.get("bucket") as string) || "products";
+
+  if (!VALID_BUCKETS.includes(bucket as BucketName)) {
+    return NextResponse.json(
+      { success: false, message: `Invalid bucket. Allowed: ${VALID_BUCKETS.join(", ")}` },
+      { status: 400 }
+    );
+  }
 
   if (!file) {
     return NextResponse.json({ success: false, message: "No file provided" }, { status: 400 });
@@ -56,18 +67,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Save to appropriate directory
-  const subDir = isVideo ? "videos" : "products";
-  const uploadDir = path.join(process.cwd(), "public", subDir);
-  await mkdir(uploadDir, { recursive: true });
-
+  // Upload to Supabase Storage
   const uniqueName = `${crypto.randomUUID()}${ext}`;
-  const filePath = path.join(uploadDir, uniqueName);
-
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(filePath, buffer);
 
-  const url = `/${subDir}/${uniqueName}`;
+  const { error } = await supabaseAdmin.storage
+    .from(bucket)
+    .upload(uniqueName, buffer, {
+      contentType: file.type,
+      upsert: false,
+    });
 
-  return NextResponse.json({ success: true, data: { url } });
+  if (error) {
+    console.error("Supabase storage upload error:", error);
+    return NextResponse.json(
+      { success: false, message: `Upload failed: ${error.message}` },
+      { status: 500 }
+    );
+  }
+
+  const { data: urlData } = supabaseAdmin.storage
+    .from(bucket)
+    .getPublicUrl(uniqueName);
+
+  return NextResponse.json({ success: true, data: { url: urlData.publicUrl } });
 }

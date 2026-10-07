@@ -69,6 +69,7 @@ export default function ProductForm({ product }: ProductFormProps) {
 
     const fd = new FormData();
     fd.append("file", file);
+    fd.append("bucket", "products");
 
     try {
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });

@@ -245,6 +245,7 @@ function AboutPanel() {
     setUploadingIdx(slotIdx);
     const fd = new FormData();
     fd.append("file", file);
+    fd.append("bucket", "about");
     try {
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
       const data = await res.json();
