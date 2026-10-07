@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Package, FileText, Users, Globe } from "lucide-react";
 import { DbProduct } from "@/types";
+import { uploadFile } from "@/lib/upload-client";
 
 type Tab = "products" | "about" | "users" | "footer";
 
@@ -21,16 +22,17 @@ function ProductsPanel() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
 
-  const fetchProducts = () => {
-    setLoading(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const fetchProducts = () => setRefreshKey((k) => k + 1);
+
+  useEffect(() => {
+    let cancelled = false;
     fetch("/api/admin/products")
       .then((r) => r.json())
-      .then((d) => setProducts(d.data?.products || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(fetchProducts, []);
+      .then((d) => { if (!cancelled) { setProducts(d.data?.products || []); setLoading(false); } })
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [refreshKey]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -205,16 +207,17 @@ function AboutPanel() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  const fetchSections = () => {
-    setLoading(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const fetchSections = () => setRefreshKey((k) => k + 1);
+
+  useEffect(() => {
+    let cancelled = false;
     fetch("/api/admin/about")
       .then((r) => r.json())
-      .then((d) => setSections(d.data?.sections || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(fetchSections, []);
+      .then((d) => { if (!cancelled) { setSections(d.data?.sections || []); setLoading(false); } })
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [refreshKey]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -243,23 +246,15 @@ function AboutPanel() {
 
   const handleImageUpload = async (slotIdx: number, file: File) => {
     setUploadingIdx(slotIdx);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("bucket", "about");
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok) {
-        setForm((prev) => {
-          const imgs = [...prev.images];
-          imgs[slotIdx] = data.data.url;
-          return { ...prev, images: imgs };
-        });
-      } else {
-        showToast(data.message || "Upload failed");
-      }
-    } catch {
-      showToast("Upload failed");
+      const publicUrl = await uploadFile(file, "about");
+      setForm((prev) => {
+        const imgs = [...prev.images];
+        imgs[slotIdx] = publicUrl;
+        return { ...prev, images: imgs };
+      });
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploadingIdx(null);
     }
@@ -546,11 +541,20 @@ function UsersPanel() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/users")
-      .then((r) => r.json())
-      .then((d) => setUsers(d.data?.users || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/users", { signal: ac.signal });
+        const d = await r.json();
+        if (!ac.signal.aborted) {
+          setUsers(d.data?.users || []);
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
   }, []);
 
   return (
@@ -624,13 +628,20 @@ function FooterPanel() {
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/footer")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.data?.footer) setLinks(d.data.footer);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/footer", { signal: ac.signal });
+        const d = await r.json();
+        if (!ac.signal.aborted) {
+          if (d.data?.footer) setLinks(d.data.footer);
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
   }, []);
 
   const showToast = (msg: string) => {

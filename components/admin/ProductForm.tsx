@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { DbProduct } from "@/types";
 import { validateProduct } from "@/lib/product-validation";
+import { uploadFile } from "@/lib/upload-client";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 
@@ -61,22 +62,11 @@ export default function ProductForm({ product }: ProductFormProps) {
     // Upload
     setUploading((prev) => prev.map((v, i) => (i === index ? true : v)));
 
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("bucket", "products");
-
     try {
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setErrors((prev) => ({ ...prev, image: data.message || "Upload failed" }));
-        return;
-      }
-
-      setImages((prev) => prev.map((v, i) => (i === index ? data.data.url : v)));
-    } catch {
-      setErrors((prev) => ({ ...prev, image: "Upload failed. Please try again." }));
+      const publicUrl = await uploadFile(file, "products");
+      setImages((prev) => prev.map((v, i) => (i === index ? publicUrl : v)));
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, image: err instanceof Error ? err.message : "Upload failed. Please try again." }));
     } finally {
       setUploading((prev) => prev.map((v, i) => (i === index ? false : v)));
     }
