@@ -6,7 +6,6 @@ import Image from "next/image";
 import { DbProduct } from "@/types";
 import { validateProduct } from "@/lib/product-validation";
 
-const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 
 interface ProductFormProps {
@@ -53,11 +52,6 @@ export default function ProductForm({ product }: ProductFormProps) {
       setErrors((prev) => ({ ...prev, image: "Invalid format. Allowed: JPG, PNG, WebP, AVIF, GIF" }));
       return;
     }
-    if (file.size > MAX_SIZE) {
-      setErrors((prev) => ({ ...prev, image: "File too large. Maximum size is 10 MB" }));
-      return;
-    }
-
     setErrors((prev) => {
       const next = { ...prev };
       delete next.image;
