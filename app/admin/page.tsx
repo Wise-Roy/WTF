@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe } from "lucide-react";
-import { DbProduct } from "@/types";
+import { Package, FileText, Users, Globe, Music } from "lucide-react";
+import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "users" | "footer";
+type Tab = "products" | "about" | "musicians" | "users" | "footer";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
   { key: "about", label: "About Us", icon: FileText },
+  { key: "musicians", label: "Musicians", icon: Music },
   { key: "users", label: "Users", icon: Users },
   { key: "footer", label: "Footer", icon: Globe },
 ];
@@ -520,6 +521,240 @@ function AboutPanel() {
   );
 }
 
+/* ─────────────── MUSICIANS TAB ─────────────── */
+function MusiciansPanel() {
+  const [musicians, setMusicians] = useState<DbMusician[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
+  const [editing, setEditing] = useState<DbMusician | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({ name: "", photo: "" });
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [refreshKey, setRefreshKey] = useState(0);
+  const fetchMusicians = () => setRefreshKey((k) => k + 1);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/musicians")
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) { setMusicians(d.data?.musicians || []); setLoading(false); } })
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [refreshKey]);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Delete "${name}"?`)) return;
+    const res = await fetch(`/api/admin/musicians/${id}`, { method: "DELETE" });
+    if (res.ok) { showToast(`"${name}" deleted`); fetchMusicians(); }
+    else showToast("Delete failed");
+  };
+
+  const handleEdit = (m: DbMusician) => {
+    setEditing(m);
+    setCreating(false);
+    setForm({ name: m.name, photo: m.photo });
+  };
+
+  const handleNew = () => {
+    setCreating(true);
+    setEditing(null);
+    setForm({ name: "", photo: "" });
+  };
+
+  const handleCancel = () => {
+    setEditing(null);
+    setCreating(false);
+    setForm({ name: "", photo: "" });
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const publicUrl = await uploadFile(file, "musicians");
+      setForm((p) => ({ ...p, photo: publicUrl }));
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) { showToast("Name is required"); return; }
+    if (!form.photo) { showToast("Photo is required"); return; }
+    setSaving(true);
+
+    try {
+      if (editing) {
+        await fetch(`/api/admin/musicians/${editing.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        showToast("Musician updated");
+      } else {
+        await fetch("/api/admin/musicians", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        showToast("Musician added");
+      }
+      handleCancel();
+      fetchMusicians();
+    } catch {
+      showToast("Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 rounded px-4 py-2.5 text-white placeholder-white/30 focus:border-[#C6FF00] focus:outline-none transition-colors";
+
+  const isFormOpen = editing || creating;
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-xl font-bold">Musicians</h2>
+        {!isFormOpen && (
+          <button
+            onClick={handleNew}
+            className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition"
+          >
+            + Add Musician
+          </button>
+        )}
+      </div>
+
+      {isFormOpen && (
+        <div className="border border-[#C6FF00]/30 rounded-lg p-6 space-y-4 mb-8">
+          <h3 className="text-sm font-bold text-[#C6FF00] uppercase tracking-wider">
+            {editing ? "Edit Musician" : "New Musician"}
+          </h3>
+
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Name</label>
+            <input
+              value={form.name}
+              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+              className={inputClass}
+              placeholder="e.g. Travis Scott"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Photo</label>
+            <div className="flex items-start gap-4">
+              <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-white/5 border border-white/10 shrink-0 flex items-center justify-center">
+                {form.photo ? (
+                  <Image src={form.photo} alt="Preview" fill className="object-cover" />
+                ) : (
+                  <span className="text-white/20 text-xs">No photo</span>
+                )}
+                {uploading && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                    <div className="h-5 w-5 border-2 border-[#C6FF00] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+              <label className="cursor-pointer bg-white/5 border border-white/10 rounded px-4 py-2.5 text-sm text-white/60 hover:border-[#C6FF00]/50 transition-colors">
+                Upload Photo
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handlePhotoUpload(file);
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-[#C6FF00] text-[#1a1a1a] px-6 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+            >
+              {saving ? "Saving..." : editing ? "Update" : "Add Musician"}
+            </button>
+            <button
+              onClick={handleCancel}
+              className="border border-white/20 text-white/60 px-6 py-2.5 text-sm uppercase tracking-wider rounded hover:border-white/40 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-16 bg-white/5 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : musicians.length === 0 && !isFormOpen ? (
+        <div className="text-center py-20">
+          <p className="text-white/40 text-lg mb-4">No musicians yet</p>
+          <button
+            onClick={handleNew}
+            className="text-[#C6FF00] hover:underline text-sm uppercase tracking-wider"
+          >
+            Add your first musician
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {musicians.map((m) => (
+            <div key={m.id} className="border border-white/10 rounded-lg overflow-hidden group hover:border-white/20 transition-colors">
+              <div className="relative aspect-square bg-white/5">
+                {m.photo && (
+                  <Image src={m.photo} alt={m.name} fill className="object-cover" />
+                )}
+              </div>
+              <div className="p-3 flex items-center justify-between">
+                <p className="font-medium text-sm truncate">{m.name}</p>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => handleEdit(m)}
+                    className="text-[#C6FF00] hover:underline text-xs uppercase tracking-wider"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(m.id, m.name)}
+                    className="text-red-400 hover:underline text-xs uppercase tracking-wider"
+                  >
+                    Del
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────── USERS TAB ─────────────── */
 interface UserProfile {
   user_id: string;
@@ -622,7 +857,7 @@ function UsersPanel() {
 
 /* ─────────────── FOOTER TAB ─────────────── */
 function FooterPanel() {
-  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "" });
+  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -671,6 +906,7 @@ function FooterPanel() {
     { key: "twitter" as const, label: "Twitter / X", placeholder: "https://x.com/yourhandle" },
     { key: "spotify" as const, label: "Spotify", placeholder: "https://open.spotify.com/artist/..." },
     { key: "facebook" as const, label: "Facebook", placeholder: "https://facebook.com/yourpage" },
+    { key: "google_review" as const, label: "Google Reviews", placeholder: "https://g.page/r/your-review-link" },
   ];
 
   return (
@@ -752,6 +988,7 @@ export default function AdminPage() {
       <main className="flex-1 pl-8 py-6 min-w-0">
         {activeTab === "products" && <ProductsPanel />}
         {activeTab === "about" && <AboutPanel />}
+        {activeTab === "musicians" && <MusiciansPanel />}
         {activeTab === "users" && <UsersPanel />}
         {activeTab === "footer" && <FooterPanel />}
       </main>

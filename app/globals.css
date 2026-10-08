@@ -54,12 +54,19 @@ body {
   transition: opacity 0.15s ease;
 }
 
-/* Hide native cursor globally — navbar is an exception */
-html,
-html *,
-html *::before,
-html *::after {
+/* Hide native cursor globally — navbar & admin are exceptions */
+html:not(:has(.admin-area)),
+html:not(:has(.admin-area)) *,
+html:not(:has(.admin-area)) *::before,
+html:not(:has(.admin-area)) *::after {
   cursor: none !important;
+}
+
+.admin-area,
+.admin-area *,
+.admin-area *::before,
+.admin-area *::after {
+  cursor: auto !important;
 }
 
 

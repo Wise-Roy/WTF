@@ -47,6 +47,15 @@ export interface SchemeConfig {
   border: string;
 }
 
+/** Database musician — matches the `musicians` table */
+export interface DbMusician {
+  id: string;
+  name: string;
+  photo: string;
+  created_at: string;
+  updated_at: string;
+}
+
 /** Database product — matches the `products` table */
 export interface DbProduct {
   id: string;

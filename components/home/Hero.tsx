@@ -14,6 +14,7 @@ export default function Hero() {
   const prefersReducedMotion = useReducedMotion();
 
   const [wordIndex, setWordIndex] = useState(0);
+  const [videoReady, setVideoReady] = useState(false);
 
   // Rotate words
   useEffect(() => {
@@ -78,13 +79,22 @@ export default function Hero() {
         className="absolute -inset-[15%] z-0 will-change-transform"
         style={{ transform: "translate3d(0, 0, 0) scale(1.1)" }}
       >
+        {/* Poster image — visible instantly while video loads */}
+        <img
+          src="/hero_bg.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
         <video
           src="/into.mp4"
           autoPlay
           loop
           muted
           playsInline
-          className="h-full w-full object-cover object-top"
+          preload="auto"
+          onCanPlayThrough={() => setVideoReady(true)}
+          className={`relative h-full w-full object-cover object-top transition-opacity duration-700 ${videoReady ? "opacity-100" : "opacity-0"}`}
         />
       </div>
 

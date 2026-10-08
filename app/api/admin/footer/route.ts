@@ -18,7 +18,7 @@ export async function GET() {
   if (error) {
     return NextResponse.json({
       success: true,
-      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "" } },
+      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "", google_review: "" } },
     });
   }
 
@@ -31,7 +31,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { instagram, twitter, spotify, facebook } = body;
+  const { instagram, twitter, spotify, facebook, google_review } = body;
 
   const { data: existing } = await supabaseAdmin
     .from("footer_settings")
@@ -44,6 +44,7 @@ export async function PUT(req: NextRequest) {
     twitter: twitter || "",
     spotify: spotify || "",
     facebook: facebook || "",
+    google_review: google_review || "",
     updated_at: new Date().toISOString(),
   };
 

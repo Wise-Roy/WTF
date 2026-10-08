@@ -6,14 +6,14 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("footer_settings")
-    .select("instagram, twitter, spotify, facebook")
+    .select("instagram, twitter, spotify, facebook, google_review")
     .limit(1)
     .single();
 
   if (error) {
     return NextResponse.json({
       success: true,
-      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "" } },
+      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "", google_review: "" } },
     });
   }
 

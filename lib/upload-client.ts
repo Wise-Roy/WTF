@@ -5,7 +5,7 @@
  */
 export async function uploadFile(
   file: File,
-  bucket: "products" | "about"
+  bucket: "products" | "about" | "musicians"
 ): Promise<string> {
   // Step 1: Get signed upload URL
   const res = await fetch("/api/admin/upload", {

@@ -209,10 +209,20 @@ export function useStarCursor(enabled: boolean) {
 
     rafRef.current = requestAnimationFrame(animate);
 
+    // Keep cursor positioned during trackpad/wheel scroll (no mousemove fires)
+    const onScroll = () => {
+      if (!isVisibleRef.current || overNavRef.current) return;
+      const { x, y } = mouseRef.current;
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      }
+    };
+
     document.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseleave", onMouseLeave);
     document.addEventListener("mouseenter", onMouseEnter);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(rafRef.current);
@@ -221,6 +231,7 @@ export function useStarCursor(enabled: boolean) {
       document.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("mouseleave", onMouseLeave);
       document.removeEventListener("mouseenter", onMouseEnter);
+      window.removeEventListener("scroll", onScroll);
     };
   }, [enabled, spawnParticle]);
 

@@ -35,7 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!authorized) return null;
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white">
+    <div className="admin-area min-h-screen bg-[#1a1a1a] text-white">
       <div className="border-b border-white/10 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-3">

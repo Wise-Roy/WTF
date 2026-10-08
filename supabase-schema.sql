@@ -131,3 +131,17 @@ CREATE POLICY "Allow all on hero_settings" ON hero_settings FOR ALL USING (true)
 
 -- Seed default hero row
 INSERT INTO hero_settings (video_url) VALUES ('/into.mp4') ON CONFLICT DO NOTHING;
+
+-- Musicians table
+CREATE TABLE IF NOT EXISTS musicians (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name text NOT NULL,
+  photo text NOT NULL DEFAULT '',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_musicians_created_at ON musicians (created_at DESC);
+
+ALTER TABLE musicians ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all on musicians" ON musicians FOR ALL USING (true) WITH CHECK (true);

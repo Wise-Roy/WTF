@@ -6,7 +6,7 @@ import crypto from "crypto";
 export const dynamic = "force-dynamic";
 
 const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif", ".mp4", ".webm"];
-const VALID_BUCKETS = ["products", "about"] as const;
+const VALID_BUCKETS = ["products", "about", "musicians"] as const;
 type BucketName = (typeof VALID_BUCKETS)[number];
 
 // POST: Generate a signed upload URL (client uploads directly to Supabase)
