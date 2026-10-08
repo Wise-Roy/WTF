@@ -71,7 +71,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen flex items-end justify-center pb-40 bg-[#FFF9D6] overflow-hidden"
+      className="relative h-screen flex items-end justify-center pb-40 bg-black overflow-hidden"
     >
       {/* Parallax video layer */}
       <div
@@ -79,13 +79,15 @@ export default function Hero() {
         className="absolute -inset-[15%] z-0 will-change-transform"
         style={{ transform: "translate3d(0, 0, 0) scale(1.1)" }}
       >
-        {/* Poster image — visible instantly while video loads */}
-        <img
-          src="/hero_bg.jpg"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-top"
-        />
+        {/* Fallback — black bg with centered logo while video loads */}
+        <div className="absolute inset-0 bg-black flex items-center justify-center">
+          <img
+            src="/white_logo.png"
+            alt=""
+            aria-hidden="true"
+            className={`w-[40vw] max-w-[400px] h-auto object-contain transition-opacity duration-700 ${videoReady ? "opacity-0" : "opacity-100"}`}
+          />
+        </div>
         <video
           src="/into.mp4"
           autoPlay

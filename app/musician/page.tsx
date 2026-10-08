@@ -47,6 +47,17 @@ function HeroIntro() {
 
   return (
     <div ref={sectionRef} className="relative h-screen bg-black flex items-center justify-center overflow-hidden">
+      {/* Background image */}
+      <Image
+        src="/music bg.jpg"
+        alt=""
+        fill
+        className="object-cover"
+        priority
+      />
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-black/50" />
+
       {/* Intro text */}
       <div ref={textRef} className="relative z-10 max-w-3xl px-8 text-center">
         <p className="font-heading text-2xl md:text-4xl lg:text-5xl text-white/90 leading-[1.3] tracking-wide">
@@ -62,14 +73,14 @@ function HeroIntro() {
       {/* Cloud — bottom left */}
       <div
         ref={cloudLRef}
-        className="absolute -bottom-10 -left-20 w-[500px] h-[300px] md:w-[700px] md:h-[400px] z-20 pointer-events-none"
+        className="absolute -bottom-10 -left-20 w-[600px] h-[350px] md:w-[800px] md:h-[450px] z-20 pointer-events-none"
       >
         <div
           className="w-full h-full"
           style={{
             background:
-              "radial-gradient(ellipse 80% 70% at 40% 80%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)",
-            filter: "blur(40px)",
+              "radial-gradient(ellipse 80% 70% at 40% 80%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.1) 55%, transparent 75%)",
+            filter: "blur(15px)",
           }}
         />
       </div>
@@ -77,14 +88,14 @@ function HeroIntro() {
       {/* Cloud — bottom right */}
       <div
         ref={cloudRRef}
-        className="absolute -bottom-10 -right-20 w-[500px] h-[300px] md:w-[700px] md:h-[400px] z-20 pointer-events-none"
+        className="absolute -bottom-10 -right-20 w-[600px] h-[350px] md:w-[800px] md:h-[450px] z-20 pointer-events-none"
       >
         <div
           className="w-full h-full"
           style={{
             background:
-              "radial-gradient(ellipse 80% 70% at 60% 80%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)",
-            filter: "blur(40px)",
+              "radial-gradient(ellipse 80% 70% at 60% 80%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.1) 55%, transparent 75%)",
+            filter: "blur(15px)",
           }}
         />
       </div>
@@ -405,7 +416,7 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
               }}
               onClick={() => handleCardClick(i)}
             >
-              <div className="relative w-full h-full bg-[#1a1a1a]">
+              <div className="relative w-full h-full bg-[#44444E]">
                 {m.photo && (
                   <Image
                     src={m.photo}
