@@ -119,10 +119,13 @@ CREATE TABLE IF NOT EXISTS about_sections (
 ALTER TABLE about_sections ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all on about_sections" ON about_sections FOR ALL USING (true) WITH CHECK (true);
 
--- Hero settings (single row for hero video)
+-- Hero settings (single row for hero video + designer hero images)
 CREATE TABLE IF NOT EXISTS hero_settings (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   video_url text NOT NULL DEFAULT '/into.mp4',
+  designer_photo_1 text NOT NULL DEFAULT '',
+  designer_photo_2 text NOT NULL DEFAULT '',
+  designer_photo_3 text NOT NULL DEFAULT '',
   updated_at timestamptz DEFAULT now()
 );
 

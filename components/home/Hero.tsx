@@ -163,7 +163,7 @@ export default function Hero() {
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
           <Button href="/shop">Fumes</Button>
-          <Button href="/about" variant="secondary" className="border-[#F5F5F5]/30 text-[#F5F5F5] hover:border-[#C6FF00] hover:text-[#C6FF00]">
+          <Button href="/designer" variant="secondary" className="border-[#F5F5F5]/30 text-[#F5F5F5] hover:border-[#C6FF00] hover:text-[#C6FF00]">
             Designers
           </Button>
         </div>

@@ -19,7 +19,7 @@ const DROPDOWN: Record<string, { label: string; href: string }[]> = {
   ],
   About: [
     { label: "Designs", href: "/design" },
-    { label: "Designers", href: "/about#artists" },
+    { label: "Designers", href: "/designer#artists" },
     { label: "Musicians", href: "/musician" },
   ],
   Contact: [

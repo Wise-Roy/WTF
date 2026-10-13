@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe, Music } from "lucide-react";
+import { Package, FileText, Users, Globe, Music, ImageIcon } from "lucide-react";
 import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "musicians" | "users" | "footer";
+type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
   { key: "about", label: "About Us", icon: FileText },
+  { key: "designer-hero", label: "Hero Section", icon: ImageIcon },
   { key: "musicians", label: "Musicians", icon: Music },
   { key: "users", label: "Users", icon: Users },
   { key: "footer", label: "Footer", icon: Globe },
@@ -954,6 +955,157 @@ function FooterPanel() {
   );
 }
 
+/* ─────────────── DESIGNER HERO TAB ─────────────── */
+function DesignerHeroPanel() {
+  const [images, setImages] = useState<string[]>(["", "", ""]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/designer-hero", { signal: ac.signal });
+        const d = await r.json();
+        if (!ac.signal.aborted && d.data?.images) {
+          setImages(d.data.images);
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleUpload = async (idx: number, file: File) => {
+    setUploadingIdx(idx);
+    try {
+      const publicUrl = await uploadFile(file, "designer");
+      setImages((prev) => {
+        const next = [...prev];
+        next[idx] = publicUrl;
+        return next;
+      });
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploadingIdx(null);
+    }
+  };
+
+  const handleRemove = (idx: number) => {
+    setImages((prev) => {
+      const next = [...prev];
+      next[idx] = "";
+      return next;
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/designer-hero", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ images }),
+      });
+      if (res.ok) showToast("Hero images saved");
+      else showToast("Save failed");
+    } catch {
+      showToast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const labels = ["Photograph 1 — Left", "Photograph 2 — Center Right", "Photograph 3 — Bottom Right"];
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl font-bold">Hero Section Settings</h2>
+        <button
+          onClick={handleSave}
+          disabled={saving || loading}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save"}
+        </button>
+      </div>
+      <p className="text-white/40 text-sm mb-8">
+        Manage the 3 photographs displayed in the Designer page scroll animation hero.
+      </p>
+
+      {loading ? (
+        <div className="grid grid-cols-3 gap-6">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="aspect-[3/4] bg-white/5 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-6">
+          {images.map((url, idx) => {
+            const isUploading = uploadingIdx === idx;
+            return (
+              <div key={idx} className="space-y-2">
+                <p className="text-xs uppercase tracking-wider text-white/50">{labels[idx]}</p>
+                <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-white/5 border border-white/10">
+                  {url ? (
+                    <>
+                      <Image src={url} alt={labels[idx]} fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(idx)}
+                        className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-500 transition-colors z-10"
+                        title="Remove"
+                      >
+                        ×
+                      </button>
+                    </>
+                  ) : (
+                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors gap-2">
+                      <span className="text-white/20 text-3xl">+</span>
+                      <span className="text-white/30 text-xs">Upload</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUpload(idx, file);
+                        }}
+                      />
+                    </label>
+                  )}
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                      <div className="h-6 w-6 border-2 border-[#C6FF00] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────── MAIN ADMIN PAGE ─────────────── */
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("products");
@@ -988,6 +1140,7 @@ export default function AdminPage() {
       <main className="flex-1 pl-8 py-6 min-w-0">
         {activeTab === "products" && <ProductsPanel />}
         {activeTab === "about" && <AboutPanel />}
+        {activeTab === "designer-hero" && <DesignerHeroPanel />}
         {activeTab === "musicians" && <MusiciansPanel />}
         {activeTab === "users" && <UsersPanel />}
         {activeTab === "footer" && <FooterPanel />}
