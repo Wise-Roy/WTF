@@ -384,7 +384,7 @@ export default function LatestDrop() {
           Six new designs. Hand-drawn, numbered, and never restocked. Drop 01 is
           live — grab yours before they vanish into the fumes.
         </p>
-        <Button href="/shop" className="mt-8">
+        <Button href="/silhouettes" className="mt-8">
           Shop all
         </Button>
       </div>

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 @theme inline {
   --color-neutral: #FFF9D6;
   --color-acid: #C6FF00;

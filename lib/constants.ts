@@ -56,7 +56,7 @@ export const SCHEMES: Record<ColorScheme, SchemeConfig> = {
 };
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "Shop", href: "/shop" },
+  { label: "Shop", href: "/silhouettes" },
   { label: "About", href: "/designer" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "/contact" },
@@ -123,7 +123,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Shop",
     links: [
-      { label: "Shop the Drop", href: "/shop" },
+      { label: "Shop the Drop", href: "/silhouettes" },
       { label: "FAQ", href: "#faq" },
     ],
   },

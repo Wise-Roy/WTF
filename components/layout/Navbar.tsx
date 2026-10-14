@@ -14,8 +14,8 @@ const NAV_ITEMS = ["Shop", "About", "Contact", "More"] as const;
 
 const DROPDOWN: Record<string, { label: string; href: string }[]> = {
   Shop: [
-    { label: "Collections", href: "/shop?view=collections" },
-    { label: "All Silhouettes", href: "/shop" },
+    { label: "Collections", href: "/collections" },
+    { label: "Silhouettes", href: "/silhouettes" },
   ],
   About: [
     { label: "Designs", href: "/design" },

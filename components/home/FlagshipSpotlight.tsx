@@ -21,7 +21,7 @@ export default function FlagshipSpotlight() {
             carries its own identity — this is the one that started the cult.
             Limited to 200 units worldwide.
           </p>
-          <Button href="/shop" className="mt-8 bg-[#1a1a1a] text-black hover:bg-[#333]">
+          <Button href="/silhouettes" className="mt-8 bg-[#1a1a1a] text-black hover:bg-[#333]">
             Get the Rat King
           </Button>
         </div>

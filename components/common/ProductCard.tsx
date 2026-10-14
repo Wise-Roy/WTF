@@ -14,11 +14,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { id, image, prod_name, prod_price, prod_quantity } = product;
 
   const imgLayersRef = useRef<(HTMLDivElement | null)[]>([null, null, null]);
-  const buttonsRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
   const activeIdx = useRef(0);
 
-  const [tapped, setTapped] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const { addItem } = useBag();
 
@@ -44,10 +43,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     const next = (activeIdx.current + 1) % 3;
     activeIdx.current = next;
     showImage(next);
-    if (buttonsRef.current) {
-      buttonsRef.current.style.opacity = "1";
-      buttonsRef.current.style.pointerEvents = "auto";
-    }
     if (priceRef.current) {
       priceRef.current.style.transform = "rotate(-20deg) scale(1.05)";
     }
@@ -55,40 +50,30 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const handlePointerLeave = useCallback(() => {
     if (isTouch) return;
-    if (buttonsRef.current) {
-      buttonsRef.current.style.opacity = "0";
-      buttonsRef.current.style.pointerEvents = "none";
-    }
     if (priceRef.current) {
       priceRef.current.style.transform = "rotate(0deg) scale(1)";
     }
   }, [isTouch]);
 
-  const handleTap = useCallback(() => {
-    if (!isTouch || isSoldOut) return;
-    setTapped((prev) => !prev);
-  }, [isTouch, isSoldOut]);
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isSoldOut) return;
+    if (isSoldOut || added) return;
     addItem({ id, name: prod_name, price: prod_price, image: imgs[0] });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   return (
-    <div
-      tabIndex={0}
-      role="article"
+    <Link
+      href={`/get/${id}`}
       aria-label={`${prod_name}, ₹${prod_price}${isSoldOut ? ", sold out" : ""}`}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      onClick={handleTap}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleTap(); }}}
-      className={`group relative rounded-xl border border-black/[0.06] bg-white overflow-visible transition-all duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-[#C6FF00] ${
+      className={`group relative rounded-xl border border-black/[0.06] bg-white overflow-visible transition-all duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-[#C6FF00] block ${
         isSoldOut
-          ? "cursor-default opacity-70"
-          : "cursor-pointer hover:-translate-y-1 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_rgba(0,0,0,0.10)]"
+          ? "opacity-70"
+          : "hover:-translate-y-1 hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_rgba(0,0,0,0.10)]"
       }`}
       style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)" }}
     >
@@ -112,33 +97,30 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           ))}
 
-          {!isSoldOut && (
-            <div
-              ref={buttonsRef}
-              className="absolute inset-0 flex items-center justify-center gap-3 z-10 transition-opacity duration-200"
-              style={{ opacity: isTouch && tapped ? 1 : 0, pointerEvents: isTouch && tapped ? "auto" : "none" }}
-            >
-              <Link
-                href={`/get/${id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="bg-white/90 backdrop-blur-sm text-[#1a1a1a] text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-[#C6FF00] hover:text-[#1a1a1a] transition-colors"
-              >
-                View
-              </Link>
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="bg-[#C6FF00] text-[#1a1a1a] text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-[#1a1a1a] hover:text-white transition-colors"
-              >
-                Add to Cart
-              </button>
-            </div>
-          )}
-
           {isSoldOut && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10">
               <span className="text-white text-xl font-extrabold uppercase tracking-wider">Sold Out</span>
             </div>
+          )}
+
+          {/* Circle add-to-cart button */}
+          {!isSoldOut && (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              aria-label={added ? `${prod_name} added to cart` : `Add ${prod_name} to cart`}
+              className={`absolute bottom-3 right-3 z-20 w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 ${
+                added
+                  ? "bg-[#1a1a1a] scale-110"
+                  : "bg-[#d4f542] hover:scale-110 active:scale-95"
+              }`}
+            >
+              {added ? (
+                <span className="text-[#d4f542] text-lg font-bold leading-none">&#10003;</span>
+              ) : (
+                <span className="text-[#1a1a1a] text-2xl font-bold leading-none transition-transform duration-200 group-hover:rotate-90">+</span>
+              )}
+            </button>
           )}
         </div>
 
@@ -163,6 +145,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -1,0 +1,5 @@
+Task: On the shop page, add the circle “+” button and the parallax effect. Change nothing else.
+
+Circle “+” button: put a 44px lime (
+#d4f542) circle with a black “+” in the bottom-right corner of each product image. On hover, scale it up slightly and rotate the “+” 90°. On click, it must do exactly what the current “Add to Cart” button does: same handler, same cart state, and the navbar “CART (n)” count goes up. Stop the click from opening the product page. After adding, show a black circle with a lime “✓”. Keep it visible on touch devices and give it an aria-label.
+Parallax: split the grid into 3 columns on desktop and 2 on mobile. Each column moves at its own speed on scroll (about 0, -0.09 and 0.05 of its distance from the viewport center, capped at ±70px, and halved on mobile). The “+” button gets a small extra float of about ±6px. Animate only transform, update with requestAnimationFrame, and turn it all off for prefers-reduced-motion.

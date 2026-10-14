@@ -72,7 +72,7 @@ function AboutSectionBlock({ section }: { section: AboutSection }) {
       <Tagline>{section.tagline}</Tagline>
       <SectionHeading className="mt-6">{section.heading}</SectionHeading>
       <p className="mt-6 font-body text-lg text-white/70 leading-relaxed max-w-lg">{section.body}</p>
-      <Button href="/shop" className="mt-8">Shop the collection</Button>
+      <Button href="/silhouettes" className="mt-8">Shop the collection</Button>
     </div>
   );
   const imageBlock = <LoopingImage images={section.images} alt={section.heading} />;
