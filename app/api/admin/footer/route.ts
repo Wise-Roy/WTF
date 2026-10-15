@@ -31,7 +31,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { instagram, twitter, spotify, facebook, google_review } = body;
+  const { instagram, twitter, spotify, facebook, google_review, privacy_policy_pdf, newsletter_pdf } = body;
 
   const { data: existing } = await supabaseAdmin
     .from("footer_settings")
@@ -45,6 +45,8 @@ export async function PUT(req: NextRequest) {
     spotify: spotify || "",
     facebook: facebook || "",
     google_review: google_review || "",
+    privacy_policy_pdf: privacy_policy_pdf || "",
+    newsletter_pdf: newsletter_pdf || "",
     updated_at: new Date().toISOString(),
   };
 

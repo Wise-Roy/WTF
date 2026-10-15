@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { DbProduct } from "@/types";
 import { useBag } from "@/context/BagContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProductStoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +74,8 @@ function StoryLayout({ product }: { product: DbProduct }) {
   const [toast, setToast] = useState<string | null>(null);
   const [hintVisible, setHintVisible] = useState(true);
   const [addedState, setAddedState] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const driverRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -81,6 +84,70 @@ function StoryLayout({ product }: { product: DbProduct }) {
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const { addItem } = useBag();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user || !product.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/wishlist");
+        const data = await res.json();
+        const inList = (data.items || []).some((item: { product_id: string }) => item.product_id === product.id);
+        if (!cancelled) setWishlisted(inList);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, product.id]);
+
+  const toggleWishlist = async () => {
+    if (!user) {
+      setToast("SIGN IN TO ADD TO FAVOURITES");
+      setTimeout(() => { router.push("/sign-in"); }, 1500);
+      return;
+    }
+    setWishlistLoading(true);
+    try {
+      if (wishlisted) {
+        const res = await fetch("/api/wishlist", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: product.id }),
+        });
+        if (res.ok) {
+          setWishlisted(false);
+          setToast("REMOVED FROM FAVOURITES");
+        } else {
+          const data = await res.json().catch(() => ({ error: "Failed" }));
+          setToast(data.error || "FAILED TO REMOVE");
+        }
+      } else {
+        const res = await fetch("/api/wishlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: product.id }),
+        });
+        if (res.ok) {
+          setWishlisted(true);
+          setToast("ADDED TO FAVOURITES");
+        } else if (res.status === 409) {
+          setWishlisted(true);
+          setToast("ALREADY IN FAVOURITES");
+        } else {
+          const data = await res.json().catch(() => ({ error: "Failed" }));
+          setToast(data.error || "FAILED TO ADD");
+        }
+      }
+    } catch (err) {
+      setToast("NETWORK ERROR");
+      console.error("Wishlist toggle failed:", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   /* ─── Scroll-driven crossfade ─── */
   useEffect(() => {
@@ -385,13 +452,19 @@ function StoryLayout({ product }: { product: DbProduct }) {
                   {isSoldOut ? "Sold Out" : addedState ? "Added ✓" : `Add to Cart — ₹${(product.prod_price * quantity).toLocaleString("en-IN")}`}
                 </button>
 
-                {/* Share */}
+                {/* Wishlist + Share */}
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    className="py-2 text-[10px] font-bold uppercase tracking-[0.14em] border-2 border-[#1a1a1a] rounded-sm hover:bg-[#FFD9E7] transition-colors text-[#1a1a1a]"
+                    onClick={toggleWishlist}
+                    disabled={wishlistLoading}
+                    className={`py-2 text-[10px] font-bold uppercase tracking-[0.14em] border-2 rounded-sm transition-colors disabled:opacity-50 ${
+                      wishlisted
+                        ? "border-[#DF2877] bg-[#DF2877] text-white"
+                        : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#FFD9E7]"
+                    }`}
                   >
-                    ♡ Wishlist
+                    {wishlisted ? "♥ Wishlisted" : "♡ Wishlist"}
                   </button>
                 </div>
 
@@ -414,6 +487,9 @@ function StoryLayout({ product }: { product: DbProduct }) {
           addedState={addedState}
           onAddToCart={handleAddToCart}
           onShare={handleShare}
+          wishlisted={wishlisted}
+          wishlistLoading={wishlistLoading}
+          onToggleWishlist={toggleWishlist}
         />
       </div>
 
@@ -443,6 +519,9 @@ function MobileStory({
   addedState,
   onAddToCart,
   onShare,
+  wishlisted,
+  wishlistLoading,
+  onToggleWishlist,
 }: {
   product: DbProduct;
   images: string[];
@@ -453,6 +532,9 @@ function MobileStory({
   addedState: boolean;
   onAddToCart: () => void;
   onShare: () => void;
+  wishlisted: boolean;
+  wishlistLoading: boolean;
+  onToggleWishlist: () => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const driverRef = useRef<HTMLDivElement>(null);
@@ -625,8 +707,17 @@ function MobileStory({
         </button>
 
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <button type="button" className="py-2 text-[10px] font-bold uppercase tracking-[0.14em] border-2 border-[#1a1a1a] rounded-sm hover:bg-[#FFD9E7] transition-colors">
-            ♡ Wishlist
+          <button
+            type="button"
+            onClick={onToggleWishlist}
+            disabled={wishlistLoading}
+            className={`py-2 text-[10px] font-bold uppercase tracking-[0.14em] border-2 rounded-sm transition-colors disabled:opacity-50 ${
+              wishlisted
+                ? "border-[#DF2877] bg-[#DF2877] text-white"
+                : "border-[#1a1a1a] hover:bg-[#FFD9E7]"
+            }`}
+          >
+            {wishlisted ? "♥ Wishlisted" : "♡ Wishlist"}
           </button>
           <button type="button" onClick={onShare} className="py-2 text-[10px] font-bold uppercase tracking-[0.14em] border-2 border-[#1a1a1a] rounded-sm hover:bg-[#FFD9E7] transition-colors">
             ↗ Share

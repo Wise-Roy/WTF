@@ -90,6 +90,8 @@ export default function Footer() {
 
   if (pathname.startsWith("/admin")) return null;
 
+  const isHome = pathname === "/";
+
   const socials = [
     { key: "instagram", icon: InstagramIcon, label: "Instagram", hoverColor: "hover:text-[#E1306C]", link: socialLinks.instagram },
     { key: "twitter", icon: XIcon, label: "Twitter", hoverColor: "hover:text-[#000000]", link: socialLinks.twitter },
@@ -101,7 +103,7 @@ export default function Footer() {
   return (
     <footer>
       {/* Top section */}
-      <div className="bg-[#FFF9D6] border-t border-[#1a1a1a]/10 py-16 px-6 md:px-12 lg:px-20">
+      <div className={`${isHome ? "bg-[#FFF9D6]" : "bg-[#A7A7A2]"} border-t border-[#1a1a1a]/10 py-16 px-6 md:px-12 lg:px-20`}>
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             {/* Brand */}
@@ -123,7 +125,7 @@ export default function Footer() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-[#1a1a1a]/50 hover:text-[#88AF00] transition-colors"
+                        className="text-sm text-[#1a1a1a]/50 hover:text-[#C6FF00] transition-colors"
                       >
                         {link.label}
                       </Link>

@@ -1,17 +1,87 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 import { DbProduct } from "@/types";
 import { useBag } from "@/context/BagContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [product, setProduct] = useState<DbProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [wishToast, setWishToast] = useState<string | null>(null);
   const { addItem } = useBag();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user || !id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/wishlist");
+        const data = await res.json();
+        const inList = (data.items || []).some((item: { product_id: string }) => item.product_id === id);
+        if (!cancelled) setWishlisted(inList);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, id]);
+
+  const toggleWishlist = async () => {
+    if (!user) {
+      setWishToast("Sign in to add to favourites");
+      setTimeout(() => { router.push("/sign-in"); }, 1500);
+      return;
+    }
+    setWishlistLoading(true);
+    try {
+      if (wishlisted) {
+        const res = await fetch("/api/wishlist", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: id }),
+        });
+        if (res.ok) {
+          setWishlisted(false);
+          setWishToast("Removed from favourites");
+        } else {
+          const data = await res.json().catch(() => ({ error: "Failed" }));
+          setWishToast(data.error || "Failed to remove");
+        }
+      } else {
+        const res = await fetch("/api/wishlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: id }),
+        });
+        if (res.ok) {
+          setWishlisted(true);
+          setWishToast("Added to favourites");
+        } else if (res.status === 409) {
+          setWishlisted(true);
+          setWishToast("Already in favourites");
+        } else {
+          const data = await res.json().catch(() => ({ error: "Failed" }));
+          setWishToast(data.error || "Failed to add");
+        }
+      }
+    } catch (err) {
+      setWishToast("Network error");
+      console.error("Wishlist toggle failed:", err);
+    } finally {
+      setWishlistLoading(false);
+      setTimeout(() => setWishToast(null), 2500);
+    }
+  };
 
   useEffect(() => {
     fetch(`/api/products/${id}`)
@@ -107,7 +177,7 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap items-center gap-4">
             <button
               type="button"
               onClick={handleAddToCart}
@@ -120,9 +190,32 @@ export default function ProductDetailPage() {
             >
               {isSoldOut ? "Sold Out" : "Add to Cart"}
             </button>
+            <button
+              type="button"
+              onClick={toggleWishlist}
+              disabled={wishlistLoading}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
+                wishlisted
+                  ? "border-[#DF2877] bg-[#FFD9E7]"
+                  : "border-[#1a1a1a]/20 bg-white hover:border-[#DF2877]/50"
+              } disabled:opacity-50`}
+              title={wishlisted ? "Remove from favourites" : "Add to favourites"}
+            >
+              <Heart
+                size={20}
+                className={wishlisted ? "text-[#DF2877] fill-[#DF2877]" : "text-[#1a1a1a]/40"}
+              />
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Wishlist toast */}
+      {wishToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-[#1a1a1a] text-white text-xs font-bold uppercase tracking-widest px-6 py-3 rounded-full border-2 border-[#DF2877]">
+          {wishToast}
+        </div>
+      )}
     </div>
   );
 }

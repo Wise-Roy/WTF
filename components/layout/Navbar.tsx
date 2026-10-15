@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
 import { useBag } from "@/context/BagContext";
@@ -66,7 +66,6 @@ export default function Navbar() {
           { label: "Sign In", href: "/sign-in" },
           { label: "Sign Up", href: "/sign-up" },
         ]),
-    { label: "FAQ", href: "/faq" },
     { label: "Sizing", href: "/sizing" },
   ];
 
@@ -113,6 +112,23 @@ export default function Navbar() {
                 {item}
               </span>
             ))}
+
+            {user ? (
+              <Link
+                href="/profile"
+                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors flex items-center gap-1.5"
+              >
+                <User size={16} />
+                Profile
+              </Link>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
 
             <Button onClick={openBag} className="text-xs py-2 px-5">
               Cart ({itemCount})
@@ -190,6 +206,24 @@ export default function Navbar() {
               </div>
             );
           })}
+          {user ? (
+            <Link
+              href="/profile"
+              onClick={() => { setMobileOpen(false); setMobileSection(null); }}
+              className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[#C6FF00]"
+            >
+              <User size={16} />
+              Profile
+            </Link>
+          ) : (
+            <Link
+              href="/sign-in"
+              onClick={() => { setMobileOpen(false); setMobileSection(null); }}
+              className="block text-sm font-bold uppercase tracking-wider text-[#C6FF00]"
+            >
+              Sign In
+            </Link>
+          )}
           <Button onClick={() => { setMobileOpen(false); openBag(); }} className="w-full text-xs py-2 mt-4">
             Cart ({itemCount})
           </Button>

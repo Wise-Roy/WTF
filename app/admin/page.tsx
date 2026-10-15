@@ -769,12 +769,20 @@ interface AdminUser {
   id: string;
   email: string;
   created_at: string;
+  is_restricted: boolean;
   profile: UserProfile | null;
 }
 
 function UsersPanel() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{ userId: string; name: string; action: "restrict" | "restore" } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -791,15 +799,106 @@ function UsersPanel() {
       }
     })();
     return () => ac.abort();
-  }, []);
+  }, [refreshKey]);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleRestriction = async () => {
+    if (!confirmDialog) return;
+    setActionLoading(true);
+
+    try {
+      const res = await fetch(`/api/admin/users/${confirmDialog.userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_restricted: confirmDialog.action === "restrict" }),
+      });
+
+      if (res.ok) {
+        showToast(`User ${confirmDialog.action === "restrict" ? "restricted" : "restored"} successfully`);
+        setRefreshKey((k) => k + 1);
+      } else {
+        showToast("Action failed");
+      }
+    } catch {
+      showToast("Action failed");
+    } finally {
+      setActionLoading(false);
+      setConfirmDialog(null);
+    }
+  };
+
+  const filtered = users.filter((u) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return (
+      u.email.toLowerCase().includes(q) ||
+      (u.profile?.name || "").toLowerCase().includes(q) ||
+      (u.profile?.phone || "").toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-[#1a1a1a] border border-white/20 rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-white mb-2">
+              {confirmDialog.action === "restrict" ? "Restrict User" : "Restore User"}
+            </h3>
+            <p className="text-white/60 text-sm mb-6">
+              {confirmDialog.action === "restrict"
+                ? `Are you sure you want to restrict "${confirmDialog.name}"? They will be unable to sign in or access protected features.`
+                : `Are you sure you want to restore access for "${confirmDialog.name}"?`}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmDialog(null)}
+                disabled={actionLoading}
+                className="px-5 py-2.5 text-sm uppercase tracking-wider border border-white/20 text-white/60 rounded hover:border-white/40 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRestriction}
+                disabled={actionLoading}
+                className={`px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded transition disabled:opacity-50 ${
+                  confirmDialog.action === "restrict"
+                    ? "bg-red-500 text-white hover:bg-red-600"
+                    : "bg-[#C6FF00] text-[#1a1a1a] hover:brightness-90"
+                }`}
+              >
+                {actionLoading ? "Processing..." : confirmDialog.action === "restrict" ? "Restrict" : "Restore"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <h2 className="text-xl font-bold">Users</h2>
-        <span className="text-white/40 text-sm">
-          {!loading && `${users.length} registered`}
-        </span>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name, email, phone..."
+            className="flex-1 sm:w-64 bg-white/5 border border-white/10 rounded px-4 py-2 text-sm text-white placeholder-white/30 focus:border-[#C6FF00] focus:outline-none transition-colors"
+          />
+          <span className="text-white/40 text-sm shrink-0">
+            {!loading && `${filtered.length} of ${users.length}`}
+          </span>
+        </div>
       </div>
 
       {loading ? (
@@ -808,9 +907,11 @@ function UsersPanel() {
             <div key={i} className="h-14 bg-white/5 rounded animate-pulse" />
           ))}
         </div>
-      ) : users.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-white/40 text-lg">No users registered yet</p>
+          <p className="text-white/40 text-lg">
+            {search ? "No users match your search" : "No users registered yet"}
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -820,33 +921,87 @@ function UsersPanel() {
                 <th className="py-3 pr-4">Email</th>
                 <th className="py-3 pr-4">Name</th>
                 <th className="py-3 pr-4">Phone</th>
-                <th className="py-3 pr-4">City</th>
-                <th className="py-3 pr-4">Country</th>
-                <th className="py-3">Joined</th>
+                <th className="py-3 pr-4">Status</th>
+                <th className="py-3 pr-4">Joined</th>
+                <th className="py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
-                <tr key={u.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="py-3 pr-4 font-medium">{u.email}</td>
-                  <td className="py-3 pr-4 text-white/60">
-                    {u.profile?.name || <span className="text-white/20">—</span>}
-                  </td>
-                  <td className="py-3 pr-4 text-white/60 font-mono text-xs">
-                    {u.profile?.phone || <span className="text-white/20">—</span>}
-                  </td>
-                  <td className="py-3 pr-4 text-white/60">
-                    {u.profile?.city || <span className="text-white/20">—</span>}
-                  </td>
-                  <td className="py-3 pr-4">
-                    <span className="bg-white/10 px-2 py-0.5 rounded text-xs">
-                      {u.profile?.country || "—"}
-                    </span>
-                  </td>
-                  <td className="py-3 text-white/40 text-xs">
-                    {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
-                  </td>
-                </tr>
+              {filtered.map((u) => (
+                <>
+                  <tr key={u.id} className="border-b border-white/5 hover:bg-white/5">
+                    <td className="py-3 pr-4 font-medium">{u.email}</td>
+                    <td className="py-3 pr-4 text-white/60">
+                      {u.profile?.name || <span className="text-white/20">—</span>}
+                    </td>
+                    <td className="py-3 pr-4 text-white/60 font-mono text-xs">
+                      {u.profile?.phone || <span className="text-white/20">—</span>}
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider ${
+                        u.is_restricted
+                          ? "bg-red-500/20 text-red-400"
+                          : "bg-green-500/20 text-green-400"
+                      }`}>
+                        {u.is_restricted ? "Restricted" : "Active"}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-white/40 text-xs">
+                      {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="py-3">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setExpandedUser(expandedUser === u.id ? null : u.id)}
+                          className="text-[#C6FF00] hover:underline text-xs uppercase tracking-wider"
+                        >
+                          {expandedUser === u.id ? "Hide" : "Details"}
+                        </button>
+                        {u.is_restricted ? (
+                          <button
+                            onClick={() => setConfirmDialog({ userId: u.id, name: u.profile?.name || u.email, action: "restore" })}
+                            className="text-green-400 hover:underline text-xs uppercase tracking-wider"
+                          >
+                            Restore
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDialog({ userId: u.id, name: u.profile?.name || u.email, action: "restrict" })}
+                            className="text-red-400 hover:underline text-xs uppercase tracking-wider"
+                          >
+                            Restrict
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedUser === u.id && (
+                    <tr key={`${u.id}-detail`} className="border-b border-white/5 bg-white/[0.02]">
+                      <td colSpan={6} className="py-4 px-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                          <div>
+                            <span className="text-white/40 uppercase tracking-wider block mb-1">City</span>
+                            <span className="text-white/70">{u.profile?.city || "—"}</span>
+                          </div>
+                          <div>
+                            <span className="text-white/40 uppercase tracking-wider block mb-1">Country</span>
+                            <span className="text-white/70">{u.profile?.country || "—"}</span>
+                          </div>
+                          <div>
+                            <span className="text-white/40 uppercase tracking-wider block mb-1">User ID</span>
+                            <span className="text-white/40 font-mono text-[10px] break-all">{u.id}</span>
+                          </div>
+                          <div>
+                            <span className="text-white/40 uppercase tracking-wider block mb-1">Account</span>
+                            <span className={u.is_restricted ? "text-red-400" : "text-green-400"}>
+                              {u.is_restricted ? "Restricted" : "Active"}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))}
             </tbody>
           </table>
@@ -858,7 +1013,7 @@ function UsersPanel() {
 
 /* ─────────────── FOOTER TAB ─────────────── */
 function FooterPanel() {
-  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "" });
+  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", privacy_policy_pdf: "", newsletter_pdf: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -908,6 +1063,8 @@ function FooterPanel() {
     { key: "spotify" as const, label: "Spotify", placeholder: "https://open.spotify.com/artist/..." },
     { key: "facebook" as const, label: "Facebook", placeholder: "https://facebook.com/yourpage" },
     { key: "google_review" as const, label: "Google Reviews", placeholder: "https://g.page/r/your-review-link" },
+    { key: "privacy_policy_pdf" as const, label: "Privacy Policy PDF", placeholder: "https://example.com/privacy-policy.pdf" },
+    { key: "newsletter_pdf" as const, label: "Newsletter PDF", placeholder: "https://example.com/newsletter.pdf" },
   ];
 
   return (

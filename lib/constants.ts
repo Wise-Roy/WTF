@@ -123,15 +123,24 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Shop",
     links: [
-      { label: "Shop the Drop", href: "/silhouettes" },
-      { label: "FAQ", href: "#faq" },
+      { label: "Collections", href: "/collections" },
+      { label: "All Silhouettes", href: "/silhouettes" },
+    ],
+  },
+  {
+    title: "About",
+    links: [
+      { label: "Designs", href: "/design" },
+      { label: "Designer", href: "/designer" },
+      { label: "Musicians", href: "/musician" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About", href: "/designer" },
       { label: "Contact", href: "/contact" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Newsletter", href: "/newsletter" },
     ],
   },
 ];

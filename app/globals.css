@@ -55,6 +55,13 @@ body {
   transition: opacity 0.15s ease;
 }
 
+/* Bigger star cursor on collection cards */
+.collection-card:hover ~ .star-cursor,
+body:has(.collection-card:hover) .star-cursor {
+  font-size: 42px !important;
+  transition: font-size 0.2s ease, opacity 0.15s ease;
+}
+
 /* Hide native cursor globally — navbar & admin are exceptions */
 html:not(:has(.admin-area)),
 html:not(:has(.admin-area)) *,
