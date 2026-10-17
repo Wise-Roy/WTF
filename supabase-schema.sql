@@ -194,3 +194,8 @@ CREATE INDEX IF NOT EXISTS idx_feedback_user ON feedback (user_id);
 
 ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all on feedback" ON feedback FOR ALL USING (true) WITH CHECK (true);
+
+-- Product fabric / fit / care (optional per-product specs)
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fabric text DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fit text DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_care text DEFAULT '';

@@ -25,6 +25,9 @@ export async function PUT(
   if (body.prod_description !== undefined) updates.prod_description = (body.prod_description as string).trim();
   if (body.prod_label !== undefined) updates.prod_label = (body.prod_label as string).trim();
   if (body.image !== undefined) updates.image = body.image;
+  if (body.prod_fabric !== undefined) updates.prod_fabric = (body.prod_fabric as string).trim();
+  if (body.prod_fit !== undefined) updates.prod_fit = (body.prod_fit as string).trim();
+  if (body.prod_care !== undefined) updates.prod_care = (body.prod_care as string).trim();
 
   if (body.prod_rank !== undefined) {
     const rank = Number(body.prod_rank);

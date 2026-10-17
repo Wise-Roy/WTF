@@ -266,25 +266,31 @@ function StoryLayout({ product }: { product: DbProduct }) {
               style={{ boxShadow: "5px 5px 0 #FFD9E7", height: "calc(72vh - 28px)" , alignSelf: "center" }}
             >
               <div className="p-6 flex-1 flex flex-col">
-                <h2 className="mt-3 font-heading text-2xl xl:text-3xl uppercase leading-[1.05] text-[#1a1a1a]">
+                <h2 className="mt-3 font-heading text-2xl xl:text-3xl uppercase leading-[1.05] text-[#C6FF00]">
                   {product.prod_name}
                 </h2>
                 <p className="mt-4 text-sm text-[#1a1a1a]/70 leading-relaxed line-clamp-3">
                   {product.prod_description || "A numbered piece from the drop. Designed, printed, and shipped with intention."}
                 </p>
 
-                <div className="mt-6 space-y-3 flex-1">
-                  {[
-                    { label: "Fabric", value: "Premium heavyweight cotton" },
-                    { label: "Fit", value: "Relaxed / Oversized" },
-                    { label: "Care", value: "Cold wash, hang dry" },
-                  ].map((spec) => (
-                    <div key={spec.label} className="border-t border-[#1a1a1a]/10 pt-2">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#DF2877]">{spec.label}</span>
-                      <p className="text-xs text-[#1a1a1a]/70 mt-0.5">{spec.value}</p>
-                    </div>
-                  ))}
-                </div>
+                {[
+                  { label: "Fabric", value: product.prod_fabric },
+                  { label: "Fit", value: product.prod_fit },
+                  { label: "Care", value: product.prod_care },
+                ].filter((s) => s.value).length > 0 && (
+                  <div className="mt-6 space-y-3 flex-1">
+                    {[
+                      { label: "Fabric", value: product.prod_fabric },
+                      { label: "Fit", value: product.prod_fit },
+                      { label: "Care", value: product.prod_care },
+                    ].filter((s) => s.value).map((spec) => (
+                      <div key={spec.label} className="border-t border-[#1a1a1a]/10 pt-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#DF2877]">{spec.label}</span>
+                        <p className="text-xs text-[#1a1a1a]/70 mt-0.5">{spec.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="border-t border-[#1a1a1a]/10 px-6 py-3">
                 <p className="text-[10px] italic text-[#1a1a1a]/40 text-center" style={{ fontFamily: "serif" }}>
@@ -398,7 +404,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
             >
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-baseline gap-3">
-                  <span className="font-heading text-3xl text-[#1a1a1a]">
+                  <span className="font-heading text-3xl text-[#C6FF00]">
                     ₹{product.prod_price.toLocaleString("en-IN")}
                   </span>
                   <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/40">
@@ -414,7 +420,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
 
                 {/* Quantity */}
                 <div className="mt-8">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/60">Quantity</span>
+                  <span className="mr-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/60">Quantity</span>
                   <div className="mt-2 inline-flex items-center border-2 border-[#1a1a1a] rounded-sm">
                     <button
                       type="button"
@@ -666,18 +672,24 @@ function MobileStory({
         <p className="mt-3 text-sm text-[#1a1a1a]/70 leading-relaxed">
           {product.prod_description || "A numbered piece from the drop. Designed, printed, and shipped with intention."}
         </p>
-        <div className="mt-4 space-y-3">
-          {[
-            { label: "Fabric", value: "Premium heavyweight cotton" },
-            { label: "Fit", value: "Relaxed / Oversized" },
-            { label: "Care", value: "Cold wash, hang dry" },
-          ].map((spec) => (
-            <div key={spec.label} className="border-t border-[#1a1a1a]/10 pt-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#DF2877]">{spec.label}</span>
-              <p className="text-xs text-[#1a1a1a]/70 mt-0.5">{spec.value}</p>
-            </div>
-          ))}
-        </div>
+        {[
+          { label: "Fabric", value: product.prod_fabric },
+          { label: "Fit", value: product.prod_fit },
+          { label: "Care", value: product.prod_care },
+        ].filter((s) => s.value).length > 0 && (
+          <div className="mt-4 space-y-3">
+            {[
+              { label: "Fabric", value: product.prod_fabric },
+              { label: "Fit", value: product.prod_fit },
+              { label: "Care", value: product.prod_care },
+            ].filter((s) => s.value).map((spec) => (
+              <div key={spec.label} className="border-t border-[#1a1a1a]/10 pt-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#DF2877]">{spec.label}</span>
+                <p className="text-xs text-[#1a1a1a]/70 mt-0.5">{spec.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Buy panel */}

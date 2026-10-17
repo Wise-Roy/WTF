@@ -24,6 +24,9 @@ export default function ProductForm({ product }: ProductFormProps) {
     prod_description: product?.prod_description || "",
     prod_label: product?.prod_label || "New",
     prod_rank: product?.prod_rank?.toString() || "0",
+    prod_fabric: product?.prod_fabric || "",
+    prod_fit: product?.prod_fit || "",
+    prod_care: product?.prod_care || "",
   });
 
   const [images, setImages] = useState<(string | null)[]>([
@@ -90,6 +93,9 @@ export default function ProductForm({ product }: ProductFormProps) {
       prod_description: form.prod_description,
       prod_label: form.prod_label,
       prod_rank: parseInt(form.prod_rank, 10),
+      prod_fabric: form.prod_fabric,
+      prod_fit: form.prod_fit,
+      prod_care: form.prod_care,
       image: imageUrls.length === 3 ? imageUrls : [],
     };
 
@@ -173,6 +179,22 @@ export default function ProductForm({ product }: ProductFormProps) {
           <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Rank (0 = unranked)</label>
           <input name="prod_rank" type="number" min="0" step="1" value={form.prod_rank} onChange={handleChange} className={inputClass} />
           {errors.prod_rank && <p className={errorClass}>{errors.prod_rank}</p>}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Fabric <span className="text-white/30">(optional)</span></label>
+        <input name="prod_fabric" value={form.prod_fabric} onChange={handleChange} className={inputClass} placeholder="e.g. Premium heavyweight cotton" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Fit <span className="text-white/30">(optional)</span></label>
+          <input name="prod_fit" value={form.prod_fit} onChange={handleChange} className={inputClass} placeholder="e.g. Relaxed / Oversized" />
+        </div>
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Care <span className="text-white/30">(optional)</span></label>
+          <input name="prod_care" value={form.prod_care} onChange={handleChange} className={inputClass} placeholder="e.g. Cold wash, hang dry" />
         </div>
       </div>
 

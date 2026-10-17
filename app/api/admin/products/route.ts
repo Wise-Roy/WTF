@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
     prod_description: (body.prod_description as string).trim(),
     prod_label: (body.prod_label as string).trim(),
     prod_rank: rank,
+    prod_fabric: ((body.prod_fabric as string) || "").trim(),
+    prod_fit: ((body.prod_fit as string) || "").trim(),
+    prod_care: ((body.prod_care as string) || "").trim(),
   }).select().single();
 
   if (error) {

@@ -97,7 +97,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link
-      href={`/get/${id}`}
+      href={`/product-story/${id}`}
       aria-label={`${prod_name}, ₹${prod_price}${isSoldOut ? ", sold out" : ""}`}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}

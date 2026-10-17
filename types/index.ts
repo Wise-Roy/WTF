@@ -66,6 +66,9 @@ export interface DbProduct {
   prod_description: string;
   prod_label: string;
   prod_rank: number;
+  prod_fabric: string;
+  prod_fit: string;
+  prod_care: string;
   created_at: string;
   updated_at: string;
 }

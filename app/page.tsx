@@ -1,4 +1,4 @@
-import { Hero, MarqueeBand, LatestDrop, WTFWay, FlagshipSpotlight, CultSpeaks, JoinCult, OfferModal } from "@/components/home";
+import { Hero, MarqueeBand, LatestDrop, WTFWay, FlagshipSpotlight, JoinCult, OfferModal } from "@/components/home";
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
       <LatestDrop />
       <WTFWay />
       <FlagshipSpotlight />
-      <CultSpeaks />
+
       <JoinCult />
     </>
   );

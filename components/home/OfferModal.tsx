@@ -386,7 +386,7 @@ function OfferContent({
             {/* CTA */}
             <motion.div {...stagger(5)} className="mt-6">
               <Link
-                href={`/get/${offer.product_id}`}
+                href={`/product-story/${offer.product_id}`}
                 onClick={() => sessionStorage.setItem(DISMISSED_KEY, "1")}
               >
                 <motion.div

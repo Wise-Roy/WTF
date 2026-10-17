@@ -128,19 +128,6 @@ export default function ContactPage() {
           )}
         </div>
       </SectionWrapper>
-
-      {/* CTA */}
-      <SectionWrapper scheme="pink" className="text-center">
-        <h3 className="font-heading text-3xl md:text-4xl uppercase tracking-wider font-bold">
-          Or just join the cult
-        </h3>
-        <p className="mt-4 text-white/70 max-w-lg mx-auto">
-          Skip the formalities. Get early access to every drop.
-        </p>
-        <Button href="/#join" className="mt-8">
-          Get early access
-        </Button>
-      </SectionWrapper>
     </>
   );
 }
