@@ -226,10 +226,66 @@ function DesignerHero({ images }: { images: string[] }) {
   );
 }
 
+/* ── Spotify Playlist URL helpers ── */
+function extractSpotifyPlaylistId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname !== "open.spotify.com") return null;
+    const match = u.pathname.match(/^\/playlist\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+/* ── Spotify Playlist Section ── */
+function SpotifyPlaylistSection({ spotifyUrl }: { spotifyUrl: string }) {
+  const playlistId = extractSpotifyPlaylistId(spotifyUrl);
+  if (!playlistId) return null;
+
+  const embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}`;
+
+  return (
+    <section className="bg-black py-16 px-6 md:px-12 lg:px-20">
+      <div className="mx-auto max-w-2xl">
+        <p className="font-body text-sm uppercase tracking-[0.2em] text-white/40 mb-3 text-center">
+          Curated by the designer
+        </p>
+        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-[0.04em] text-white mb-10 text-center">
+          The Playlist
+        </h2>
+
+        {/* Gradient-glow bordered faux-browser card */}
+        <div className="group relative">
+          {/* Outer glow layer */}
+          <div
+            className="absolute -inset-px rounded-3xl opacity-60 blur-md transition-opacity duration-300 group-hover:opacity-100"
+            style={{ background: "linear-gradient(135deg, #FF2D8C, #a855f5, #7B2FFF)" }}
+            aria-hidden="true"
+          />
+          {/* Inner card */}
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#121212] p-1.5">
+            <iframe
+              src={embedUrl}
+              width="100%"
+              height="552"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title="Spotify playlist player"
+              className="border-0 rounded-2xl"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ── Main Page ── */
 export default function DesignerPage() {
   const [sections, setSections] = useState<AboutSection[]>([]);
   const [heroImages, setHeroImages] = useState<string[]>(FALLBACK_HERO_IMAGES);
+  const [spotifyUrl, setSpotifyUrl] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -251,6 +307,13 @@ export default function DesignerPage() {
         }
       })
       .catch(() => {});
+
+    fetch("/api/footer")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data?.footer?.spotify) setSpotifyUrl(d.data.footer.spotify);
+      })
+      .catch(() => {});
   }, []);
 
   const displaySections = loaded ? sections : FALLBACK_SECTIONS;
@@ -258,6 +321,7 @@ export default function DesignerPage() {
   return (
     <>
       <DesignerHero images={heroImages} />
+      {spotifyUrl && <SpotifyPlaylistSection spotifyUrl={spotifyUrl} />}
       {displaySections.map((section) => (
         <AboutSectionBlock key={section.id} section={section} />
       ))}

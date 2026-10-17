@@ -1,10 +1,26 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DbProduct } from "@/types";
 import { useBag } from "@/context/BagContext";
+
+// Singleton offer cache — fetched once per page load
+let offerCache: { product_id: string; original_price: number } | null | undefined = undefined;
+let offerPromise: Promise<void> | null = null;
+
+function fetchOfferOnce() {
+  if (offerPromise) return offerPromise;
+  offerPromise = fetch("/api/offer")
+    .then((r) => r.json())
+    .then((d) => {
+      const o = d.data?.offer;
+      offerCache = o && o.product_id ? { product_id: o.product_id, original_price: o.original_price } : null;
+    })
+    .catch(() => { offerCache = null; });
+  return offerPromise;
+}
 
 interface ProductCardProps {
   product: DbProduct;
@@ -12,6 +28,21 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { id, image, prod_name, prod_price, prod_quantity } = product;
+  const [offerOriginalPrice, setOfferOriginalPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (offerCache !== undefined) {
+      if (offerCache && offerCache.product_id === id) {
+        setOfferOriginalPrice(offerCache.original_price);
+      }
+      return;
+    }
+    fetchOfferOnce().then(() => {
+      if (offerCache && offerCache.product_id === id) {
+        setOfferOriginalPrice(offerCache.original_price);
+      }
+    });
+  }, [id]);
 
   const imgLayersRef = useRef<(HTMLDivElement | null)[]>([null, null, null]);
   const priceRef = useRef<HTMLDivElement>(null);
@@ -139,9 +170,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             ref={priceRef}
             className="shrink-0 bg-[#C6FF00] rounded-full px-4 py-2 transition-transform duration-500 ease-in-out"
           >
-            <p className="font-extrabold font-mono tabular-nums leading-none text-[22px] max-sm:text-[18px] text-[#111]">
-              {priceStr}
-            </p>
+            {offerOriginalPrice && offerOriginalPrice > prod_price ? (
+              <div className="flex items-center gap-2">
+                <span className="font-mono tabular-nums leading-none text-[14px] max-sm:text-[12px] text-[#111]/40 line-through">
+                  ₹{offerOriginalPrice.toLocaleString()}
+                </span>
+                <p className="font-extrabold font-mono tabular-nums leading-none text-[22px] max-sm:text-[18px] text-[#111]">
+                  {priceStr}
+                </p>
+              </div>
+            ) : (
+              <p className="font-extrabold font-mono tabular-nums leading-none text-[22px] max-sm:text-[18px] text-[#111]">
+                {priceStr}
+              </p>
+            )}
           </div>
         </div>
       </div>

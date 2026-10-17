@@ -17,8 +17,22 @@ export default function ProductDetailPage() {
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [wishToast, setWishToast] = useState<string | null>(null);
+  const [offerOriginalPrice, setOfferOriginalPrice] = useState<number | null>(null);
   const { addItem } = useBag();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!id) return;
+    fetch("/api/offer")
+      .then((r) => r.json())
+      .then((d) => {
+        const o = d.data?.offer;
+        if (o && o.product_id === id && o.original_price) {
+          setOfferOriginalPrice(o.original_price);
+        }
+      })
+      .catch(() => {});
+  }, [id]);
 
   useEffect(() => {
     if (!user || !id) return;
@@ -161,9 +175,16 @@ export default function ProductDetailPage() {
             {product.prod_name}
           </h1>
 
-          <p className="mt-4 text-3xl font-extrabold font-mono text-[#1a1a1a]">
-            ₹{product.prod_price.toLocaleString()}
-          </p>
+          <div className="mt-4 flex items-center gap-3">
+            {offerOriginalPrice && offerOriginalPrice > product.prod_price && (
+              <span className="text-xl font-mono text-[#1a1a1a]/40 line-through">
+                ₹{offerOriginalPrice.toLocaleString()}
+              </span>
+            )}
+            <p className="text-3xl font-extrabold font-mono text-[#1a1a1a]">
+              ₹{product.prod_price.toLocaleString()}
+            </p>
+          </div>
 
           <p className="mt-6 text-[#1a1a1a]/70 leading-relaxed text-lg">
             {product.prod_description}

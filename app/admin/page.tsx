@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe, Music, ImageIcon } from "lucide-react";
+import { Package, FileText, Users, Globe, Music, ImageIcon, Tag } from "lucide-react";
 import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero";
+type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
@@ -16,6 +16,7 @@ const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "musicians", label: "Musicians", icon: Music },
   { key: "users", label: "Users", icon: Users },
   { key: "footer", label: "Footer", icon: Globe },
+  { key: "offers", label: "Offers", icon: Tag },
 ];
 
 /* ─────────────── PRODUCTS TAB ─────────────── */
@@ -1263,6 +1264,299 @@ function DesignerHeroPanel() {
   );
 }
 
+/* ─────────────── OFFERS TAB ─────────────── */
+function OffersPanel() {
+  const [form, setForm] = useState({
+    is_enabled: false,
+    header: "",
+    description: "",
+    product_id: "",
+    original_price: 0,
+    discounted_price: "",
+    image_path: "",
+    end_time: "",
+  });
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const [offerRes, prodRes] = await Promise.all([
+          fetch("/api/admin/offer", { signal: ac.signal }),
+          fetch("/api/admin/products", { signal: ac.signal }),
+        ]);
+        const offerData = await offerRes.json();
+        const prodData = await prodRes.json();
+        if (!ac.signal.aborted) {
+          setProducts(prodData.data?.products || []);
+          if (offerData.data?.offer) {
+            const o = offerData.data.offer;
+            setForm({
+              is_enabled: o.is_enabled || false,
+              header: o.header || "",
+              description: o.description || "",
+              product_id: o.product_id || "",
+              original_price: o.original_price || 0,
+              discounted_price: o.discounted_price ? String(o.discounted_price) : "",
+              image_path: o.image_path || "",
+              end_time: o.end_time || "",
+            });
+          }
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
+
+  const selectedProduct = products.find((p) => p.id === form.product_id);
+
+  const handleProductChange = (productId: string) => {
+    const prod = products.find((p) => p.id === productId);
+    setForm((p) => ({
+      ...p,
+      product_id: productId,
+      original_price: prod ? prod.prod_price : 0,
+    }));
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const publicUrl = await uploadFile(file, "offers");
+      setForm((p) => ({ ...p, image_path: publicUrl }));
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/offer", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          original_price: form.original_price,
+          discounted_price: Number(form.discounted_price) || 0,
+        }),
+      });
+      const d = await res.json();
+      if (res.ok) showToast("Offer saved");
+      else showToast(d.message || "Save failed");
+    } catch {
+      showToast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 rounded px-4 py-2.5 text-white placeholder-white/30 focus:border-[#C6FF00] focus:outline-none transition-colors";
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-xl font-bold">Offer Card</h2>
+        <button
+          onClick={handleSave}
+          disabled={saving || loading}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-12 bg-white/5 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-6 max-w-lg">
+          {/* Toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="block text-sm font-medium text-white/60">Offer Status</label>
+              <p className="text-xs text-white/30 mt-1">
+                {form.is_enabled ? "Modal will appear on home page — product price will update to discounted price" : "Modal is hidden — product shows original price"}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm((p) => ({ ...p, is_enabled: !p.is_enabled }))}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                form.is_enabled ? "bg-[#C6FF00]" : "bg-white/20"
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  form.is_enabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Product Selection */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Product {form.is_enabled && <span className="text-red-400">*</span>}
+            </label>
+            <select
+              value={form.product_id}
+              onChange={(e) => handleProductChange(e.target.value)}
+              className={inputClass}
+            >
+              <option value="" className="bg-[#1a1a1a]">Select a product...</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id} className="bg-[#1a1a1a]">
+                  {p.prod_name} — ₹{p.prod_price}
+                </option>
+              ))}
+            </select>
+            {selectedProduct && (
+              <p className="text-xs text-white/30 mt-1">
+                Original price: ₹{selectedProduct.prod_price.toLocaleString("en-IN")}
+              </p>
+            )}
+          </div>
+
+          {/* Header */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Offer Header {form.is_enabled && <span className="text-red-400">*</span>}
+            </label>
+            <input
+              value={form.header}
+              onChange={(e) => setForm((p) => ({ ...p, header: e.target.value }))}
+              className={inputClass}
+              placeholder="e.g. Summer Sale — 40% Off"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Offer Description {form.is_enabled && <span className="text-red-400">*</span>}
+            </label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+              rows={3}
+              className={inputClass}
+              placeholder="Describe the promotional offer..."
+            />
+          </div>
+
+          {/* Discounted Price */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Discounted Price (₹) {form.is_enabled && <span className="text-red-400">*</span>}
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={form.discounted_price}
+              onChange={(e) => setForm((p) => ({ ...p, discounted_price: e.target.value }))}
+              className={inputClass}
+              placeholder="1999"
+            />
+            {selectedProduct && form.discounted_price && Number(form.discounted_price) < selectedProduct.prod_price && (
+              <p className="text-xs text-[#C6FF00] mt-1">
+                {Math.round((1 - Number(form.discounted_price) / selectedProduct.prod_price) * 100)}% off
+              </p>
+            )}
+          </div>
+
+          {/* End Time */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Offer End Time {form.is_enabled && <span className="text-red-400">*</span>}
+            </label>
+            <input
+              type="datetime-local"
+              value={form.end_time}
+              onChange={(e) => setForm((p) => ({ ...p, end_time: e.target.value }))}
+              className={inputClass}
+            />
+            {form.end_time && (
+              <p className="text-xs text-white/30 mt-1">
+                Countdown will show until {new Date(form.end_time).toLocaleString()}
+              </p>
+            )}
+          </div>
+
+          {/* Image */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Offer Image {form.is_enabled && <span className="text-red-400">*</span>}
+            </label>
+            <div className="flex items-start gap-4">
+              <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10 shrink-0 flex items-center justify-center">
+                {form.image_path ? (
+                  <>
+                    <Image src={form.image_path} alt="Offer preview" fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setForm((p) => ({ ...p, image_path: "" }))}
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-500 transition-colors z-10"
+                      title="Remove"
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <span className="text-white/20 text-xs">No image</span>
+                )}
+                {uploading && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                    <div className="h-5 w-5 border-2 border-[#C6FF00] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+              <label className="cursor-pointer bg-white/5 border border-white/10 rounded px-4 py-2.5 text-sm text-white/60 hover:border-[#C6FF00]/50 transition-colors">
+                Upload Image
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────── MAIN ADMIN PAGE ─────────────── */
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("products");
@@ -1301,6 +1595,7 @@ export default function AdminPage() {
         {activeTab === "musicians" && <MusiciansPanel />}
         {activeTab === "users" && <UsersPanel />}
         {activeTab === "footer" && <FooterPanel />}
+        {activeTab === "offers" && <OffersPanel />}
       </main>
     </div>
   );
