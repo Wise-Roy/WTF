@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette } from "lucide-react";
+import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star } from "lucide-react";
 import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images";
+type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
@@ -18,6 +18,7 @@ const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "footer", label: "Footer", icon: Globe },
   { key: "offers", label: "Offers", icon: Tag },
   { key: "design-images", label: "Design Page", icon: Palette },
+  { key: "main-character", label: "Main Character", icon: Star },
 ];
 
 /* ─────────────── PRODUCTS TAB ─────────────── */
@@ -1714,6 +1715,246 @@ function DesignImagesPanel() {
   );
 }
 
+/* ─────────────── MAIN CHARACTER TAB ─────────────── */
+function MainCharacterPanel() {
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [form, setForm] = useState({
+    product_id: "",
+    custom_title: "",
+    custom_description: "",
+    selected_image: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const [flagshipRes, prodRes] = await Promise.all([
+          fetch("/api/admin/flagship", { signal: ac.signal }),
+          fetch("/api/admin/products", { signal: ac.signal }),
+        ]);
+        const flagshipData = await flagshipRes.json();
+        const prodData = await prodRes.json();
+        if (!ac.signal.aborted) {
+          setProducts(prodData.data?.products || []);
+          if (flagshipData.data?.flagship) {
+            const f = flagshipData.data.flagship;
+            setForm({
+              product_id: f.product_id || "",
+              custom_title: f.custom_title || "",
+              custom_description: f.custom_description || "",
+              selected_image: f.selected_image || "",
+            });
+          }
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
+
+  const selectedProduct = products.find((p) => p.id === form.product_id);
+
+  const handleProductChange = (productId: string) => {
+    const prod = products.find((p) => p.id === productId);
+    setForm((p) => ({
+      ...p,
+      product_id: productId,
+      selected_image: prod?.image?.[0] || "",
+    }));
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleSave = async () => {
+    if (!form.product_id) { showToast("Select a product"); return; }
+    if (!form.selected_image) { showToast("Select an image"); return; }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/flagship", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const d = await res.json();
+      if (res.ok) showToast("Main Character saved");
+      else showToast(d.message || "Save failed");
+    } catch {
+      showToast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 rounded px-4 py-2.5 text-white placeholder-white/30 focus:border-[#C6FF00] focus:outline-none transition-colors";
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl font-bold">Main Character</h2>
+        <button
+          onClick={handleSave}
+          disabled={saving || loading}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+      <p className="text-white/40 text-sm mb-8">
+        Select one product to feature in the Flagship Spotlight on the home page. Pick an image from its existing uploads. Title and description are optional — if left empty, product defaults are used.
+      </p>
+
+      {loading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-12 bg-white/5 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Form */}
+          <div className="space-y-6">
+            {/* Product Dropdown */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+                Product <span className="text-red-400">*</span>
+              </label>
+              <select
+                value={form.product_id}
+                onChange={(e) => handleProductChange(e.target.value)}
+                className={inputClass}
+              >
+                <option value="" className="bg-[#1a1a1a]">Select a product...</option>
+                {products.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-[#1a1a1a]">
+                    {p.prod_name} — ₹{p.prod_price}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Image Selection */}
+            {selectedProduct && selectedProduct.image?.length > 0 && (
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+                  Select Image <span className="text-red-400">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {selectedProduct.image.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setForm((p) => ({ ...p, selected_image: img }))}
+                      className={`relative aspect-[3/4] rounded-lg overflow-hidden border-2 transition-colors ${
+                        form.selected_image === img
+                          ? "border-[#C6FF00]"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                    >
+                      <Image src={img} alt={`Product image ${idx + 1}`} fill className="object-cover" />
+                      {form.selected_image === img && (
+                        <div className="absolute inset-0 bg-[#C6FF00]/10 flex items-center justify-center">
+                          <span className="bg-[#C6FF00] text-[#1a1a1a] text-xs font-bold px-2 py-1 rounded">
+                            Selected
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Custom Title */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+                Custom Title <span className="text-white/20">(optional)</span>
+              </label>
+              <input
+                value={form.custom_title}
+                onChange={(e) => setForm((p) => ({ ...p, custom_title: e.target.value }))}
+                className={inputClass}
+                placeholder={selectedProduct?.prod_name || "Leave empty to use product name"}
+              />
+              {!form.custom_title && selectedProduct && (
+                <p className="text-xs text-white/30 mt-1">
+                  Will display: &ldquo;{selectedProduct.prod_name}&rdquo;
+                </p>
+              )}
+            </div>
+
+            {/* Custom Description */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+                Custom Description <span className="text-white/20">(optional)</span>
+              </label>
+              <textarea
+                value={form.custom_description}
+                onChange={(e) => setForm((p) => ({ ...p, custom_description: e.target.value }))}
+                rows={4}
+                className={inputClass}
+                placeholder={selectedProduct?.prod_description || "Leave empty to use product description"}
+              />
+              {!form.custom_description && selectedProduct && (
+                <p className="text-xs text-white/30 mt-1 line-clamp-2">
+                  Will display: &ldquo;{selectedProduct.prod_description}&rdquo;
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Preview</label>
+            <div className="border border-white/10 rounded-lg p-6 bg-[#C6FF00]/5">
+              {selectedProduct ? (
+                <div className="space-y-4">
+                  <p className="text-xs uppercase tracking-wider text-[#C6FF00]">Main Character</p>
+                  <h3 className="text-lg font-bold uppercase tracking-wider">
+                    {form.custom_title || selectedProduct.prod_name}
+                  </h3>
+                  <p className="text-sm text-white/60 line-clamp-4">
+                    {form.custom_description || selectedProduct.prod_description}
+                  </p>
+                  {form.selected_image && (
+                    <div className="relative aspect-[3/4] rounded-lg overflow-hidden mt-4">
+                      <Image
+                        src={form.selected_image}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-white/30 text-sm">Select a product to see preview</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────── MAIN ADMIN PAGE ─────────────── */
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("products");
@@ -1754,6 +1995,7 @@ export default function AdminPage() {
         {activeTab === "footer" && <FooterPanel />}
         {activeTab === "offers" && <OffersPanel />}
         {activeTab === "design-images" && <DesignImagesPanel />}
+        {activeTab === "main-character" && <MainCharacterPanel />}
       </main>
     </div>
   );

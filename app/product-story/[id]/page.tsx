@@ -263,7 +263,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
             {/* LEFT CARD — The Details */}
             <div
               className="bg-white border-2 border-[#1a1a1a] rounded-md flex flex-col justify-between overflow-hidden"
-              style={{ boxShadow: "5px 5px 0 #FFD9E7", height: "calc(72vh - 28px)" , alignSelf: "center" }}
+              style={{  height: "calc(72vh - 28px)" , alignSelf: "center" }}
             >
               <div className="p-6 flex-1 flex flex-col">
                 <h2 className="mt-3 font-heading text-2xl xl:text-3xl uppercase leading-[1.05] text-[#C6FF00]">
@@ -400,7 +400,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
             {/* RIGHT CARD — The Price */}
             <div
               className="bg-white border-2 border-[#1a1a1a] rounded-md flex flex-col justify-between overflow-hidden"
-              style={{ boxShadow: "5px 5px 0 #FFD9E7", height: "calc(72vh - 28px)", alignSelf: "center" }}
+              style={{ height: "calc(72vh - 28px)", alignSelf: "center" }}
             >
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-baseline gap-3">

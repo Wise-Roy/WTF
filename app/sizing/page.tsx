@@ -38,9 +38,6 @@ function SizeChart() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#1a1a1a]/70">
-              THE NUMBERS
-            </p>
             <h2
               className={`${bebas.className} text-[#1a1a1a] text-6xl md:text-8xl leading-[0.85]`}
             >
@@ -51,7 +48,7 @@ function SizeChart() {
 
         {/* Table */}
         <motion.div
-          className="border-2 border-[#1a1a1a] bg-[#1a1a1a] shadow-[10px_10px_0_#DF2877] mt-10"
+        className="border-2 border-[#1a1a1a] bg-[#1a1a1a] mt-10"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
@@ -185,9 +182,6 @@ function SizeFinder() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#1a1a1a]/70">
-            SKIP THE MATH
-          </p>
           <h2
             className={`${bebas.className} text-[#1a1a1a] text-6xl md:text-8xl leading-[0.85]`}
           >
@@ -200,7 +194,7 @@ function SizeFinder() {
 
         {/* Tool card */}
         <motion.div
-          className="max-w-3xl mx-auto mt-10 bg-[#1a1a1a] border-2 border-[#1a1a1a] shadow-[10px_10px_0_#DF2877] p-6 md:p-10"
+          className="max-w-3xl mx-auto mt-10 bg-[#1a1a1a] border-2 border-[#1a1a1a] p-6 md:p-10"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
