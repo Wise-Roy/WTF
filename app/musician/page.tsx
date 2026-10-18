@@ -49,7 +49,7 @@ function HeroIntro() {
     <div ref={sectionRef} className="relative h-screen bg-black flex items-center justify-center overflow-hidden">
       {/* Background image */}
       <Image
-        src="/music-bg.jpg"
+        src="/music.jpg"
         alt=""
         fill
         className="object-cover"

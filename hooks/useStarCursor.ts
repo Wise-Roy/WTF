@@ -68,7 +68,6 @@ export function useStarCursor(enabled: boolean) {
   const mouseRef = useRef({ x: -100, y: -100 });
   const rafRef = useRef<number>(0);
   const isVisibleRef = useRef(false);
-  const overNavRef = useRef(false);
 
   const spawnParticle = useCallback(
     (x: number, y: number, isBurst: boolean) => {
@@ -115,46 +114,28 @@ export function useStarCursor(enabled: boolean) {
     const onMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
 
-      const target = e.target as HTMLElement;
-      const isOverNav = !!target.closest("nav");
-
-      if (isOverNav !== overNavRef.current) {
-        overNavRef.current = isOverNav;
-        if (cursorRef.current) {
-          cursorRef.current.style.opacity = isOverNav ? "0" : "1";
-        }
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        if (cursorRef.current) cursorRef.current.style.opacity = "1";
       }
 
-      if (!isOverNav) {
-        if (!isVisibleRef.current) {
-          isVisibleRef.current = true;
-          if (cursorRef.current) cursorRef.current.style.opacity = "1";
-        }
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+      }
 
-        if (cursorRef.current) {
-          cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
-        }
+      const dx = e.clientX - lastPosRef.current.x;
+      const dy = e.clientY - lastPosRef.current.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
 
-        const dx = e.clientX - lastPosRef.current.x;
-        const dy = e.clientY - lastPosRef.current.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist > SPAWN_DISTANCE) {
-          for (let i = 0; i < TRAIL_PARTICLES; i++) {
-            spawnParticle(e.clientX, e.clientY, false);
-          }
-          lastPosRef.current = { x: e.clientX, y: e.clientY };
-        }
-      } else {
-        if (cursorRef.current) {
-          cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+      if (dist > SPAWN_DISTANCE) {
+        for (let i = 0; i < TRAIL_PARTICLES; i++) {
+          spawnParticle(e.clientX, e.clientY, false);
         }
         lastPosRef.current = { x: e.clientX, y: e.clientY };
       }
     };
 
     const onMouseDown = (e: MouseEvent) => {
-      if (overNavRef.current) return;
       for (let i = 0; i < BURST_PARTICLES; i++) {
         spawnParticle(e.clientX, e.clientY, true);
       }
@@ -211,7 +192,7 @@ export function useStarCursor(enabled: boolean) {
 
     // Keep cursor positioned during trackpad/wheel scroll (no mousemove fires)
     const onScroll = () => {
-      if (!isVisibleRef.current || overNavRef.current) return;
+      if (!isVisibleRef.current) return;
       const { x, y } = mouseRef.current;
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;

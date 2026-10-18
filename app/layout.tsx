@@ -28,8 +28,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${anton.variable} ${spaceGrotesk.variable}`}>
-      <body className="min-h-screen flex flex-col antialiased">
+    <html lang="en" suppressHydrationWarning className={`${anton.variable} ${spaceGrotesk.variable}`}>
+      <body suppressHydrationWarning className="min-h-screen flex flex-col antialiased">
         <LogoLoader />
         <StarCursorEffect />
         <AuthProvider>

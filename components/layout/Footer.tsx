@@ -88,7 +88,7 @@ export default function Footer() {
       .catch(() => {});
   }, []);
 
-  if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/admin")) return <footer style={{ display: "none" }} />;
 
   const isHome = pathname === "/";
 

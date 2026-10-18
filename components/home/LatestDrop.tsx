@@ -28,9 +28,11 @@ function Carousel({ products }: { products: DbProduct[] }) {
   const lastDragTime = useRef(0);
 
   const count = products.length;
-  const reducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
 
   // Wrap index for infinite loop
   const wrap = useCallback(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Tangerine } from "next/font/google";
 import gsap from "gsap";
@@ -14,7 +14,7 @@ const tangerine = Tangerine({
   display: "swap",
 });
 
-const HERO_IMAGES = [
+const FALLBACK_IMAGES = [
   { src: "/D1.jpg", alt: "Design 1" },
   { src: "/D2.jpg", alt: "Design 2" },
   { src: "/D3.jpg", alt: "Design 3" },
@@ -30,6 +30,29 @@ function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [heroImages, setHeroImages] = useState(FALLBACK_IMAGES);
+
+  // Fetch design images from DB
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const r = await fetch("/api/design-images", { signal: ac.signal });
+        const d = await r.json();
+        if (!ac.signal.aborted && d.data?.images?.length > 0) {
+          setHeroImages(
+            d.data.images.map((src: string, i: number) => ({
+              src,
+              alt: `Design ${i + 1}`,
+            }))
+          );
+        }
+      } catch {
+        // Keep fallback images
+      }
+    })();
+    return () => ac.abort();
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -86,7 +109,7 @@ function HeroSection() {
       triggers.forEach((t) => t.kill());
       mm.revert();
     };
-  }, []);
+  }, [heroImages]);
 
   return (
     <div ref={sectionRef} className="relative bg-black">
@@ -101,7 +124,7 @@ function HeroSection() {
 
       {/* Vertical image stack */}
       <div className="relative z-10 flex flex-col">
-        {HERO_IMAGES.map((img, i) => (
+        {heroImages.map((img, i) => (
           <div
             key={img.src}
             ref={(el) => { imageRefs.current[i] = el; }}

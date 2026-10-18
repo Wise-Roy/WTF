@@ -46,7 +46,7 @@ export default function Navbar() {
   }, []);
 
   // Hide navbar on admin routes
-  if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/admin")) return <nav style={{ display: "none" }} />;
 
   const showSolid = !isHome || scrolled;
 
@@ -82,10 +82,6 @@ export default function Navbar() {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <style>{`
-        nav, nav * { cursor: auto !important; }
-        nav a, nav button, nav span { cursor: pointer !important; }
-      `}</style>
       <div className="mx-auto max-w-7xl flex items-center justify-between px-6 md:px-12 lg:px-20 h-16">
         <Link href="/">
           <Image

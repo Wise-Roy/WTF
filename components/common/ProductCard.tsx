@@ -54,7 +54,11 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const isSoldOut = prod_quantity <= 0;
   const priceStr = `₹${prod_price.toLocaleString()}`;
-  const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const imgs = [
     image?.[0] || "/eg.jpg",

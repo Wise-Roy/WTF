@@ -62,7 +62,7 @@ body:has(.collection-card:hover) .star-cursor {
   transition: font-size 0.2s ease, opacity 0.15s ease;
 }
 
-/* Hide native cursor globally — navbar & admin are exceptions */
+/* Hide native cursor globally — only admin area gets default cursor */
 html:not(:has(.admin-area)),
 html:not(:has(.admin-area)) *,
 html:not(:has(.admin-area)) *::before,
@@ -70,10 +70,10 @@ html:not(:has(.admin-area)) *::after {
   cursor: none !important;
 }
 
-.admin-area,
-.admin-area *,
-.admin-area *::before,
-.admin-area *::after {
+html .admin-area,
+html .admin-area *,
+html .admin-area *::before,
+html .admin-area *::after {
   cursor: auto !important;
 }
 

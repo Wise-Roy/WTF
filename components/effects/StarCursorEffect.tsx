@@ -1,26 +1,35 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { useStarCursor } from "@/hooks/useStarCursor";
 
 export function StarCursorEffect() {
-  const prefersReducedMotion = useReducedMotion();
-  const enabled = !prefersReducedMotion;
-  const { canvasRef, cursorRef } = useStarCursor(enabled);
+  const [enabled, setEnabled] = useState(false);
 
-  if (!enabled) return null;
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setEnabled(!mq.matches);
+    const handler = (e: MediaQueryListEvent) => setEnabled(!e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const { canvasRef, cursorRef } = useStarCursor(enabled);
 
   return (
     <>
-      {/* Canvas for particle rendering */}
       <canvas
         ref={canvasRef}
         className="star-cursor-canvas"
         aria-hidden="true"
+        style={{ display: enabled ? undefined : "none" }}
       />
-
-      {/* Custom star cursor */}
-      <div ref={cursorRef} className="star-cursor" aria-hidden="true">
+      <div
+        ref={cursorRef}
+        className="star-cursor"
+        aria-hidden="true"
+        style={{ display: enabled ? undefined : "none" }}
+      >
         ✦
       </div>
     </>

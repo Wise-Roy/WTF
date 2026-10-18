@@ -199,3 +199,6 @@ CREATE POLICY "Allow all on feedback" ON feedback FOR ALL USING (true) WITH CHEC
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fabric text DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fit text DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_care text DEFAULT '';
+
+-- Design page images (6 images stored as jsonb array in hero_settings)
+ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS design_images jsonb NOT NULL DEFAULT '["","","","","",""]';

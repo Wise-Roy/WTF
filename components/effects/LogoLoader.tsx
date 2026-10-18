@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Bebas_Neue } from "next/font/google";
+
+const bebasNeue = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 /*
  * Premium full-screen logo loader.
@@ -54,6 +61,7 @@ function StarSVG({ size, color }: { size: number; color: string }) {
 
 export default function LogoLoader() {
   const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(true);
   const [phase, setPhase] = useState<"loading" | "collapse" | "fly" | "done">("loading");
   const [stars] = useState(createStars);
@@ -78,12 +86,13 @@ export default function LogoLoader() {
     phaseRef.current = phase;
   }, [phase]);
 
+  // Determine visibility client-side only to avoid hydration mismatch
   useEffect(() => {
-    if (typeof window === "undefined") return;
     if (sessionStorage.getItem("wtf-loaded")) {
       setVisible(false);
       setPhase("done");
     }
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -222,73 +231,69 @@ export default function LogoLoader() {
     return () => cancelAnimationFrame(rafRef.current);
   }, [visible, phase, tick, prefersReducedMotion]);
 
-  if (!visible && phase === "done") return null;
+  // Always render a stable wrapper to prevent body child-count changes (hydration mismatch)
+  const showLoader = mounted && visible;
+  const showNothing = !mounted || (!visible && phase === "done");
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          className="fixed inset-0 z-[9999] bg-black"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-        >
-          {/* Load Bebas Neue from Google Fonts */}
-          {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-          <link
-            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
-            rel="stylesheet"
-          />
-
-          {/* Stars */}
-          <div ref={starsContainerRef} className="absolute inset-0 pointer-events-none">
-            {stars.map((star) => (
-              <div key={star.id} className="absolute top-0 left-0 will-change-transform">
-                <StarSVG size={star.size} color={star.color} />
-              </div>
-            ))}
-          </div>
-
-          {/* Logo */}
-          <div
-            ref={logoElRef}
-            className="absolute top-0 left-0 will-change-transform pointer-events-none"
+    <div id="logo-loader-root" style={showNothing ? { display: "none" } : undefined}>
+      <AnimatePresence>
+        {showLoader && (
+          <motion.div
+            className="fixed inset-0 z-[9999] bg-black"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
           >
-            <img
-              src="/white_logo.png"
-              alt="Wxrship The Fumes"
-              width={180}
-              height={180}
-              className="w-[180px] h-[180px] object-contain"
-            />
-          </div>
+            {/* Stars */}
+            <div ref={starsContainerRef} className="absolute inset-0 pointer-events-none">
+              {stars.map((star) => (
+                <div key={star.id} className="absolute top-0 left-0 will-change-transform">
+                  <StarSVG size={star.size} color={star.color} />
+                </div>
+              ))}
+            </div>
 
-          {/* Progress bar + percentage — below orbit circle */}
-          <div
-            ref={progressGroupRef}
-            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 pointer-events-none"
-            style={{ top: `calc(50% + ${ORBIT_RADIUS + 40}px)` }}
-          >
-            {/* Percentage */}
-            <span
-              ref={percentRef}
-              className="text-[#C6FF00] text-4xl tracking-wider"
-              style={{ fontFamily: "'Bebas Neue', cursive" }}
+            {/* Logo */}
+            <div
+              ref={logoElRef}
+              className="absolute top-0 left-0 will-change-transform pointer-events-none"
             >
-              0
-            </span>
-
-            {/* Bar track */}
-            <div className="w-48 h-[3px] bg-white/10 rounded-full overflow-hidden">
-              <div
-                ref={barFillRef}
-                className="h-full rounded-full"
-                style={{ width: "0%", backgroundColor: "#C6FF00" }}
+              <img
+                src="/white_logo.png"
+                alt="Wxrship The Fumes"
+                width={180}
+                height={180}
+                className="w-[180px] h-[180px] object-contain"
               />
             </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+
+            {/* Progress bar + percentage — below orbit circle */}
+            <div
+              ref={progressGroupRef}
+              className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 pointer-events-none"
+              style={{ top: `calc(50% + ${ORBIT_RADIUS + 40}px)` }}
+            >
+              {/* Percentage */}
+              <span
+                ref={percentRef}
+                className={`${bebasNeue.className} text-[#C6FF00] text-4xl tracking-wider`}
+              >
+                0
+              </span>
+
+              {/* Bar track */}
+              <div className="w-48 h-[3px] bg-white/10 rounded-full overflow-hidden">
+                <div
+                  ref={barFillRef}
+                  className="h-full rounded-full"
+                  style={{ width: "0%", backgroundColor: "#C6FF00" }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
