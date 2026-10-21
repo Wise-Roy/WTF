@@ -25,24 +25,23 @@ function HeroIntro() {
     const cloudR = cloudRRef.current;
     if (!section || !text || !cloudL || !cloudR) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: "bottom top",
-        scrub: 1,
-        pin: true,
-      },
-    });
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+          pin: true,
+        },
+      });
 
-    tl.to(text, { y: -200, opacity: 0, ease: "none" }, 0);
-    tl.to(cloudL, { y: -300, x: -100, opacity: 0, ease: "none" }, 0);
-    tl.to(cloudR, { y: -300, x: 100, opacity: 0, ease: "none" }, 0);
+      tl.to(text, { y: -200, opacity: 0, ease: "none" }, 0);
+      tl.to(cloudL, { y: -300, x: -100, opacity: 0, ease: "none" }, 0);
+      tl.to(cloudR, { y: -300, x: 100, opacity: 0, ease: "none" }, 0);
+    }, sectionRef);
 
-    return () => {
-      tl.kill();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -120,24 +119,24 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
   const lastDragX = useRef(0);
   const lastDragTime = useRef(0);
   const rafRef = useRef(0);
-  const [activeIdx, setActiveIdx] = useState(0);
+  const activeIdxRef = useRef(0);
 
   const count = musicians.length;
   const angleStep = 360 / count;
 
   // Responsive ring radius
   const getRadius = useCallback(() => {
-    if (typeof window === "undefined") return 400;
-    if (window.innerWidth < 640) return 200;
-    if (window.innerWidth < 1024) return 300;
-    return 400;
+    if (typeof window === "undefined") return 480;
+    if (window.innerWidth < 640) return 250;
+    if (window.innerWidth < 1024) return 360;
+    return 480;
   }, []);
 
   const getCardSize = useCallback(() => {
-    if (typeof window === "undefined") return 220;
-    if (window.innerWidth < 640) return 140;
-    if (window.innerWidth < 1024) return 180;
-    return 220;
+    if (typeof window === "undefined") return 280;
+    if (window.innerWidth < 640) return 180;
+    if (window.innerWidth < 1024) return 230;
+    return 280;
   }, []);
 
   // Calculate which card is active from rotation
@@ -202,7 +201,8 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
         y: 20,
         duration: 0.2,
         onComplete: () => {
-          setActiveIdx(idx);
+          activeIdxRef.current = idx;
+          el.textContent = musicians[idx]?.name || "";
           gsap.fromTo(
             el,
             { opacity: 0, y: -20 },
@@ -211,8 +211,56 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
         },
       });
     },
-    []
+    [musicians]
   );
+
+  // Click on card — rotate to front
+  const handleCardClick = useCallback(
+    (idx: number) => {
+      const targetRotation = -(idx * angleStep);
+      let diff = targetRotation - rotationRef.current;
+      diff = ((diff % 360) + 540) % 360 - 180;
+
+      gsap.to(rotationRef, {
+        current: rotationRef.current + diff,
+        duration: 0.8,
+        ease: "power2.inOut",
+      });
+    },
+    [angleStep]
+  );
+
+  // Build ring children imperatively — React never reconciles these nodes
+  useEffect(() => {
+    const ring = ringRef.current;
+    if (!ring) return;
+    ring.innerHTML = "";
+
+    musicians.forEach((m, i) => {
+      const card = document.createElement("div");
+      card.className = "absolute will-change-transform rounded-xl overflow-hidden shadow-2xl";
+      card.style.left = "-140px";
+      card.style.top = "-182px";
+      card.style.transformStyle = "preserve-3d";
+      card.style.backfaceVisibility = "hidden";
+      card.addEventListener("click", () => handleCardClick(i));
+
+      const inner = document.createElement("div");
+      inner.className = "relative w-full h-full bg-[#44444E]";
+
+      if (m.photo) {
+        const img = document.createElement("img");
+        img.src = m.photo;
+        img.alt = m.name;
+        img.className = "absolute inset-0 w-full h-full object-cover";
+        img.loading = "lazy";
+        inner.appendChild(img);
+      }
+
+      card.appendChild(inner);
+      ring.appendChild(card);
+    });
+  }, [musicians, handleCardClick]);
 
   // Main animation loop
   useEffect(() => {
@@ -355,23 +403,6 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
     };
   }, []);
 
-  // Click on card — rotate to front
-  const handleCardClick = useCallback(
-    (idx: number) => {
-      const targetRotation = -(idx * angleStep);
-      let diff = targetRotation - rotationRef.current;
-      // Shortest path
-      diff = ((diff % 360) + 540) % 360 - 180;
-
-      gsap.to(rotationRef, {
-        current: rotationRef.current + diff,
-        duration: 0.8,
-        ease: "power2.inOut",
-      });
-    },
-    [angleStep]
-  );
-
   return (
     <div className="relative min-h-screen bg-black py-20">
       {/* Ambient glow */}
@@ -385,16 +416,16 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
         className="relative mx-auto select-none"
         style={{
           perspective: "1000px",
-          height: "60vh",
-          minHeight: "400px",
-          maxHeight: "700px",
+          height: "70vh",
+          minHeight: "500px",
+          maxHeight: "850px",
         }}
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* 3D ring container */}
+        {/* 3D ring container — children rendered imperatively to avoid React/GSAP conflicts */}
         <div
           ref={ringRef}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing"
@@ -403,33 +434,7 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
             width: 0,
             height: 0,
           }}
-        >
-          {musicians.map((m, i) => (
-            <div
-              key={m.id}
-              className="absolute will-change-transform rounded-xl overflow-hidden shadow-2xl"
-              style={{
-                left: "-110px",
-                top: "-143px",
-                transformStyle: "preserve-3d",
-                backfaceVisibility: "hidden",
-              }}
-              onClick={() => handleCardClick(i)}
-            >
-              <div className="relative w-full h-full bg-[#44444E]">
-                {m.photo && (
-                  <Image
-                    src={m.photo}
-                    alt={m.name}
-                    fill
-                    sizes="220px"
-                    className="object-cover"
-                  />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        />
       </div>
 
       {/* Active musician name */}
@@ -439,7 +444,7 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
           className="font-heading text-4xl md:text-6xl uppercase tracking-wider"
           style={{ color: "#C6FF00" }}
         >
-          {musicians[activeIdx]?.name || ""}
+          {musicians[0]?.name || ""}
         </h2>
       </div>
 
@@ -452,12 +457,67 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
 }
 
 /* ────────────────────────────────────────────
+ *  SPOTIFY PLAYLIST
+ * ──────────────────────────────────────────── */
+
+function extractSpotifyPlaylistId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname !== "open.spotify.com") return null;
+    const match = u.pathname.match(/^\/playlist\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+function SpotifyPlaylistSection({ spotifyUrl }: { spotifyUrl: string }) {
+  const playlistId = extractSpotifyPlaylistId(spotifyUrl);
+  if (!playlistId) return null;
+
+  const embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}`;
+
+  return (
+    <section className="bg-black py-16 px-6 md:px-12 lg:px-20">
+      <div className="mx-auto max-w-2xl">
+        <p className="font-body text-sm uppercase tracking-[0.2em] text-white/40 mb-3 text-center">
+          Curated by the designer
+        </p>
+        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-[0.04em] text-white mb-10 text-center">
+          The Playlist
+        </h2>
+
+        <div className="group relative">
+          <div
+            className="absolute -inset-px rounded-3xl opacity-60 blur-md transition-opacity duration-300 group-hover:opacity-100"
+            style={{ background: "linear-gradient(135deg, #FF2D8C, #a855f5, #7B2FFF)" }}
+            aria-hidden="true"
+          />
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#121212] p-1.5">
+            <iframe
+              src={embedUrl}
+              width="100%"
+              height="552"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title="Spotify playlist player"
+              className="border-0 rounded-2xl"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ────────────────────────────────────────────
  *  MAIN PAGE
  * ──────────────────────────────────────────── */
 
 export default function MusicianPage() {
   const [musicians, setMusicians] = useState<DbMusician[]>([]);
   const [loading, setLoading] = useState(true);
+  const [spotifyUrl, setSpotifyUrl] = useState("");
 
   useEffect(() => {
     fetch("/api/musicians")
@@ -465,6 +525,13 @@ export default function MusicianPage() {
       .then((d) => setMusicians(d.data?.musicians || []))
       .catch(() => {})
       .finally(() => setLoading(false));
+
+    fetch("/api/footer")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data?.footer?.spotify) setSpotifyUrl(d.data.footer.spotify);
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -482,6 +549,8 @@ export default function MusicianPage() {
       ) : (
         <MusicianCarousel musicians={musicians} />
       )}
+
+      {spotifyUrl && <SpotifyPlaylistSection spotifyUrl={spotifyUrl} />}
     </div>
   );
 }

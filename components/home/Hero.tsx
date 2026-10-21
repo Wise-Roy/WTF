@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/components/common";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 
 const WORDS = ["FUMES", "NOISE", "CHAOS", "RHYTHM", "ENERGY", "VIBE"] as const;
 const INTERVAL = 2800;
@@ -81,7 +82,7 @@ export default function Hero() {
       >
         {/* Fallback — black bg with centered logo while video loads */}
         <div className="absolute inset-0 bg-black flex items-center justify-center">
-          <img
+          <Image
             src="/white_logo.png"
             alt=""
             aria-hidden="true"
@@ -89,7 +90,7 @@ export default function Hero() {
           />
         </div>
         <video
-          src="/into.mp4"
+          src="/intro.mp4"
           autoPlay
           loop
           muted
@@ -119,7 +120,7 @@ export default function Hero() {
         >
           {/* Desktop: all on one line | Mobile: rotating word on second line, centered */}
           <span className="flex flex-col items-center md:flex-row md:justify-center md:gap-[0.3em]">
-            <span className="whitespace-nowrap">WXRSHIP THE</span>
+            <span className="whitespace-nowrap" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}>WXRSHIP THE</span>
             <span
               className="relative inline-flex justify-center overflow-hidden translate-y-[0.08em]"
               style={{ height: "1.15em", width: "7.5ch" }}
@@ -164,7 +165,7 @@ export default function Hero() {
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
           <Button href="/silhouettes">Fumes</Button>
           <Button href="/designer" variant="secondary" className="border-[#F5F5F5]/30 text-[#F5F5F5] hover:border-[#C6FF00] hover:text-[#C6FF00]">
-            Designers
+            Designer
           </Button>
         </div>
       </div>

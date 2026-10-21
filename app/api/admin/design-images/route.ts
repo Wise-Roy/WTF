@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
-const MAX_IMAGES = 6;
+const MAX_IMAGES = 3;
 
 export async function GET() {
   if (!(await isAdmin())) {

@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star } from "lucide-react";
+import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star, Layers } from "lucide-react";
 import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character";
+type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character" | "collection-hero";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
@@ -18,6 +18,7 @@ const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "footer", label: "Footer", icon: Globe },
   { key: "offers", label: "Offers", icon: Tag },
   { key: "design-images", label: "Design Page", icon: Palette },
+  { key: "collection-hero", label: "Collection Hero", icon: Layers },
   { key: "main-character", label: "Main Character", icon: Star },
 ];
 
@@ -1561,8 +1562,8 @@ function OffersPanel() {
 
 /* ─────────────── DESIGN PAGE IMAGES TAB ─────────────── */
 function DesignImagesPanel() {
-  const [images, setImages] = useState<string[]>(["", "", "", "", "", ""]);
-  const [savedImages, setSavedImages] = useState<string[]>(["", "", "", "", "", ""]);
+  const [images, setImages] = useState<string[]>(["", "", ""]);
+  const [savedImages, setSavedImages] = useState<string[]>(["", "", ""]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
@@ -1656,17 +1657,17 @@ function DesignImagesPanel() {
         </button>
       </div>
       <p className="text-white/40 text-sm mb-8">
-        Upload exactly 6 images for the Design page hero scroll. Old images are automatically cleaned up from storage on save.
+        Upload exactly 3 images for the Design page hero scroll. Old images are automatically cleaned up from storage on save.
       </p>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
+        <div className="grid grid-cols-3 gap-6">
+          {[0, 1, 2].map((i) => (
             <div key={i} className="aspect-[3/4] bg-white/5 rounded-lg animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           {images.map((url, idx) => {
             const isUploading = uploadingIdx === idx;
             return (
@@ -1683,6 +1684,157 @@ function DesignImagesPanel() {
                         title="Remove"
                       >
                         ×
+                      </button>
+                    </>
+                  ) : (
+                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors gap-2">
+                      <span className="text-white/20 text-3xl">+</span>
+                      <span className="text-white/30 text-xs">Upload</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUpload(idx, file);
+                        }}
+                      />
+                    </label>
+                  )}
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                      <div className="h-6 w-6 border-2 border-[#C6FF00] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────── COLLECTION HERO TAB ─────────────── */
+function CollectionHeroPanel() {
+  const [images, setImages] = useState<string[]>(["", "", ""]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/collection-hero", { signal: ac.signal });
+        const d = await r.json();
+        if (!ac.signal.aborted && d.data?.images) {
+          setImages(d.data.images);
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleUpload = async (idx: number, file: File) => {
+    setUploadingIdx(idx);
+    try {
+      const publicUrl = await uploadFile(file, "collections");
+      setImages((prev) => {
+        const next = [...prev];
+        next[idx] = publicUrl;
+        return next;
+      });
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploadingIdx(null);
+    }
+  };
+
+  const handleRemove = (idx: number) => {
+    setImages((prev) => {
+      const next = [...prev];
+      next[idx] = "";
+      return next;
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/collection-hero", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ images }),
+      });
+      if (res.ok) showToast("Collection hero images saved");
+      else showToast("Save failed");
+    } catch {
+      showToast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const labels = ["Image 1 — Background Left", "Image 2 — Background Center", "Image 3 — Background Right"];
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl font-bold">Collection Hero Images</h2>
+        <button
+          onClick={handleSave}
+          disabled={saving || loading}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save"}
+        </button>
+      </div>
+      <p className="text-white/40 text-sm mb-8">
+        Upload 3 images for the Collections page parallax hero. These cycle through with scroll-driven zoom and fade effects.
+      </p>
+
+      {loading ? (
+        <div className="grid grid-cols-3 gap-6">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="aspect-[3/4] bg-white/5 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-6">
+          {images.map((url, idx) => {
+            const isUploading = uploadingIdx === idx;
+            return (
+              <div key={idx} className="space-y-2">
+                <p className="text-xs uppercase tracking-wider text-white/50">{labels[idx]}</p>
+                <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-white/5 border border-white/10">
+                  {url ? (
+                    <>
+                      <Image src={url} alt={labels[idx]} fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(idx)}
+                        className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-500 transition-colors z-10"
+                        title="Remove"
+                      >
+                        x
                       </button>
                     </>
                   ) : (
@@ -1995,6 +2147,7 @@ export default function AdminPage() {
         {activeTab === "footer" && <FooterPanel />}
         {activeTab === "offers" && <OffersPanel />}
         {activeTab === "design-images" && <DesignImagesPanel />}
+        {activeTab === "collection-hero" && <CollectionHeroPanel />}
         {activeTab === "main-character" && <MainCharacterPanel />}
       </main>
     </div>

@@ -10,10 +10,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function WTFWay() {
   return (
-    <SectionWrapper scheme="grey">
+    <SectionWrapper scheme="grey" className="!bg-transparent !text-white">
       <div className="text-center">
         <Tagline>WTF Codes</Tagline>
-        <SectionHeading className="mt-6">
+        <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}>
           Why we&apos;re weird on purpose
         </SectionHeading>
       </div>
@@ -26,10 +26,10 @@ export default function WTFWay() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-[#C6FF00] mb-6">
                 <Icon size={28} strokeWidth={1.5} className="text-[#1a1a1a]" />
               </div>
-              <h3 className="font-heading text-xl uppercase tracking-wider font-bold">
+              <h3 className="font-heading text-xl uppercase tracking-wider font-bold text-white">
                 {prop.title}
               </h3>
-              <p className="mt-4 text-[#1a1a1a]/70 leading-relaxed">
+              <p className="mt-4 text-white/70 leading-relaxed">
                 {prop.description}
               </p>
             </div>

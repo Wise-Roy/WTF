@@ -16,9 +16,9 @@ export default function JoinCult() {
   };
 
   return (
-    <SectionWrapper scheme="pink" id="join" className="text-center">
-      <Tagline className="bg-white text-[#1a1a1a]">Join the Cult</Tagline>
-      <SectionHeading className="mt-6">Zero FOMO</SectionHeading>
+    <SectionWrapper scheme="pink" id="join" className="!bg-transparent text-center">
+      <Tagline className="bg-[#C6FF00] text-[#1a1a1a]">Join the Cult</Tagline>
+      <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}>Zero FOMO</SectionHeading>
 
       {submitted ? (
         <p className="mt-8 text-xl font-bold text-[#C6FF00]">
@@ -47,7 +47,7 @@ export default function JoinCult() {
         </form>
       )}
 
-      <p className="mt-4 text-sm text-white/60">We Promise, No spam.</p>
+      <p className="mt-4 text-sm text-[#C6FF00]">We Promise, No Spam.</p>
     </SectionWrapper>
   );
 }

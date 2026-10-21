@@ -39,7 +39,8 @@ function SizeChart() {
         >
           <div>
             <h2
-              className={`${bebas.className} text-[#1a1a1a] text-6xl md:text-8xl leading-[0.85]`}
+              className={`${bebas.className} text-6xl md:text-8xl leading-[0.85]`}
+              style={{ WebkitTextStroke: "1.5px #DF2877", color: "white" }}
             >
               SIZE CHART
             </h2>
@@ -106,7 +107,7 @@ function SizeChart() {
         {/* Footnote */}
         <p className="mt-6 flex items-center justify-center gap-2 text-[#1a1a1a]/70 text-xs md:text-sm font-bold uppercase tracking-widest text-center">
           <Star className="text-[#DF2877]" />
-          Body measurements, not garment measurements. The tape doesn&apos;t lie.
+          BADDIES OF ALL SIZES
           <Star className="text-[#DF2877]" />
         </p>
       </div>
@@ -188,7 +189,7 @@ function SizeFinder() {
             FIND YOUR SIZE
           </h2>
           <p className="text-xs md:text-sm font-bold uppercase tracking-widest text-[#1a1a1a]/70 mt-2">
-            Punch in your numbers. We&apos;ll do the cult math.
+            Punch in your numbers. We&apos;ll do the math.
           </p>
         </motion.div>
 

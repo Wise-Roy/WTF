@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { Tangerine } from "next/font/google";
 import gsap from "gsap";
@@ -18,8 +18,6 @@ const FALLBACK_IMAGES = [
   { src: "/D1.jpg", alt: "Design 1" },
   { src: "/D2.jpg", alt: "Design 2" },
   { src: "/D3.jpg", alt: "Design 3" },
-  { src: "/D4.jpg", alt: "Design 4" },
-  { src: "/D5.jpg.jpg", alt: "Design 5" },
 ];
 
 /* ────────────────────────────────────────────
@@ -29,91 +27,120 @@ const FALLBACK_IMAGES = [
 function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [heroImages, setHeroImages] = useState(FALLBACK_IMAGES);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const gsapCtxRef = useRef<ReturnType<typeof gsap.context> | null>(null);
 
-  // Fetch design images from DB
+  // Build image DOM imperatively so React never reconciles GSAP-mutated nodes
   useEffect(() => {
+    const stack = stackRef.current;
+    if (!stack) return;
+
+    const buildImages = (images: { src: string; alt: string }[]) => {
+      // Kill existing GSAP before touching DOM
+      if (gsapCtxRef.current) {
+        gsapCtxRef.current.revert();
+        gsapCtxRef.current = null;
+      }
+
+      // Clear previous children
+      stack.innerHTML = "";
+
+      // Create image containers
+      images.forEach((img, i) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "relative w-full will-change-transform overflow-hidden";
+        wrapper.style.aspectRatio = "1/0.75";
+
+        const imgEl = document.createElement("img");
+        imgEl.src = img.src;
+        imgEl.alt = img.alt;
+        imgEl.className = "absolute inset-0 w-full h-full object-cover";
+        if (i < 2) imgEl.loading = "eager";
+        else imgEl.loading = "lazy";
+
+        wrapper.appendChild(imgEl);
+        stack.appendChild(wrapper);
+      });
+
+      // Setup GSAP
+      setupGsap(stack.children as HTMLCollectionOf<HTMLElement>);
+    };
+
+    const setupGsap = (children: HTMLCollectionOf<HTMLElement>) => {
+      const section = sectionRef.current;
+      const title = titleRef.current;
+      if (!section || !title) return;
+
+      gsapCtxRef.current = gsap.context(() => {
+        const mm = gsap.matchMedia();
+        mm.add(
+          {
+            reduced: "(prefers-reduced-motion: reduce)",
+            normal: "(prefers-reduced-motion: no-preference)",
+          },
+          (ctx) => {
+            const { reduced } = ctx.conditions!;
+            if (reduced) return;
+
+            const titleTl = gsap.timeline();
+            titleTl.to(title, { y: -150, opacity: 0, ease: "none", duration: 1 });
+            titleTl.set(title, { visibility: "hidden" });
+
+            ScrollTrigger.create({
+              trigger: section,
+              start: "60% bottom",
+              end: "bottom top",
+              scrub: 1,
+              animation: titleTl,
+            });
+
+            for (let i = 0; i < children.length; i++) {
+              const el = children[i];
+              const direction = i % 2 === 0 ? -80 : 80;
+              ScrollTrigger.create({
+                trigger: el,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1,
+                animation: gsap.fromTo(
+                  el,
+                  { y: -direction },
+                  { y: direction, ease: "none" }
+                ),
+              });
+            }
+          }
+        );
+      }, sectionRef);
+    };
+
+    // Start with fallbacks
+    buildImages(FALLBACK_IMAGES);
+
+    // Fetch from DB and rebuild
     const ac = new AbortController();
-    (async () => {
-      try {
-        const r = await fetch("/api/design-images", { signal: ac.signal });
-        const d = await r.json();
+    fetch("/api/design-images", { signal: ac.signal })
+      .then((r) => r.json())
+      .then((d) => {
         if (!ac.signal.aborted && d.data?.images?.length > 0) {
-          setHeroImages(
+          buildImages(
             d.data.images.map((src: string, i: number) => ({
               src,
               alt: `Design ${i + 1}`,
             }))
           );
         }
-      } catch {
-        // Keep fallback images
-      }
-    })();
-    return () => ac.abort();
-  }, []);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const title = titleRef.current;
-    if (!section || !title) return;
-
-    const mm = gsap.matchMedia();
-    const triggers: ScrollTrigger[] = [];
-
-    mm.add(
-      {
-        reduced: "(prefers-reduced-motion: reduce)",
-        normal: "(prefers-reduced-motion: no-preference)",
-      },
-      (ctx) => {
-        const { reduced } = ctx.conditions!;
-        if (reduced) return;
-
-        // Title stays visible through all images, fades near last image
-        const titleTl = gsap.timeline();
-        titleTl.to(title, { y: -150, opacity: 0, ease: "none", duration: 1 });
-        titleTl.set(title, { visibility: "hidden" });
-
-        const titleTrigger = ScrollTrigger.create({
-          trigger: section,
-          start: "60% bottom",
-          end: "bottom top",
-          scrub: 1,
-          animation: titleTl,
-        });
-        triggers.push(titleTrigger);
-
-        // Alternating parallax on images
-        imageRefs.current.forEach((el, i) => {
-          if (!el) return;
-          const direction = i % 2 === 0 ? -80 : 80; // even=up, odd=down
-          const imgTrigger = ScrollTrigger.create({
-            trigger: el,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-            animation: gsap.fromTo(
-              el,
-              { y: -direction },
-              { y: direction, ease: "none" }
-            ),
-          });
-          triggers.push(imgTrigger);
-        });
-      }
-    );
+      })
+      .catch(() => {});
 
     return () => {
-      triggers.forEach((t) => t.kill());
-      mm.revert();
+      ac.abort();
+      if (gsapCtxRef.current) gsapCtxRef.current.revert();
     };
-  }, [heroImages]);
+  }, []);
 
   return (
     <div ref={sectionRef} className="relative bg-black">
-      {/* Fixed "Designs" overlay — fades upward on scroll, hidden past hero */}
       <h1
         ref={titleRef}
         className={`${tangerine.className} fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 text-[#C6FF00] text-[14vw] md:text-[10vw] lg:text-[8vw] pointer-events-none whitespace-nowrap`}
@@ -122,26 +149,8 @@ function HeroSection() {
         Designs
       </h1>
 
-      {/* Vertical image stack */}
-      <div className="relative z-10 flex flex-col">
-        {heroImages.map((img, i) => (
-          <div
-            key={img.src}
-            ref={(el) => { imageRefs.current[i] = el; }}
-            className="relative w-full will-change-transform overflow-hidden"
-            style={{ height: "110vh" }}
-          >
-            <Image
-              src={img.src}
-              alt={img.alt}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority={i < 2}
-            />
-          </div>
-        ))}
-      </div>
+      {/* GSAP-managed — children rendered imperatively, React hands off */}
+      <div ref={stackRef} className="relative z-10 flex flex-col" />
     </div>
   );
 }
@@ -167,19 +176,23 @@ function BrandStory() {
             />
           </div>
           {/* Right border — stops before star */}
-          <div className="absolute right-0 top-0 w-px bg-black/10" style={{ bottom: "28px" }} />
+          <div className="absolute right-0 top-0 w-px bg-black/10" style={{ bottom: "36px" }} />
           {/* Bottom border — stops before star */}
-          <div className="absolute bottom-0 left-0 h-px bg-black/10" style={{ right: "28px" }} />
+          <div className="absolute bottom-0 left-0 h-px bg-black/10" style={{ right: "36px" }} />
           {/* WTF star — bottom-right corner */}
           <svg
             viewBox="0 0 48 48"
             className="absolute z-10"
-            style={{ bottom: "-20px", right: "-20px", width: "52px", height: "52px" }}
+            style={{ bottom: "-30px", right: "-30px", width: "72px", height: "72px" }}
             fill="#1a1a1a"
           >
             <path d="M24 2 L28.9 17.6 L45.1 17.6 L31.8 27.4 L36.7 43 L24 33.2 L11.3 43 L16.2 27.4 L2.9 17.6 L19.1 17.6 Z" />
-            <path d="M24 8 L27.2 18.6 L38.4 18.6 L29.2 25.4 L32.4 36 L24 29.2 L15.6 36 L18.8 25.4 L9.6 18.6 L20.8 18.6 Z" fill="none" stroke="white" strokeWidth="1" />
+            <path d="M24 8 L27.2 18.6 L38.4 18.6 L29.2 25.4 L32.4 36 L24 29.2 L15.6 36 L18.8 25.4 L9.6 18.6 L20.8 18.6 Z" fill="none" stroke="#C6FF00" strokeWidth="1" />
           </svg>
+          <svg viewBox="0 0 48 48" className="absolute z-10" style={{ top: "-30px", left: "-30px", width: "72px", height: "72px" }} fill="#1a1a1a">
+        <path d="M24 2 L28.9 17.6 L45.1 17.6 L31.8 27.4 L36.7 43 L24 33.2 L11.3 43 L16.2 27.4 L2.9 17.6 L19.1 17.6 Z" />
+        <path d="M24 8 L27.2 18.6 L38.4 18.6 L29.2 25.4 L32.4 36 L24 29.2 L15.6 36 L18.8 25.4 L9.6 18.6 L20.8 18.6 Z" fill="none" stroke="#C6FF00" strokeWidth="1" />
+      </svg>
         </div>
 
         {/* Right — copy */}

@@ -200,5 +200,17 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fabric text DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fit text DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_care text DEFAULT '';
 
--- Design page images (6 images stored as jsonb array in hero_settings)
-ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS design_images jsonb NOT NULL DEFAULT '["","","","","",""]';
+-- Design page images (3 images stored as jsonb array in hero_settings)
+ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS design_images jsonb NOT NULL DEFAULT '["","",""]';
+
+-- Collection hero images (3 images for collections page parallax hero)
+ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS collection_hero_1 text NOT NULL DEFAULT '';
+ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS collection_hero_2 text NOT NULL DEFAULT '';
+ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS collection_hero_3 text NOT NULL DEFAULT '';
+
+-- Storage bucket for collection hero images
+INSERT INTO storage.buckets (id, name, public) VALUES ('collections', 'collections', true) ON CONFLICT DO NOTHING;
+CREATE POLICY "Public read collections" ON storage.objects FOR SELECT USING (bucket_id = 'collections');
+CREATE POLICY "Admin insert collections" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'collections');
+CREATE POLICY "Admin update collections" ON storage.objects FOR UPDATE USING (bucket_id = 'collections');
+CREATE POLICY "Admin delete collections" ON storage.objects FOR DELETE USING (bucket_id = 'collections');

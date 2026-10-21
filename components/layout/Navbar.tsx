@@ -9,23 +9,29 @@ import { Button } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
 import { useBag } from "@/context/BagContext";
 
-const NAV_ITEMS = ["Shop", "About", "Contact", "More"] as const;
-
-
-const DROPDOWN: Record<string, { label: string; href: string }[]> = {
-  Shop: [
-    { label: "Collections", href: "/collections" },
-    { label: "Silhouettes", href: "/silhouettes" },
-  ],
-  About: [
-    { label: "Designs", href: "/design" },
-    { label: "Designers", href: "/designer" },
-    { label: "Musicians", href: "/musician" },
-  ],
-  Contact: [
-    { label: "Contact", href: "/contact" },
-  ],
-};
+const MENU_SECTIONS = [
+  {
+    heading: "Shop",
+    links: [
+      { label: "Collections", href: "/collections" },
+      { label: "Silhouettes", href: "/silhouettes" },
+    ],
+  },
+  {
+    heading: "About",
+    links: [
+      { label: "Designs", href: "/design" },
+      { label: "Designer", href: "/designer" },
+      { label: "Musicians", href: "/musician" },
+    ],
+  },
+  {
+    heading: "Contact",
+    links: [
+      { label: "Contact", href: "/contact" },
+    ],
+  },
+];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -38,6 +44,22 @@ export default function Navbar() {
   const { user } = useAuth();
   const { openBag, itemCount } = useBag();
 
+  const menuSections = [
+    ...MENU_SECTIONS,
+    {
+      heading: "More",
+      links: [
+        { label: "Sizing", href: "/sizing" },
+        ...(!user
+          ? [
+              { label: "Sign In", href: "/sign-in" },
+              { label: "Sign Up", href: "/sign-up" },
+            ]
+          : []),
+      ],
+    },
+  ];
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 360);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -45,7 +67,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Hide navbar on admin routes
   if (pathname.startsWith("/admin")) return <nav style={{ display: "none" }} />;
 
   const showSolid = !isHome || scrolled;
@@ -57,21 +78,6 @@ export default function Navbar() {
 
   const closeMega = () => {
     megaTimeout.current = setTimeout(() => setMegaOpen(false), 150);
-  };
-
-  const moreLinks = [
-    ...(user
-      ? [{ label: "Profile", href: "/profile" }]
-      : [
-          { label: "Sign In", href: "/sign-in" },
-          { label: "Sign Up", href: "/sign-up" },
-        ]),
-    { label: "Sizing", href: "/sizing" },
-  ];
-
-  const getDropdownLinks = (item: string) => {
-    if (item === "More") return moreLinks;
-    return DROPDOWN[item] ?? [];
   };
 
   return (
@@ -94,75 +100,83 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Desktop nav */}
-        <div
-          className="hidden md:flex items-center gap-8 relative"
-          onMouseEnter={openMega}
-          onMouseLeave={closeMega}
-        >
-            {NAV_ITEMS.map((item) => (
-              <span
-                key={item}
-                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
-              >
-                {item}
-              </span>
-            ))}
+        {/* Desktop nav — hamburger + profile + cart */}
+        <div className="hidden md:flex items-center gap-6">
+          {/* Hamburger menu trigger */}
+          <div
+            className="relative"
+            onMouseEnter={openMega}
+            onMouseLeave={closeMega}
+          >
+            <button
+              className="text-white hover:text-[#C6FF00] transition-colors p-1"
+              aria-label="Menu"
+            >
+              <Menu size={24} />
+            </button>
 
-            {user ? (
-              <Link
-                href="/profile"
-                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors flex items-center gap-1.5"
-              >
-                <User size={16} />
-                Profile
-              </Link>
-            ) : (
-              <Link
-                href="/sign-in"
-                className="text-sm uppercase tracking-wider text-white/80 hover:text-[#C6FF00] transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
-
-            <Button onClick={openBag} className="text-xs py-2 px-5">
-              Cart ({itemCount})
-            </Button>
-
-            {/* Mega dropdown — columns aligned under nav links */}
+            {/* Mega dropdown */}
             {megaOpen && (
-              <div className="absolute top-full -left-2 right-0 mt-3 bg-[#C6FF00]/60 text-[#1a1a1a] backdrop-blur-md rounded-lg shadow-lg py-5 grid grid-cols-4 divide-x divide-white/20">
-                {NAV_ITEMS.map((item) => {
-                  const links = getDropdownLinks(item);
-                  return (
-                    <ul key={item} className="px-4 space-y-2">
-                      {links.map((link) => (
-                        <li key={link.href}>
-                          <Link
-                            href={link.href}
-                            onClick={() => setMegaOpen(false)}
-                            className="text-sm cursor-pointer hover:text-black transition-colors"
-                          >
-                            {link.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                })}
+              <div
+                className="absolute top-full right-0 mt-3 bg-[#C6FF00]/60 text-[#1a1a1a] backdrop-blur-md rounded-lg shadow-lg py-5 min-w-[480px] grid grid-cols-4 divide-x divide-white/20"
+              >
+                {menuSections.map((section) => (
+                  <ul key={section.heading} className="px-4 space-y-2">
+                    <li className="text-xs font-bold uppercase tracking-wider text-black/70 mb-2">
+                      {section.heading}
+                    </li>
+                    {section.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          onClick={() => setMegaOpen(false)}
+                          className="text-sm cursor-pointer hover:text-[#C6FF00] transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ))}
               </div>
             )}
+          </div>
+
+          {/* Profile — only when logged in */}
+          {user && (
+            <Link
+              href="/profile"
+              className="text-white hover:text-[#C6FF00] transition-colors flex items-center gap-1.5"
+              aria-label="Profile"
+            >
+              <User size={20} />
+            </Link>
+          )}
+
+          <Button onClick={openBag} className="text-xs py-2 px-5">
+            Cart ({itemCount})
+          </Button>
         </div>
 
         {/* Mobile toggle */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-white"
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex md:hidden items-center gap-4">
+          {user && (
+            <Link
+              href="/profile"
+              className="text-white hover:text-[#C6FF00] transition-colors"
+              aria-label="Profile"
+            >
+              <User size={20} />
+            </Link>
+          )}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="text-white"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -170,24 +184,23 @@ export default function Navbar() {
         <div className={`md:hidden border-t border-white/10 px-6 py-6 space-y-5 transition-colors duration-300 ${
           showSolid ? "bg-[#DF2877]" : "bg-black/40 backdrop-blur-md"
         }`}>
-          {(["Shop", "About", "Contact", "More"] as const).map((section) => {
-            const links = getDropdownLinks(section);
-            const isOpen = mobileSection === section;
+          {menuSections.map((section) => {
+            const isOpen = mobileSection === section.heading;
             return (
-              <div key={section}>
+              <div key={section.heading}>
                 <button
                   type="button"
-                  onClick={() => setMobileSection(isOpen ? null : section)}
+                  onClick={() => setMobileSection(isOpen ? null : section.heading)}
                   className="flex items-center justify-between w-full text-sm font-bold uppercase tracking-wider text-white"
                 >
-                  {section}
+                  {section.heading}
                   <span className={`ml-2 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
                     ▾
                   </span>
                 </button>
                 {isOpen && (
                   <div className="mt-2 ml-3 space-y-2">
-                    {links.map((link) => (
+                    {section.links.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
@@ -202,24 +215,6 @@ export default function Navbar() {
               </div>
             );
           })}
-          {user ? (
-            <Link
-              href="/profile"
-              onClick={() => { setMobileOpen(false); setMobileSection(null); }}
-              className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[#C6FF00]"
-            >
-              <User size={16} />
-              Profile
-            </Link>
-          ) : (
-            <Link
-              href="/sign-in"
-              onClick={() => { setMobileOpen(false); setMobileSection(null); }}
-              className="block text-sm font-bold uppercase tracking-wider text-[#C6FF00]"
-            >
-              Sign In
-            </Link>
-          )}
           <Button onClick={() => { setMobileOpen(false); openBag(); }} className="w-full text-xs py-2 mt-4">
             Cart ({itemCount})
           </Button>

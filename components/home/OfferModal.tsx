@@ -225,7 +225,7 @@ function OfferContent({
 
   return (
     <motion.div
-      className="fixed inset-0 z-80 flex items-center justify-center px-4"
+      className="fixed inset-0 z-80 flex items-center justify-center px-4 overflow-y-auto py-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -234,7 +234,7 @@ function OfferContent({
       onMouseLeave={onMouseLeave}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Glow blobs */}
       <motion.div
@@ -257,7 +257,7 @@ function OfferContent({
       {/* Card with 3D tilt */}
       <motion.div
         ref={cardRef}
-        className="relative w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl cursor-default"
+        className="relative w-full max-w-4xl my-auto rounded-3xl overflow-hidden shadow-2xl cursor-default"
         style={{
           rotateX: p.rotateX,
           rotateY: p.rotateY,

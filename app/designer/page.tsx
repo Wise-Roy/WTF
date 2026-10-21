@@ -56,9 +56,13 @@ function LoopingImage({ images, alt }: { images: string[]; alt: string }) {
       </div>
       <div className="absolute left-0 top-0 w-px bg-black/10" style={{ bottom: "28px" }} />
       <div className="absolute bottom-0 right-0 h-px bg-black/10" style={{ left: "28px" }} />
-      <svg viewBox="0 0 48 48" className="absolute z-10" style={{ bottom: "-20px", left: "-20px", width: "52px", height: "52px" }} fill="#1a1a1a">
+      <svg viewBox="0 0 48 48" className="absolute z-10" style={{ bottom: "-24px", left: "-24px", width: "64px", height: "64px" }} fill="#1a1a1a">
         <path d="M24 2 L28.9 17.6 L45.1 17.6 L31.8 27.4 L36.7 43 L24 33.2 L11.3 43 L16.2 27.4 L2.9 17.6 L19.1 17.6 Z" />
-        <path d="M24 8 L27.2 18.6 L38.4 18.6 L29.2 25.4 L32.4 36 L24 29.2 L15.6 36 L18.8 25.4 L9.6 18.6 L20.8 18.6 Z" fill="none" stroke="white" strokeWidth="1" />
+        <path d="M24 8 L27.2 18.6 L38.4 18.6 L29.2 25.4 L32.4 36 L24 29.2 L15.6 36 L18.8 25.4 L9.6 18.6 L20.8 18.6 Z" fill="none" stroke="#C6FF00" strokeWidth="1" />
+      </svg>
+      <svg viewBox="0 0 48 48" className="absolute z-10" style={{ top: "-24px", right: "-24px", width: "64px", height: "64px" }} fill="#1a1a1a">
+        <path d="M24 2 L28.9 17.6 L45.1 17.6 L31.8 27.4 L36.7 43 L24 33.2 L11.3 43 L16.2 27.4 L2.9 17.6 L19.1 17.6 Z" />
+        <path d="M24 8 L27.2 18.6 L38.4 18.6 L29.2 25.4 L32.4 36 L24 29.2 L15.6 36 L18.8 25.4 L9.6 18.6 L20.8 18.6 Z" fill="none" stroke="#C6FF00" strokeWidth="1" />
       </svg>
     </div>
   );

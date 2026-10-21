@@ -3,9 +3,9 @@ import { NavLink, Product, Review, ValueProp, FooterColumn, SchemeConfig, ColorS
 export const BRAND = {
   name: "Wxrship The Fumes",
   shortName: "WTF",
-  motto: "Weird is a choice.",
+  motto: "BRAT OVER BASICS",
   email: "hello@wxrshipthefumes.com",
-  copyright: "2026 Wxrship The Fumes. Weird is a choice.",
+  copyright: "2026 WXRSHIP THE FUMES. BRAT OVER BASICS",
 } as const;
 
 export const COLORS = {
@@ -140,7 +140,6 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: "Contact", href: "/contact" },
       { label: "Privacy Policy", href: "/privacy-policy" },
-      { label: "Newsletter", href: "/newsletter" },
     ],
   },
 ];

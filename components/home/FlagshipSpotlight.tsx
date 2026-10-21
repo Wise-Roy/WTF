@@ -40,12 +40,15 @@ export default function FlagshipSpotlight() {
   const ctaHref = productId ? `/product-story/${productId}` : "/silhouettes";
 
   return (
-    <SectionWrapper scheme="acid">
+    <SectionWrapper scheme="acid" className="!bg-transparent">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Content — left, vertically centered */}
         <div>
           <Tagline className="bg-[#1a1a1a] text-black">Main Character</Tagline>
-          <h2 className="mt-6 font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-[0.08em] leading-[0.95]">
+          <h2
+            className="mt-6 font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-[0.08em] leading-[0.95]"
+            style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}
+          >
             {title}
           </h2>
           <p className="mt-6 font-body text-lg text-[#1a1a1a]/80 leading-relaxed max-w-lg">
