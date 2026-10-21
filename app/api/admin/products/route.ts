@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
     prod_fabric: ((body.prod_fabric as string) || "").trim(),
     prod_fit: ((body.prod_fit as string) || "").trim(),
     prod_care: ((body.prod_care as string) || "").trim(),
+    prod_chapter_1: ((body.prod_chapter_1 as string) || "").trim(),
+    prod_chapter_2: ((body.prod_chapter_2 as string) || "").trim(),
+    prod_chapter_3: ((body.prod_chapter_3 as string) || "").trim(),
   }).select().single();
 
   if (error) {

@@ -56,7 +56,7 @@ function CollectionCard({ product }: { product: DbProduct }) {
   return (
     <motion.div ref={cardRef} style={{ scale, opacity }} className="will-change-transform">
       <Link
-        href={`/product-story/${id}`}
+        href={`/product/${id}`}
         aria-label={prod_name}
         className="group relative overflow-hidden block collection-card"
       >

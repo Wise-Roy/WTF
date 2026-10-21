@@ -200,6 +200,11 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fabric text DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_fit text DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_care text DEFAULT '';
 
+-- Chapter descriptions for product page (3 chapters, one per image)
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_chapter_1 text DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_chapter_2 text DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_chapter_3 text DEFAULT '';
+
 -- Design page images (3 images stored as jsonb array in hero_settings)
 ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS design_images jsonb NOT NULL DEFAULT '["","",""]';
 

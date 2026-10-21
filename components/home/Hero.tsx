@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/components/common";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 
 const WORDS = ["FUMES", "NOISE", "CHAOS", "RHYTHM", "ENERGY", "VIBE"] as const;
 const INTERVAL = 2800;
@@ -82,7 +81,7 @@ export default function Hero() {
       >
         {/* Fallback — black bg with centered logo while video loads */}
         <div className="absolute inset-0 bg-black flex items-center justify-center">
-          <Image
+          <img
             src="/white_logo.png"
             alt=""
             aria-hidden="true"

@@ -27,6 +27,9 @@ export default function ProductForm({ product }: ProductFormProps) {
     prod_fabric: product?.prod_fabric || "",
     prod_fit: product?.prod_fit || "",
     prod_care: product?.prod_care || "",
+    prod_chapter_1: product?.prod_chapter_1 || "",
+    prod_chapter_2: product?.prod_chapter_2 || "",
+    prod_chapter_3: product?.prod_chapter_3 || "",
   });
 
   const [images, setImages] = useState<(string | null)[]>([
@@ -96,6 +99,9 @@ export default function ProductForm({ product }: ProductFormProps) {
       prod_fabric: form.prod_fabric,
       prod_fit: form.prod_fit,
       prod_care: form.prod_care,
+      prod_chapter_1: form.prod_chapter_1,
+      prod_chapter_2: form.prod_chapter_2,
+      prod_chapter_3: form.prod_chapter_3,
       image: imageUrls.length === 3 ? imageUrls : [],
     };
 
@@ -196,6 +202,30 @@ export default function ProductForm({ product }: ProductFormProps) {
           <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Care <span className="text-white/30">(optional)</span></label>
           <input name="prod_care" value={form.prod_care} onChange={handleChange} className={inputClass} placeholder="e.g. Cold wash, hang dry" />
         </div>
+      </div>
+
+      {/* Chapter Descriptions (for product page) */}
+      <div className="space-y-4">
+        <label className="block text-xs uppercase tracking-wider text-white/50 mb-1">
+          Chapter Descriptions <span className="text-white/30">(for product page — one per image)</span>
+        </label>
+        {[
+          { name: "prod_chapter_1", label: "Chapter 1 — Concept", placeholder: "Describe the concept behind this piece..." },
+          { name: "prod_chapter_2", label: "Chapter 2 — Material", placeholder: "Describe the materials and craftsmanship..." },
+          { name: "prod_chapter_3", label: "Chapter 3 — Provenance", placeholder: "Describe the story and exclusivity..." },
+        ].map((ch) => (
+          <div key={ch.name}>
+            <p className="text-white/50 text-xs mb-2">{ch.label}</p>
+            <textarea
+              name={ch.name}
+              value={form[ch.name as keyof typeof form]}
+              onChange={handleChange}
+              rows={3}
+              className={inputClass}
+              placeholder={ch.placeholder}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Image uploads */}

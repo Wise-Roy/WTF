@@ -28,6 +28,9 @@ export async function PUT(
   if (body.prod_fabric !== undefined) updates.prod_fabric = (body.prod_fabric as string).trim();
   if (body.prod_fit !== undefined) updates.prod_fit = (body.prod_fit as string).trim();
   if (body.prod_care !== undefined) updates.prod_care = (body.prod_care as string).trim();
+  if (body.prod_chapter_1 !== undefined) updates.prod_chapter_1 = (body.prod_chapter_1 as string).trim();
+  if (body.prod_chapter_2 !== undefined) updates.prod_chapter_2 = (body.prod_chapter_2 as string).trim();
+  if (body.prod_chapter_3 !== undefined) updates.prod_chapter_3 = (body.prod_chapter_3 as string).trim();
 
   if (body.prod_rank !== undefined) {
     const rank = Number(body.prod_rank);

@@ -269,9 +269,6 @@ function StoryLayout({ product }: { product: DbProduct }) {
                 <h2 className="mt-3 font-heading text-2xl xl:text-3xl uppercase leading-[1.05] text-[#C6FF00]">
                   {product.prod_name}
                 </h2>
-                <p className="mt-4 text-sm text-[#1a1a1a]/70 leading-relaxed line-clamp-3">
-                  {product.prod_description || "A numbered piece from the drop. Designed, printed, and shipped with intention."}
-                </p>
 
                 {[
                   { label: "Fabric", value: product.prod_fabric },
@@ -669,9 +666,6 @@ function MobileStory({
       {/* Details card */}
       <div className="mx-4 mt-8 bg-white border-2 border-[#1a1a1a] rounded-md p-6" style={{ boxShadow: "5px 5px 0 #FFD9E7" }}>
         <h2 className="font-heading text-lg uppercase text-[#1a1a1a]">The Details</h2>
-        <p className="mt-3 text-sm text-[#1a1a1a]/70 leading-relaxed">
-          {product.prod_description || "A numbered piece from the drop. Designed, printed, and shipped with intention."}
-        </p>
         {[
           { label: "Fabric", value: product.prod_fabric },
           { label: "Fit", value: product.prod_fit },

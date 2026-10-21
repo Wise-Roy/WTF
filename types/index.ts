@@ -69,6 +69,9 @@ export interface DbProduct {
   prod_fabric: string;
   prod_fit: string;
   prod_care: string;
+  prod_chapter_1: string;
+  prod_chapter_2: string;
+  prod_chapter_3: string;
   created_at: string;
   updated_at: string;
 }
