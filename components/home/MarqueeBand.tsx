@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 const REPEAT_COUNT = 8;
 const SEPARATOR = " \u2731 ";
-const TEXT = "BRAT OVER BASICS";
+const TEXT = "BRAT OVER BASIC";
 
 export default function MarqueeBand() {
   const bandRef = useRef<HTMLDivElement>(null);

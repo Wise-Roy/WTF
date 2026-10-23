@@ -3,9 +3,9 @@ import { NavLink, Product, Review, ValueProp, FooterColumn, SchemeConfig, ColorS
 export const BRAND = {
   name: "Wxrship The Fumes",
   shortName: "WTF",
-  motto: "BRAT OVER BASICS",
+  motto: "BRAT OVER BASIC",
   email: "hello@wxrshipthefumes.com",
-  copyright: "2026 WXRSHIP THE FUMES. BRAT OVER BASICS",
+  copyright: "2026 WXRSHIP THE FUMES. BRAT OVER BASIC",
 } as const;
 
 export const COLORS = {

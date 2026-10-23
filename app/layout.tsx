@@ -21,7 +21,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "WXRSHIP THE FUMES | BRAT OVER BASICS",
+  title: "WXRSHIP THE FUMES | BRAT OVER BASIC",
   description:
     "WTF is streetwear for the ones who chose to stand out. Limited drops. Original art. No restocks.",
 };
