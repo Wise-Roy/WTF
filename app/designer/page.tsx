@@ -186,6 +186,8 @@ function DesignerHero({ images }: { images: string[] }) {
   }
 
   return (
+    // Wrapper owned by React: ScrollTrigger pin inserts a pin-spacer around the inner div
+    <div>
     <div ref={containerRef} className="relative h-screen w-full overflow-hidden bg-[#FFF9D6] text-[#1a1a1a]">
       {/* Watermark */}
       <div
@@ -226,6 +228,7 @@ function DesignerHero({ images }: { images: string[] }) {
       >
         <span className="text-[#C6FF00]">Des</span>igner
       </h1>
+    </div>
     </div>
   );
 }

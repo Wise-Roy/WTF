@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X, Minus, Plus } from "lucide-react";
 import { useBag } from "@/context/BagContext";
@@ -20,7 +20,23 @@ export default function BagDrawer() {
     };
   }, [isOpen]);
 
-  const shipping = subtotal >= 5000 ? 0 : 500;
+  const [shippingSettings, setShippingSettings] = useState({ fee: 500, freeAbove: 5000 });
+
+  // Refetch on every open so admin changes show without a full page reload
+  useEffect(() => {
+    if (!isOpen) return;
+    fetch("/api/footer", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        const f = d.data?.footer;
+        if (f?.shipping_fee != null && f?.free_shipping_threshold != null) {
+          setShippingSettings({ fee: Number(f.shipping_fee), freeAbove: Number(f.free_shipping_threshold) });
+        }
+      })
+      .catch(() => {});
+  }, [isOpen]);
+
+  const shipping = subtotal >= shippingSettings.freeAbove ? 0 : shippingSettings.fee;
   const total = subtotal + shipping;
   const isEmpty = items.length === 0;
 

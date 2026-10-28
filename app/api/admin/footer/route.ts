@@ -18,7 +18,7 @@ export async function GET() {
   if (error) {
     return NextResponse.json({
       success: true,
-      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "", google_review: "" } },
+      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", shipping_fee: 500, free_shipping_threshold: 5000 } },
     });
   }
 
@@ -32,6 +32,12 @@ export async function PUT(req: NextRequest) {
 
   const body = await req.json();
   const { instagram, twitter, spotify, facebook, google_review, privacy_policy_pdf, newsletter_pdf } = body;
+  const shippingFee = Number(body.shipping_fee);
+  const freeShippingThreshold = Number(body.free_shipping_threshold);
+
+  if (!Number.isFinite(shippingFee) || shippingFee < 0 || !Number.isFinite(freeShippingThreshold) || freeShippingThreshold < 0) {
+    return NextResponse.json({ success: false, message: "Shipping values must be 0 or more" }, { status: 400 });
+  }
 
   const { data: existing } = await supabaseAdmin
     .from("footer_settings")
@@ -47,6 +53,8 @@ export async function PUT(req: NextRequest) {
     google_review: google_review || "",
     privacy_policy_pdf: privacy_policy_pdf || "",
     newsletter_pdf: newsletter_pdf || "",
+    shipping_fee: shippingFee,
+    free_shipping_threshold: freeShippingThreshold,
     updated_at: new Date().toISOString(),
   };
 

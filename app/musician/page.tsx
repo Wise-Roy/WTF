@@ -45,6 +45,8 @@ function HeroIntro() {
   }, []);
 
   return (
+    // Wrapper owned by React: ScrollTrigger pin inserts a pin-spacer around the inner div
+    <div>
     <div ref={sectionRef} className="relative h-screen bg-black flex items-center justify-center overflow-hidden">
       {/* Background image */}
       <Image
@@ -98,6 +100,7 @@ function HeroIntro() {
           }}
         />
       </div>
+    </div>
     </div>
   );
 }

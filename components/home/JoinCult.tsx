@@ -6,12 +6,36 @@ import { SectionWrapper, Tagline, SectionHeading, Input } from "@/components/com
 export default function JoinCult() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong");
+        return;
+      }
+
       setSubmitted(true);
       setEmail("");
+    } catch {
+      setError("Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,10 +64,12 @@ export default function JoinCult() {
           />
           <button
             type="submit"
-            className="bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 text-sm font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors"
+            disabled={loading}
+            className="bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 text-sm font-bold uppercase tracking-wider whitespace-nowrap hover:bg-[#d4ff33] transition-colors disabled:opacity-50"
           >
-            Subscribe
+            {loading ? "Sending..." : "Subscribe"}
           </button>
+          {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
         </form>
       )}
 

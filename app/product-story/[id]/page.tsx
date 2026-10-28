@@ -585,8 +585,8 @@ function MobileStory({
 
   return (
     <>
-      {/* Compact header */}
-      <div className="px-6 pt-6 pb-4">
+      {/* Compact header — pt clears the 64px the sticky breadcrumb is shifted down by the fixed navbar */}
+      <div className="px-6 pt-[88px] pb-4">
         <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#DF2877]">
           ✶ {product.prod_label || "DROP 001"}
         </span>

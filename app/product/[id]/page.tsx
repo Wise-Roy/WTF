@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -87,7 +87,6 @@ function TextReveal({ children, className = "" }: { children: React.ReactNode; c
 /* ─── Sticky Top Bar ─── */
 function StickyTopBar({ product }: { product: DbProduct }) {
   const { addItem } = useBag();
-  const router = useRouter();
   const isSoldOut = product.prod_quantity <= 0;
   const [added, setAdded] = useState(false);
 
@@ -100,9 +99,7 @@ function StickyTopBar({ product }: { product: DbProduct }) {
       image: product.image?.[0] || "/eg.jpg",
     });
     setAdded(true);
-    setTimeout(() => {
-      router.push(`/product-story/${product.id}`);
-    }, 600);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   return (
@@ -315,6 +312,21 @@ export default function ProductPage() {
       <ChapterSplit chapter={chapters[0]} />
       <ChapterSplit chapter={chapters[1]} reversed />
       <ChapterPoster chapter={chapters[2]} />
+
+      {/* Buy CTA */}
+      <section className="py-16 md:py-24 px-6 sm:px-10 bg-[#FFFAF6] border-t-[1.5px] border-[#0A0A0A]">
+        <div className="mx-auto max-w-7xl flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase leading-[0.85] tracking-[-0.04em] text-[#0A0A0A]">
+            {product.prod_name}
+          </h2>
+          <Link
+            href={`/product-story/${product.id}`}
+            className="self-start md:self-auto inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#C6FF00] text-[#0A0A0A] text-sm font-bold uppercase tracking-[0.15em] hover:brightness-90 active:scale-95 transition-all"
+          >
+            Buy it &rarr;
+          </Link>
+        </div>
+      </section>
     </motion.div>
   );
 }

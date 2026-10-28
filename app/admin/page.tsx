@@ -1018,6 +1018,7 @@ function UsersPanel() {
 /* ─────────────── FOOTER TAB ─────────────── */
 function FooterPanel() {
   const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", privacy_policy_pdf: "", newsletter_pdf: "" });
+  const [shipping, setShipping] = useState({ shipping_fee: "500", free_shipping_threshold: "5000" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -1029,7 +1030,13 @@ function FooterPanel() {
         const r = await fetch("/api/admin/footer", { signal: ac.signal });
         const d = await r.json();
         if (!ac.signal.aborted) {
-          if (d.data?.footer) setLinks(d.data.footer);
+          if (d.data?.footer) {
+            setLinks(d.data.footer);
+            setShipping({
+              shipping_fee: String(d.data.footer.shipping_fee ?? 500),
+              free_shipping_threshold: String(d.data.footer.free_shipping_threshold ?? 5000),
+            });
+          }
           setLoading(false);
         }
       } catch {
@@ -1050,9 +1057,9 @@ function FooterPanel() {
       const res = await fetch("/api/admin/footer", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(links),
+        body: JSON.stringify({ ...links, ...shipping }),
       });
-      if (res.ok) showToast("Footer links saved");
+      if (res.ok) showToast("Footer settings saved");
       else showToast("Save failed");
     } catch {
       showToast("Save failed");
@@ -1110,6 +1117,28 @@ function FooterPanel() {
               />
             </div>
           ))}
+
+          <div className="pt-6 border-t border-white/10">
+            <h3 className="text-lg font-bold mb-1">Shipping</h3>
+            <p className="text-xs text-white/40 mb-6">Shown in the bag. Orders at or above the threshold ship free.</p>
+            <div className="space-y-6">
+              {[
+                { key: "shipping_fee" as const, label: "Shipping fee (₹)" },
+                { key: "free_shipping_threshold" as const, label: "Free shipping above (₹)" },
+              ].map((f) => (
+                <div key={f.key}>
+                  <label className="block text-sm font-medium text-white/60 mb-2">{f.label}</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={shipping[f.key]}
+                    onChange={(e) => setShipping((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#C6FF00]/50 transition-colors"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
