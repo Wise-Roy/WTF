@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SectionWrapper, Tagline, SectionHeading, Input } from "@/components/common";
+import { isValidEmail, INVALID_EMAIL_MESSAGE } from "@/lib/email";
 
 export default function JoinCult() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,10 @@ export default function JoinCult() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    if (!isValidEmail(email)) {
+      setError(INVALID_EMAIL_MESSAGE);
+      return;
+    }
 
     setLoading(true);
     setError("");

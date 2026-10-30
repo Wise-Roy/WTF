@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { isValidEmail, INVALID_EMAIL_MESSAGE } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const { name, email, message } = await req.json();
 
+  if (!isValidEmail(email)) {
+    return NextResponse.json({ error: INVALID_EMAIL_MESSAGE }, { status: 400 });
+  }
+
   if (
     typeof name !== "string" || !name.trim() || name.length > 200 ||
-    typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
     typeof message !== "string" || !message.trim() || message.length > 5000
   ) {
     return NextResponse.json({ error: "Please fill all fields correctly" }, { status: 400 });

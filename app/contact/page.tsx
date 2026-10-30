@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { SectionWrapper, Input, Button, Tagline, SectionHeading } from "@/components/common";
+import { isValidEmail, INVALID_EMAIL_MESSAGE } from "@/lib/email";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -23,6 +24,10 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+    if (!isValidEmail(formData.email)) {
+      setError(INVALID_EMAIL_MESSAGE);
+      return;
+    }
 
     setLoading(true);
     setError("");

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { isValidEmail, INVALID_EMAIL_MESSAGE } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  if (!isValidEmail(email)) {
+    return NextResponse.json({ error: INVALID_EMAIL_MESSAGE }, { status: 400 });
   }
 
   try {
