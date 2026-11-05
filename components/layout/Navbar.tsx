@@ -50,6 +50,7 @@ export default function Navbar() {
       heading: "More",
       links: [
         { label: "Sizing", href: "/sizing" },
+        { label: "Press", href: "/press" },
         ...(!user
           ? [
               { label: "Sign In", href: "/sign-in" },

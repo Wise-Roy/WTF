@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star, Layers } from "lucide-react";
+import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star, Layers, Newspaper } from "lucide-react";
 import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character" | "collection-hero";
+type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character" | "collection-hero" | "press";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
@@ -20,6 +20,7 @@ const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "design-images", label: "Design Page", icon: Palette },
   { key: "collection-hero", label: "Collection Hero", icon: Layers },
   { key: "main-character", label: "Main Character", icon: Star },
+  { key: "press", label: "Press", icon: Newspaper },
 ];
 
 /* ─────────────── PRODUCTS TAB ─────────────── */
@@ -1677,10 +1678,23 @@ function OffersPanel() {
   );
 }
 
-/* ─────────────── DESIGN PAGE IMAGES TAB ─────────────── */
-function DesignImagesPanel() {
-  const [images, setImages] = useState<string[]>(["", "", ""]);
-  const [savedImages, setSavedImages] = useState<string[]>(["", "", ""]);
+/* ─────────────── IMAGE SLOTS TAB (Design page / Press) ─────────────── */
+function ImageSlotsPanel({
+  endpoint,
+  count,
+  cols,
+  title,
+  description,
+}: {
+  endpoint: string;
+  count: number;
+  cols: number;
+  title: string;
+  description: string;
+}) {
+  const empty = () => Array<string>(count).fill("");
+  const [images, setImages] = useState<string[]>(empty);
+  const [savedImages, setSavedImages] = useState<string[]>(empty);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
@@ -1690,7 +1704,7 @@ function DesignImagesPanel() {
     const ac = new AbortController();
     (async () => {
       try {
-        const r = await fetch("/api/admin/design-images", { signal: ac.signal });
+        const r = await fetch(endpoint, { signal: ac.signal });
         const d = await r.json();
         if (!ac.signal.aborted && d.data?.images) {
           setImages(d.data.images);
@@ -1702,7 +1716,7 @@ function DesignImagesPanel() {
       }
     })();
     return () => ac.abort();
-  }, []);
+  }, [endpoint]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -1736,14 +1750,14 @@ function DesignImagesPanel() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/admin/design-images", {
+      const res = await fetch(endpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ images, previousImages: savedImages }),
       });
       if (res.ok) {
         setSavedImages([...images]);
-        showToast("Design images saved");
+        showToast("Images saved");
       } else {
         const d = await res.json();
         showToast(d.message || "Save failed");
@@ -1764,7 +1778,7 @@ function DesignImagesPanel() {
       )}
 
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-bold">Design Page Images</h2>
+        <h2 className="text-xl font-bold">{title}</h2>
         <button
           onClick={handleSave}
           disabled={saving || loading}
@@ -1773,18 +1787,16 @@ function DesignImagesPanel() {
           {saving ? "Saving..." : "Save"}
         </button>
       </div>
-      <p className="text-white/40 text-sm mb-8">
-        Upload exactly 3 images for the Design page hero scroll. Old images are automatically cleaned up from storage on save.
-      </p>
+      <p className="text-white/40 text-sm mb-8">{description}</p>
 
       {loading ? (
-        <div className="grid grid-cols-3 gap-6">
-          {[0, 1, 2].map((i) => (
+        <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          {empty().map((_, i) => (
             <div key={i} className="aspect-[3/4] bg-white/5 rounded-lg animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
           {images.map((url, idx) => {
             const isUploading = uploadingIdx === idx;
             return (
@@ -1793,7 +1805,7 @@ function DesignImagesPanel() {
                 <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-white/5 border border-white/10">
                   {url ? (
                     <>
-                      <Image src={url} alt={`Design ${idx + 1}`} fill className="object-cover" />
+                      <Image src={url} alt={`${title} ${idx + 1}`} fill className="object-cover" />
                       <button
                         type="button"
                         onClick={() => handleRemove(idx)}
@@ -2263,7 +2275,24 @@ export default function AdminPage() {
         {activeTab === "users" && <UsersPanel />}
         {activeTab === "footer" && <FooterPanel />}
         {activeTab === "offers" && <OffersPanel />}
-        {activeTab === "design-images" && <DesignImagesPanel />}
+        {activeTab === "design-images" && (
+          <ImageSlotsPanel
+            endpoint="/api/admin/design-images"
+            count={3}
+            cols={3}
+            title="Design Page Images"
+            description="Upload exactly 3 images for the Design page hero scroll. Old images are automatically cleaned up from storage on save."
+          />
+        )}
+        {activeTab === "press" && (
+          <ImageSlotsPanel
+            endpoint="/api/admin/press"
+            count={10}
+            cols={5}
+            title="Press Images"
+            description="Upload 10 images for the Press page gallery. Old images are automatically cleaned up from storage on save."
+          />
+        )}
         {activeTab === "collection-hero" && <CollectionHeroPanel />}
         {activeTab === "main-character" && <MainCharacterPanel />}
       </main>

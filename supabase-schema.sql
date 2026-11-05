@@ -238,3 +238,13 @@ CREATE POLICY "Admin delete documents" ON storage.objects FOR DELETE USING (buck
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_quick_info_1 text NOT NULL DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_quick_info_2 text NOT NULL DEFAULT '';
 ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_quick_info_3 text NOT NULL DEFAULT '';
+
+-- Press page images (10 images stored as jsonb array in hero_settings)
+ALTER TABLE hero_settings ADD COLUMN IF NOT EXISTS press_images jsonb NOT NULL DEFAULT '["","","","","","","","","",""]';
+
+-- Storage bucket for design/press images
+INSERT INTO storage.buckets (id, name, public) VALUES ('designs', 'designs', true) ON CONFLICT DO NOTHING;
+CREATE POLICY "Public read designs" ON storage.objects FOR SELECT USING (bucket_id = 'designs');
+CREATE POLICY "Admin insert designs" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'designs');
+CREATE POLICY "Admin update designs" ON storage.objects FOR UPDATE USING (bucket_id = 'designs');
+CREATE POLICY "Admin delete designs" ON storage.objects FOR DELETE USING (bucket_id = 'designs');
