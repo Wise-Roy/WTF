@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  AnimatePresence,
   motion,
   useScroll,
   useTransform,
@@ -12,11 +13,11 @@ import {
   MotionValue,
 } from "framer-motion";
 import { DbProduct } from "@/types";
-import { useBag } from "@/context/BagContext";
+import { SectionFade } from "@/components/common";
 /* ─── Helpers ─── */
 
 function buildChapters(product: DbProduct) {
-  const images = product.image?.length === 3 ? product.image : ["/eg.jpg", "/eg.jpg", "/eg.jpg"];
+  const images = product.image?.length ? product.image : ["/eg.jpg", "/eg.jpg", "/eg.jpg"];
   return [
     {
       number: "01",
@@ -34,10 +35,12 @@ function buildChapters(product: DbProduct) {
     },
     {
       number: "03",
-      title: "PROVENANCE",
+      title: "Line Up",
       body: product.prod_chapter_3 || "We do not restock. We do not reprint. We do not apologize. When the run is done, the run is done.",
       image: images[2],
-      alt: `${product.prod_name} — provenance`,
+      // Line Up cycles through the last three uploads
+      slides: images.slice(2).filter(Boolean),
+      alt: `${product.prod_name} — lineup`,
     },
   ];
 }
@@ -86,55 +89,30 @@ function TextReveal({ children, className = "" }: { children: React.ReactNode; c
 
 /* ─── Sticky Top Bar ─── */
 function StickyTopBar({ product }: { product: DbProduct }) {
-  const { addItem } = useBag();
   const isSoldOut = product.prod_quantity <= 0;
-  const [added, setAdded] = useState(false);
-
-  const handleAdd = () => {
-    if (isSoldOut || added) return;
-    addItem({
-      id: product.id,
-      name: product.prod_name,
-      price: product.prod_price,
-      image: product.image?.[0] || "/eg.jpg",
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-  };
 
   return (
     <div className="sticky top-16 z-40" style={{ background: "rgba(255,194,212,0.78)", backdropFilter: "blur(20px) saturate(140%)", borderBottom: "1px solid rgba(10,10,10,0.15)" }}>
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-3 flex items-center justify-between">
         {/* Left: Back */}
-        <Link href="/collections" className="flex items-center gap-2 group">
+       <Link href="/collections" className="flex items-center gap-2 group">
           <span className="text-[#0A0A0A] text-sm">&larr;</span>
           <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-[0.25em] text-[#0A0A0A]/70 group-hover:text-[#0A0A0A] transition-colors">Back</span>
         </Link>
 
-        {/* Right: Add to Cart */}
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={isSoldOut}
+        {/* Right: Shop */}
+        <Link
+          href="/silhouettes"
+          aria-disabled={isSoldOut}
           className={`flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] transition-all ${
             isSoldOut
-              ? "bg-[#0A0A0A]/20 text-[#0A0A0A]/40 cursor-not-allowed"
-              : added
-                ? "bg-[#0A0A0A] text-white"
-                : "bg-[#C6FF00] text-[#0A0A0A] hover:brightness-90 active:scale-95"
+              ? "bg-[#0A0A0A]/20 text-[#0A0A0A]/40 pointer-events-none"
+              : "bg-[#C6FF00] text-[#0A0A0A] hover:brightness-90 active:scale-95"
           }`}
         >
-          {isSoldOut ? (
-            "Sold Out"
-          ) : added ? (
-            "Added ✓"
-          ) : (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-              Add to Cart
-            </>
-          )}
-        </button>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Shop
+        </Link>
       </div>
     </div>
   );
@@ -229,17 +207,47 @@ function ChapterSplit({
 }
 
 /* ─── Chapter 3 — Full-Bleed Poster ─── */
-function ChapterPoster({ chapter }: { chapter: { number: string; title: string; body: string; image: string; alt: string } }) {
+function ChapterPoster({
+  chapter,
+}: {
+  chapter: { number: string; title: string; body: string; image: string; slides?: string[]; alt: string };
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
   const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1.25]);
 
+  const slides = chapter.slides?.length ? chapter.slides : [chapter.image];
+  const [slideIdx, setSlideIdx] = useState(0);
+
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const timer = setInterval(() => setSlideIdx((i) => (i + 1) % slides.length), 4000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   return (
     <section ref={ref} className="relative overflow-hidden min-h-[60vh] md:min-h-[70vh] py-20 md:py-32 lg:py-40 bg-[#FFFAF6]">
       {/* Image */}
       <motion.div className="absolute inset-0" style={{ y, scale }}>
-        <Image src={chapter.image} alt={chapter.alt} fill className="object-cover object-center" sizes="100vw" />
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={slides[slideIdx]}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+          >
+            <Image
+              src={slides[slideIdx]}
+              alt={chapter.alt}
+              fill
+              className="object-cover object-center"
+              sizes="100vw"
+            />
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
 
       {/* Overlay */}
@@ -290,9 +298,10 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-[#FFFAF6] flex flex-col items-center justify-center gap-4">
         <p className="text-[#0A0A0A]/50 text-lg">Product not found.</p>
-        <Link href="/collections" className="text-xs font-bold uppercase tracking-widest text-[#0A0A0A]/60 hover:text-[#0A0A0A] transition-colors">
+        <Link href="/collections" className="text-xs font-bold uppercase tracking-widest text-[#0A0A0
+A]/60 hover:text-[#0A0A0A] transition-colors">
           &larr; Back to collections
-        </Link>
+          </Link>
       </div>
     );
   }
@@ -309,6 +318,7 @@ export default function ProductPage() {
     >
       <StickyTopBar product={product} />
       <IntroHero product={product} chapters={chapters} />
+      <SectionFade from="#0f0f0f" to="#FFFAF6" className="h-24 md:h-32" />
       <ChapterSplit chapter={chapters[0]} />
       <ChapterSplit chapter={chapters[1]} reversed />
       <ChapterPoster chapter={chapters[2]} />

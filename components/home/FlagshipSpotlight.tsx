@@ -47,7 +47,7 @@ export default function FlagshipSpotlight() {
           <Tagline className="bg-[#1a1a1a] text-black">Main Character</Tagline>
           <h2
             className="mt-6 font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-[0.08em] leading-[0.95]"
-            style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}
+            style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}
           >
             {title}
           </h2>

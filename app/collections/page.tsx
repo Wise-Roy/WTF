@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ProductSkeleton } from "@/components/common";
+import { ProductSkeleton, SectionFade } from "@/components/common";
 import CollectionHero from "@/components/collections/CollectionHero";
 import { DbProduct } from "@/types";
 
@@ -60,7 +60,7 @@ function CollectionCard({ product }: { product: DbProduct }) {
         aria-label={prod_name}
         className="group relative overflow-hidden block collection-card"
       >
-        <div className="relative aspect-[4/5] overflow-hidden select-none">
+        <div className="relative aspect-square overflow-hidden select-none">
           <Image
             src={img}
             alt={prod_name}
@@ -91,7 +91,7 @@ function CollectionsContent() {
   const { products, loading } = useFetchProducts("All");
 
   return (
-    <section className="relative z-20 bg-[#FFF9D6] px-6 md:px-12 lg:px-20 pt-16 pb-24">
+    <section className="relative z-20 px-6 md:px-12 lg:px-20 pt-16 pb-24">
       <div className="mx-auto max-w-7xl">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -121,9 +121,22 @@ export default function CollectionsPage() {
   return (
     <>
       <CollectionHero />
+      <SectionFade from="#1a1a1a" to="#FFF9D6" />
+      {/* Continuous gradient behind the grid, like the home page */}
+      <div
+        style={{
+          background: `
+            radial-gradient(ellipse at 15% 10%, rgba(244, 205, 181, 0.35) 0%, transparent 35%),
+            radial-gradient(ellipse at 85% 40%, rgba(190, 174, 211, 0.3) 0%, transparent 35%),
+            radial-gradient(ellipse at 20% 75%, rgba(198, 255, 0, 0.15) 0%, transparent 30%),
+            radial-gradient(ellipse at 80% 95%, rgba(223, 40, 119, 0.15) 0%, transparent 30%),
+            linear-gradient(180deg, #FFF9D6 0%, #f8ead6 55%, #ece3ee 100%)
+          `,
+        }}
+      >
       <Suspense
         fallback={
-          <section className="relative z-20 bg-[#FFF9D6] px-6 md:px-12 lg:px-20 pt-16 pb-24">
+          <section className="relative z-20 px-6 md:px-12 lg:px-20 pt-16 pb-24">
             <div className="mx-auto max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
                 <ProductSkeleton key={i} />
@@ -134,6 +147,7 @@ export default function CollectionsPage() {
       >
         <CollectionsContent />
       </Suspense>
+      </div>
     </>
   );
 }

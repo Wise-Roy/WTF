@@ -13,6 +13,8 @@ interface ProductFormProps {
   product?: DbProduct;
 }
 
+const QUICK_INFO_MAX = 120;
+
 export default function ProductForm({ product }: ProductFormProps) {
   const router = useRouter();
   const isEdit = !!product;
@@ -30,18 +32,29 @@ export default function ProductForm({ product }: ProductFormProps) {
     prod_chapter_1: product?.prod_chapter_1 || "",
     prod_chapter_2: product?.prod_chapter_2 || "",
     prod_chapter_3: product?.prod_chapter_3 || "",
+    prod_quick_info_1: product?.prod_quick_info_1 || "",
+    prod_quick_info_2: product?.prod_quick_info_2 || "",
+    prod_quick_info_3: product?.prod_quick_info_3 || "",
   });
 
   const [images, setImages] = useState<(string | null)[]>([
     product?.image?.[0] || null,
     product?.image?.[1] || null,
     product?.image?.[2] || null,
+    product?.image?.[3] || null,
+    product?.image?.[4] || null,
   ]);
 
-  const [uploading, setUploading] = useState<boolean[]>([false, false, false]);
+  const [uploading, setUploading] = useState<boolean[]>([false, false, false, false, false]);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const fileRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+  const fileRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -102,7 +115,10 @@ export default function ProductForm({ product }: ProductFormProps) {
       prod_chapter_1: form.prod_chapter_1,
       prod_chapter_2: form.prod_chapter_2,
       prod_chapter_3: form.prod_chapter_3,
-      image: imageUrls.length === 3 ? imageUrls : [],
+      prod_quick_info_1: form.prod_quick_info_1,
+      prod_quick_info_2: form.prod_quick_info_2,
+      prod_quick_info_3: form.prod_quick_info_3,
+      image: imageUrls.length === 5 ? imageUrls : [],
     };
 
     const { valid, errors: validationErrors } = validateProduct(body);
@@ -139,7 +155,9 @@ export default function ProductForm({ product }: ProductFormProps) {
   const imageLabels = [
     "Image 1 — Primary / Default",
     "Image 2 — Vertical Reveal",
-    "Image 3 — Horizontal Reveal",
+    "Image 3 — Line Up slide 1",
+    "Image 4 — Line Up slide 2",
+    "Image 5 — Line Up slide 3",
   ];
 
   return (
@@ -228,10 +246,31 @@ export default function ProductForm({ product }: ProductFormProps) {
         ))}
       </div>
 
+      {/* Quick Info (product story page) */}
+      <div className="space-y-4">
+        <label className="block text-xs uppercase tracking-wider text-white/50 mb-1">
+          Quick Info <span className="text-white/30">(for product story page — 3 short points, 2 lines each, optional)</span>
+        </label>
+        {[1, 2, 3].map((n) => (
+          <div key={n}>
+            <p className="text-white/50 text-xs mb-2">Point {n}</p>
+            <textarea
+              name={`prod_quick_info_${n}`}
+              value={form[`prod_quick_info_${n}` as keyof typeof form] as string}
+              onChange={handleChange}
+              rows={2}
+              maxLength={QUICK_INFO_MAX}
+              className={inputClass}
+              placeholder="e.g. Ships in 3-5 working days across India"
+            />
+          </div>
+        ))}
+      </div>
+
       {/* Image uploads */}
       <div className="space-y-4">
         <div>
-          <label className="block text-xs uppercase tracking-wider text-white/50 mb-1">Product Images (3 required)</label>
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-1">Product Images (5 required)</label>
           <p className="text-white/30 text-xs">Max 10 MB per image. Formats: JPG, PNG, WebP, AVIF, GIF</p>
         </div>
         {errors.image && <p className={errorClass}>{errors.image}</p>}

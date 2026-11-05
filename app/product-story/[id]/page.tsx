@@ -49,6 +49,35 @@ export default function ProductStoryPage() {
   return <StoryLayout product={product} />;
 }
 
+/* ─── Quick Info ─── */
+function QuickInfo({ product }: { product: DbProduct }) {
+  const points = [product.prod_quick_info_1, product.prod_quick_info_2, product.prod_quick_info_3].filter(
+    (p) => p && p.trim()
+  );
+  if (points.length === 0) return null;
+
+  return (
+    <div className="mt-6 border-t-2 border-[#1a1a1a]/10 pt-4">
+      <div className="flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#DF2877]" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white">Quick Info</span>
+      </div>
+      <ul className="mt-3 space-y-2">
+        {points.map((point, i) => (
+          <li key={i} className="flex gap-2 text-[11px] leading-snug text-white">
+            <span className="text-[#DF2877] shrink-0">✶</span>
+            <span className="line-clamp-2">{point}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /* ─── Toast ─── */
 function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   useEffect(() => {
@@ -262,7 +291,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
 
             {/* LEFT CARD — The Details */}
             <div
-              className="bg-white border-2 border-[#1a1a1a] rounded-md flex flex-col justify-between overflow-hidden"
+              className="bg-black border-2 border-[#C6FF00] rounded-md flex flex-col justify-between overflow-hidden"
               style={{  height: "calc(72vh - 28px)" , alignSelf: "center" }}
             >
               <div className="p-6 flex-1 flex flex-col">
@@ -283,14 +312,14 @@ function StoryLayout({ product }: { product: DbProduct }) {
                     ].filter((s) => s.value).map((spec) => (
                       <div key={spec.label} className="border-t border-[#1a1a1a]/10 pt-2">
                         <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#DF2877]">{spec.label}</span>
-                        <p className="text-xs text-[#1a1a1a]/70 mt-0.5">{spec.value}</p>
+                        <p className="text-xs text-white mt-0.5">{spec.value}</p>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
               <div className="border-t border-[#1a1a1a]/10 px-6 py-3">
-                <p className="text-[10px] italic text-[#1a1a1a]/40 text-center" style={{ fontFamily: "serif" }}>
+                <p className="text-[10px] italic text-white text-center" style={{ fontFamily: "serif" }}>
                   Scroll the gallery — the sides stay put, only the look changes.
                 </p>
               </div>
@@ -396,7 +425,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
 
             {/* RIGHT CARD — The Price */}
             <div
-              className="bg-white border-2 border-[#1a1a1a] rounded-md flex flex-col justify-between overflow-hidden"
+              className="bg-black border-2 border-[#C6FF00] rounded-md flex flex-col justify-between overflow-hidden"
               style={{ height: "calc(72vh - 28px)", alignSelf: "center" }}
             >
               <div className="p-6 flex-1 flex flex-col">
@@ -404,7 +433,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
                   <span className="font-heading text-3xl text-[#C6FF00]">
                     ₹{product.prod_price.toLocaleString("en-IN")}
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/40">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white">
                     Price / Incl. all taxes
                   </span>
                 </div>
@@ -417,22 +446,22 @@ function StoryLayout({ product }: { product: DbProduct }) {
 
                 {/* Quantity */}
                 <div className="mt-8">
-                  <span className="mr-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/60">Quantity</span>
+                  <span className="mr-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white">Quantity</span>
                   <div className="mt-2 inline-flex items-center border-2 border-[#1a1a1a] rounded-sm">
                     <button
                       type="button"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-1.5 text-sm font-bold hover:bg-[#1a1a1a]/5 transition-colors"
+                      className="px-3 py-1.5 text-sm font-bold hover:bg-[#DF2877] transition-colors text-white"
                     >
                       −
                     </button>
-                    <span className="px-4 py-1.5 text-sm font-bold tabular-nums border-x-2 border-[#1a1a1a]">
+                    <span className="px-4 py-1.5 text-sm font-bold tabular-nums border-x-2 border-[#1a1a1a] text-white">
                       {quantity}
                     </span>
                     <button
                       type="button"
                       onClick={() => setQuantity(Math.min(9, quantity + 1))}
-                      className="px-3 py-1.5 text-sm font-bold hover:bg-[#1a1a1a]/5 transition-colors"
+                      className="px-3 py-1.5 text-sm font-bold hover:bg-[#DF2877] transition-colors text-white"
                     >
                       +
                     </button>
@@ -449,7 +478,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
                       ? "bg-[#1a1a1a]/10 text-[#1a1a1a]/30 border-[#1a1a1a]/10"
                       : addedState
                         ? "bg-[#C6FF00] text-[#1a1a1a] border-[#C6FF00]"
-                        : "bg-[#1a1a1a] text-white border-[#1a1a1a] hover:bg-[#DF2877] hover:border-[#DF2877]"
+                        : "bg-[#C6FF00] text-black border-[#1a1a1a] hover:bg-[#DF2877] hover:border-[#DF2877]"
                   }`}
                 >
                   {isSoldOut ? "Sold Out" : addedState ? "Added ✓" : `Add to Cart — ₹${(product.prod_price * quantity).toLocaleString("en-IN")}`}
@@ -464,12 +493,14 @@ function StoryLayout({ product }: { product: DbProduct }) {
                     className={`py-2 text-[10px] font-bold uppercase tracking-[0.14em] border-2 rounded-sm transition-colors disabled:opacity-50 ${
                       wishlisted
                         ? "border-[#DF2877] bg-[#DF2877] text-white"
-                        : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#FFD9E7]"
+                        : "border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#DF2877] bg-[#C6FF00]"
                     }`}
                   >
                     {wishlisted ? "♥ Wishlisted" : "♡ Wishlist"}
                   </button>
                 </div>
+
+                <QuickInfo product={product} />
 
                 <div className="flex-1" />
               </div>
@@ -729,6 +760,8 @@ function MobileStory({
             ↗ Share
           </button>
         </div>
+
+        <QuickInfo product={product} />
 
         <p className="mt-4 text-[9px] uppercase tracking-[0.10em] text-[#1a1a1a]/40 text-center font-bold">
           Free shipping over ₹5,000 ✶ 7-day returns ✶ Never restocked

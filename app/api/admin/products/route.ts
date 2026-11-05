@@ -57,6 +57,9 @@ export async function POST(req: NextRequest) {
     prod_chapter_1: ((body.prod_chapter_1 as string) || "").trim(),
     prod_chapter_2: ((body.prod_chapter_2 as string) || "").trim(),
     prod_chapter_3: ((body.prod_chapter_3 as string) || "").trim(),
+    prod_quick_info_1: ((body.prod_quick_info_1 as string) || "").trim(),
+    prod_quick_info_2: ((body.prod_quick_info_2 as string) || "").trim(),
+    prod_quick_info_3: ((body.prod_quick_info_3 as string) || "").trim(),
   }).select().single();
 
   if (error) {

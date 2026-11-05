@@ -144,7 +144,7 @@ function HeroSection() {
       <h1
         ref={titleRef}
         className={`${tangerine.className} fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 text-[#C6FF00] text-[14vw] md:text-[10vw] lg:text-[8vw] pointer-events-none whitespace-nowrap`}
-        style={{ textShadow: "0 4px 40px rgba(0,0,0,0.6)" }}
+        style={{ textShadow: "0 4px 40px rgba(0,0,0,0.6), 0 2px 30px rgba(198,255,0,0.55)" }}
       >
         Designs
       </h1>

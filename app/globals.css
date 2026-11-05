@@ -103,3 +103,12 @@ html .admin-area *::after {
     display: none !important;
   }
 }
+
+/* Glowing page titles — same halo as the designer hero */
+.title-glow-lime {
+  text-shadow: 0 2px 30px rgba(198, 255, 0, 0.55);
+}
+
+.title-glow-pink {
+  text-shadow: 0 2px 30px rgba(223, 40, 119, 0.55);
+}

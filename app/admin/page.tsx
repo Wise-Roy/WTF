@@ -527,13 +527,15 @@ function AboutPanel() {
 }
 
 /* ─────────────── MUSICIANS TAB ─────────────── */
+const MUSICIAN_DESC_MAX = 160;
+
 function MusiciansPanel() {
   const [musicians, setMusicians] = useState<DbMusician[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
   const [editing, setEditing] = useState<DbMusician | null>(null);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: "", photo: "" });
+  const [form, setForm] = useState({ name: "", photo: "", description: "" });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -564,19 +566,19 @@ function MusiciansPanel() {
   const handleEdit = (m: DbMusician) => {
     setEditing(m);
     setCreating(false);
-    setForm({ name: m.name, photo: m.photo });
+    setForm({ name: m.name, photo: m.photo, description: m.description || "" });
   };
 
   const handleNew = () => {
     setCreating(true);
     setEditing(null);
-    setForm({ name: "", photo: "" });
+    setForm({ name: "", photo: "", description: "" });
   };
 
   const handleCancel = () => {
     setEditing(null);
     setCreating(false);
-    setForm({ name: "", photo: "" });
+    setForm({ name: "", photo: "", description: "" });
   };
 
   const handlePhotoUpload = async (file: File) => {
@@ -660,6 +662,21 @@ function MusiciansPanel() {
               className={inputClass}
               placeholder="e.g. Travis Scott"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+              Description <span className="text-white/30 normal-case">(optional, 2 lines max)</span>
+            </label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm((p) => ({ ...p, description: e.target.value.slice(0, MUSICIAN_DESC_MAX) }))}
+              rows={2}
+              maxLength={MUSICIAN_DESC_MAX}
+              className={inputClass + " resize-none"}
+              placeholder="Short line or two about the artist"
+            />
+            <p className="text-xs text-white/30 mt-1">{form.description.length}/{MUSICIAN_DESC_MAX}</p>
           </div>
 
           <div>
@@ -1016,8 +1033,11 @@ function UsersPanel() {
 }
 
 /* ─────────────── FOOTER TAB ─────────────── */
+type PdfKey = "terms_of_service_pdf" | "shipping_policy_pdf" | "privacy_policy_pdf" | "newsletter_pdf";
+
 function FooterPanel() {
-  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", privacy_policy_pdf: "", newsletter_pdf: "" });
+  const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", terms_of_service_pdf: "", shipping_policy_pdf: "", privacy_policy_pdf: "", newsletter_pdf: "" });
+  const [uploadingPdf, setUploadingPdf] = useState<string | null>(null);
   const [shipping, setShipping] = useState({ shipping_fee: "500", free_shipping_threshold: "5000" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1068,14 +1088,33 @@ function FooterPanel() {
     }
   };
 
+  const handlePdfUpload = async (key: PdfKey, file: File) => {
+    if (file.type !== "application/pdf") { showToast("PDF files only"); return; }
+    setUploadingPdf(key);
+    try {
+      const publicUrl = await uploadFile(file, "documents");
+      setLinks((prev) => ({ ...prev, [key]: publicUrl }));
+      showToast("PDF uploaded — remember to save");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploadingPdf(null);
+    }
+  };
+
   const fields = [
     { key: "instagram" as const, label: "Instagram", placeholder: "https://instagram.com/yourpage" },
     { key: "twitter" as const, label: "Twitter / X", placeholder: "https://x.com/yourhandle" },
     { key: "spotify" as const, label: "Spotify", placeholder: "https://open.spotify.com/artist/..." },
     { key: "facebook" as const, label: "Facebook", placeholder: "https://facebook.com/yourpage" },
     { key: "google_review" as const, label: "Google Reviews", placeholder: "https://g.page/r/your-review-link" },
-    { key: "privacy_policy_pdf" as const, label: "Privacy Policy PDF", placeholder: "https://example.com/privacy-policy.pdf" },
-    { key: "newsletter_pdf" as const, label: "Newsletter PDF", placeholder: "https://example.com/newsletter.pdf" },
+  ];
+
+  const pdfFields: { key: PdfKey; label: string }[] = [
+    { key: "terms_of_service_pdf", label: "Terms of Service PDF" },
+    { key: "shipping_policy_pdf", label: "Shipping Policy PDF" },
+    { key: "privacy_policy_pdf", label: "Return & Privacy Policy PDF" },
+    { key: "newsletter_pdf", label: "Newsletter PDF" },
   ];
 
   return (
@@ -1117,6 +1156,55 @@ function FooterPanel() {
               />
             </div>
           ))}
+
+          <div className="pt-6 border-t border-white/10">
+            <h3 className="text-lg font-bold mb-1">Documents</h3>
+            <p className="text-xs text-white/40 mb-6">PDFs shown on the Company pages in the footer.</p>
+            <div className="space-y-6">
+              {pdfFields.map((f) => (
+                <div key={f.key}>
+                  <label className="block text-sm font-medium text-white/60 mb-2">{f.label}</label>
+                  <div className="flex items-center gap-3">
+                    <label className="cursor-pointer bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white/60 hover:border-[#C6FF00]/50 transition-colors shrink-0">
+                      {uploadingPdf === f.key ? "Uploading..." : links[f.key] ? "Replace PDF" : "Upload PDF"}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        disabled={uploadingPdf !== null}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handlePdfUpload(f.key, file);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {links[f.key] ? (
+                      <>
+                        <a
+                          href={links[f.key]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-[#C6FF00] hover:underline truncate"
+                        >
+                          View current PDF
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setLinks((prev) => ({ ...prev, [f.key]: "" }))}
+                          className="text-xs text-red-400 hover:underline shrink-0"
+                        >
+                          Remove
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-xs text-white/30">No PDF uploaded</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div className="pt-6 border-t border-white/10">
             <h3 className="text-lg font-bold mb-1">Shipping</h3>

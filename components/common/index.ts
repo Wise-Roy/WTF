@@ -7,3 +7,5 @@ export { default as Input } from "./Input";
 export { default as ProductCard } from "./ProductCard";
 export { default as PageHeader } from "./PageHeader";
 export { default as ProductSkeleton } from "./ProductSkeleton";
+export { default as SectionFade } from "./SectionFade";
+export { default as PolicyPdfPage } from "./PolicyPdfPage";

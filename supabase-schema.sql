@@ -219,3 +219,22 @@ CREATE POLICY "Public read collections" ON storage.objects FOR SELECT USING (buc
 CREATE POLICY "Admin insert collections" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'collections');
 CREATE POLICY "Admin update collections" ON storage.objects FOR UPDATE USING (bucket_id = 'collections');
 CREATE POLICY "Admin delete collections" ON storage.objects FOR DELETE USING (bucket_id = 'collections');
+
+-- Optional short bio shown under the musician's name on the musician page
+ALTER TABLE musicians ADD COLUMN IF NOT EXISTS description text NOT NULL DEFAULT '';
+
+-- Footer legal PDFs (Company column: Terms of Service, Shipping Policy, Return & Privacy Policy)
+ALTER TABLE footer_settings ADD COLUMN IF NOT EXISTS terms_of_service_pdf text NOT NULL DEFAULT '';
+ALTER TABLE footer_settings ADD COLUMN IF NOT EXISTS shipping_policy_pdf text NOT NULL DEFAULT '';
+
+-- Storage bucket for policy PDFs
+INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', true) ON CONFLICT DO NOTHING;
+CREATE POLICY "Public read documents" ON storage.objects FOR SELECT USING (bucket_id = 'documents');
+CREATE POLICY "Admin insert documents" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'documents');
+CREATE POLICY "Admin update documents" ON storage.objects FOR UPDATE USING (bucket_id = 'documents');
+CREATE POLICY "Admin delete documents" ON storage.objects FOR DELETE USING (bucket_id = 'documents');
+
+-- Quick Info bullets shown on the product story page (3 short points, optional)
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_quick_info_1 text NOT NULL DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_quick_info_2 text NOT NULL DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prod_quick_info_3 text NOT NULL DEFAULT '';

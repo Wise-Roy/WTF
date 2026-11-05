@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const name = (body.name as string)?.trim();
   const photo = (body.photo as string)?.trim();
+  const description = (body.description as string)?.trim() || "";
 
   if (!name || name.length < 1) {
     return NextResponse.json(
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from("musicians")
-    .insert({ name, photo })
+    .insert({ name, photo, description })
     .select()
     .single();
 

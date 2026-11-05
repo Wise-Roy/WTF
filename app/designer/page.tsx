@@ -5,7 +5,7 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "framer-motion";
-import { SectionWrapper, SectionHeading, Tagline, Button } from "@/components/common";
+import { SectionWrapper, SectionHeading, Tagline, Button, SectionFade } from "@/components/common";
 import { useImageParallax } from "@/hooks";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -328,10 +328,19 @@ export default function DesignerPage() {
   return (
     <>
       <DesignerHero images={heroImages} />
-      {spotifyUrl && <SpotifyPlaylistSection spotifyUrl={spotifyUrl} />}
+      <SectionFade from="#FFF9D6" to="#DF2877" />
+
       {displaySections.map((section) => (
         <AboutSectionBlock key={section.id} section={section} />
       ))}
+      
+      <SectionFade from="#DF2877" to={spotifyUrl ? "#000" : "#000"} />
+      {spotifyUrl && (
+        <>
+          <SpotifyPlaylistSection spotifyUrl={spotifyUrl} />
+          
+        </>
+      )}
     </>
   );
 }

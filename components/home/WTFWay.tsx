@@ -13,7 +13,7 @@ export default function WTFWay() {
     <SectionWrapper scheme="grey" className="!bg-transparent !text-white">
       <div className="text-center">
         <Tagline>WTF Codes</Tagline>
-        <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}>
+        <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}>
           Why we&apos;re weird on purpose
         </SectionHeading>
       </div>

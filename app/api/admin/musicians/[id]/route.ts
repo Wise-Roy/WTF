@@ -42,6 +42,7 @@ export async function PUT(
 
   if (body.name !== undefined) updates.name = (body.name as string).trim();
   if (body.photo !== undefined) updates.photo = (body.photo as string).trim();
+  if (body.description !== undefined) updates.description = (body.description as string).trim();
 
   const { data, error } = await supabaseAdmin
     .from("musicians")

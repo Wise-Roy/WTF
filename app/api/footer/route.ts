@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("footer_settings")
-    .select("instagram, twitter, spotify, facebook, google_review, privacy_policy_pdf, newsletter_pdf, shipping_fee, free_shipping_threshold")
+    .select("instagram, twitter, spotify, facebook, google_review, privacy_policy_pdf, terms_of_service_pdf, shipping_policy_pdf, newsletter_pdf, shipping_fee, free_shipping_threshold")
     .limit(1)
     .single();
 

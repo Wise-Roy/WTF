@@ -139,7 +139,9 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     title: "Company",
     links: [
       { label: "Contact", href: "/contact" },
-      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms-of-service" },
+      { label: "Shipping Policy", href: "/shipping-policy" },
+      { label: "Return & Privacy Policy", href: "/privacy-policy" },
     ],
   },
 ];

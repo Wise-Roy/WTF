@@ -49,10 +49,10 @@ export function validateProduct(input: ProductInput): ValidationResult {
   else if (!Number.isInteger(rank)) errors.prod_rank = "Rank must be a whole number";
 
   // image
-  if (!Array.isArray(input.image) || input.image.length !== 3) {
-    errors.image = "Exactly 3 images are required";
+  if (!Array.isArray(input.image) || input.image.length !== 5) {
+    errors.image = "Exactly 5 images are required";
   } else if (input.image.some((i) => typeof i !== "string" || !i.trim())) {
-    errors.image = "All 3 image URLs must be non-empty strings";
+    errors.image = "All 5 image URLs must be non-empty strings";
   }
 
   return { valid: Object.keys(errors).length === 0, errors };

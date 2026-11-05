@@ -381,7 +381,7 @@ export default function LatestDrop() {
     <SectionWrapper scheme="dark" className="!bg-transparent">
       <div ref={headerRef} className="text-left">
         <Tagline>Latest Releases</Tagline>
-        <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}>Extra, Extra !</SectionHeading>
+        <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}>Extra, Extra !</SectionHeading>
         <p className="mt-6 max-w-2xl text-lg text-black/70 leading-relaxed">
           Six new designs. Hand-drawn, numbered, and never restocked. Drop 01 is
           live — grab yours before they vanish into the fumes.

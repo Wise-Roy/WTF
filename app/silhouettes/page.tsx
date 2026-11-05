@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Cinzel } from "next/font/google";
-import { ProductCard, ProductSkeleton } from "@/components/common";
+import { ProductCard, ProductSkeleton, SectionFade } from "@/components/common";
 import { DbProduct } from "@/types";
 
 const cinzel = Cinzel({
@@ -126,7 +126,7 @@ function ShopContent() {
   const allLabels = ["All", ...labels];
 
   return (
-    <section className="bg-[#FFF9D6] px-6 md:px-12 lg:px-20 pt-16 pb-24">
+    <section className="px-6 md:px-12 lg:px-20 pt-16 pb-24">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap gap-3 mb-20">
           {allLabels.map((label) => (
@@ -196,7 +196,7 @@ function HeroSection() {
   return (
     <div
       ref={heroRef}
-      className="relative h-[35vh] bg-[#C6FF00] overflow-hidden"
+      className="relative h-[50vh] bg-[#C6FF00] overflow-hidden"
     >
       <div
         className="absolute pointer-events-none select-none opacity-[0.04]"
@@ -206,7 +206,7 @@ function HeroSection() {
       </div>
       <h1
         ref={textRef}
-        className="absolute bottom-0 left-0 right-0 text-[#DF2877] text-center select-none will-change-transform translate-y-[40%]"
+        className="absolute bottom-0 left-0 right-0 text-[#DF2877] text-center select-none will-change-transform translate-y-[40%] title-glow-pink"
         style={{
           fontFamily: cinzel.style.fontFamily,
           fontSize: "clamp(3rem, 10vw, 8rem)",
@@ -224,9 +224,22 @@ export default function SilhouettesPage() {
   return (
     <>
       <HeroSection />
+      <SectionFade from="#C6FF00" to="#FFF9D6" />
+      {/* Continuous gradient behind the grid, like the home page */}
+      <div
+        style={{
+          background: `
+            radial-gradient(ellipse at 15% 10%, rgba(244, 205, 181, 0.35) 0%, transparent 35%),
+            radial-gradient(ellipse at 85% 40%, rgba(190, 174, 211, 0.3) 0%, transparent 35%),
+            radial-gradient(ellipse at 20% 75%, rgba(198, 255, 0, 0.15) 0%, transparent 30%),
+            radial-gradient(ellipse at 80% 95%, rgba(223, 40, 119, 0.15) 0%, transparent 30%),
+            linear-gradient(180deg, #FFF9D6 0%, #f8ead6 55%, #ece3ee 100%)
+          `,
+        }}
+      >
       <Suspense
         fallback={
-          <section className="bg-[#FFF9D6] px-6 md:px-12 lg:px-20 pb-24">
+          <section className="px-6 md:px-12 lg:px-20 pb-24">
             <div className="mx-auto max-w-7xl grid grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
                 <ProductSkeleton key={i} />
@@ -237,6 +250,7 @@ export default function SilhouettesPage() {
       >
         <ShopContent />
       </Suspense>
+      </div>
     </>
   );
 }

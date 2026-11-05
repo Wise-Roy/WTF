@@ -52,6 +52,7 @@ export interface DbMusician {
   id: string;
   name: string;
   photo: string;
+  description: string;
   created_at: string;
   updated_at: string;
 }
@@ -72,6 +73,9 @@ export interface DbProduct {
   prod_chapter_1: string;
   prod_chapter_2: string;
   prod_chapter_3: string;
+  prod_quick_info_1: string;
+  prod_quick_info_2: string;
+  prod_quick_info_3: string;
   created_at: string;
   updated_at: string;
 }

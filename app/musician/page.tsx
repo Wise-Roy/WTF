@@ -113,6 +113,7 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const rotationRef = useRef(0);
   const velocityRef = useRef(0);
@@ -198,16 +199,18 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
     (idx: number) => {
       const el = nameRef.current;
       if (!el) return;
+      const desc = descRef.current;
 
-      gsap.to(el, {
+      gsap.to([el, desc].filter(Boolean), {
         opacity: 0,
         y: 20,
         duration: 0.2,
         onComplete: () => {
           activeIdxRef.current = idx;
           el.textContent = musicians[idx]?.name || "";
+          if (desc) desc.textContent = musicians[idx]?.description || "";
           gsap.fromTo(
-            el,
+            [el, desc].filter(Boolean),
             { opacity: 0, y: -20 },
             { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
           );
@@ -407,7 +410,7 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-black py-20">
+    <div className="relative min-h-screen py-20">
       {/* Ambient glow */}
       <div
         ref={glowRef}
@@ -449,6 +452,12 @@ function MusicianCarousel({ musicians }: { musicians: DbMusician[] }) {
         >
           {musicians[0]?.name || ""}
         </h2>
+        <p
+          ref={descRef}
+          className="mt-3 mx-auto max-w-xl px-6 text-sm md:text-base text-white/60 leading-relaxed line-clamp-3"
+        >
+          {musicians[0]?.description || ""}
+        </p>
       </div>
 
       {/* Swipe hint */}
@@ -481,7 +490,7 @@ function SpotifyPlaylistSection({ spotifyUrl }: { spotifyUrl: string }) {
   const embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}`;
 
   return (
-    <section className="bg-black py-16 px-6 md:px-12 lg:px-20">
+    <section className="py-16 px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-2xl">
         <p className="font-body text-sm uppercase tracking-[0.2em] text-white/40 mb-3 text-center">
           Curated by the designer
@@ -538,7 +547,18 @@ export default function MusicianPage() {
   }, []);
 
   return (
-    <div className="bg-black min-h-screen">
+    // Single continuous gradient behind all sections, like the home page
+    <div
+      className="min-h-screen"
+      style={{
+        background: `
+          radial-gradient(ellipse at 20% 30%, rgba(168, 85, 245, 0.18) 0%, transparent 35%),
+          radial-gradient(ellipse at 80% 55%, rgba(223, 40, 119, 0.16) 0%, transparent 35%),
+          radial-gradient(ellipse at 25% 85%, rgba(198, 255, 0, 0.08) 0%, transparent 30%),
+          linear-gradient(180deg, #000 0%, #000 25%, #140c1f 50%, #1f0b18 78%, #0a0a0a 100%)
+        `,
+      }}
+    >
       <HeroIntro />
 
       {loading ? (

@@ -47,7 +47,7 @@ export default function JoinCult() {
   return (
     <SectionWrapper scheme="pink" id="join" className="!bg-transparent text-center">
       <Tagline className="bg-[#C6FF00] text-[#1a1a1a]">Join the Cult</Tagline>
-      <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "white" }}>Zero FOMO</SectionHeading>
+      <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}>Zero FOMO</SectionHeading>
 
       {submitted ? (
         <p className="mt-8 text-xl font-bold text-[#C6FF00]">

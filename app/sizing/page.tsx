@@ -27,7 +27,7 @@ function Star({ className = "" }: { className?: string }) {
 
 function SizeChart() {
   return (
-    <section id="chart" className="bg-[#C6FF00] scroll-mt-20">
+    <section id="chart" className="scroll-mt-20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-16 md:py-24">
         {/* Header */}
         <motion.div
@@ -40,7 +40,7 @@ function SizeChart() {
           <div>
             <h2
               className={`${bebas.className} text-6xl md:text-8xl leading-[0.85]`}
-              style={{ WebkitTextStroke: "1.5px #DF2877", color: "white" }}
+              style={{ WebkitTextStroke: "1.5px #DF2877", color: "black" }}
             >
               SIZE CHART
             </h2>
@@ -172,7 +172,7 @@ function SizeFinder() {
   return (
     <section
       id="finder"
-      className="bg-[#C6FF00] border-t-2 border-[#1a1a1a] scroll-mt-20"
+      className="scroll-mt-20"
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 py-16 md:py-24">
         {/* Header */}
@@ -185,6 +185,7 @@ function SizeFinder() {
         >
           <h2
             className={`${bebas.className} text-[#1a1a1a] text-6xl md:text-8xl leading-[0.85]`}
+            style={{ WebkitTextStroke: "1.5px #DF2877", color: "black" }}
           >
             FIND YOUR SIZE
           </h2>
@@ -340,7 +341,16 @@ function SizeFinder() {
 
 export default function SizingPage() {
   return (
-    <div>
+    // Single continuous gradient behind both sections, like the home page
+    <div
+      style={{
+        background: `
+          radial-gradient(ellipse at 85% 20%, rgba(190, 174, 211, 0.3) 0%, transparent 35%),
+          radial-gradient(ellipse at 15% 60%, rgba(223, 40, 119, 0.12) 0%, transparent 30%),
+          linear-gradient(180deg, #C6FF00 0%, #d9ff5c 40%, #eaff9e 55%, #d9ff5c 70%, #C6FF00 100%)
+        `,
+      }}
+    >
       <SizeChart />
       <SizeFinder />
     </div>

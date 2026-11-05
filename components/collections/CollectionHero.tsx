@@ -43,13 +43,13 @@ function ParallaxLine({
       style={{
         opacity,
         x,
-        ...(isHeading ? { WebkitTextStroke: "1.5px #C6FF00", color: "white" } : {}),
+        ...(isHeading ? { WebkitTextStroke: "1.5px #C6FF00", color: "black" } : {}),
       }}
       className={
         isTagline
           ? "block text-xs sm:text-sm uppercase tracking-[0.25em] opacity-60 font-medium mb-4 drop-shadow-md"
           : isHeading
-            ? "block font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-wider leading-tight mb-6 drop-shadow-lg"
+            ? "block font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-wider leading-tight mb-6 drop-shadow-lg title-glow-lime"
             : "block text-lg md:text-xl opacity-80 leading-relaxed drop-shadow-md"
       }
     >
