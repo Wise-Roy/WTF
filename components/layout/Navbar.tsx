@@ -51,6 +51,7 @@ export default function Navbar() {
       links: [
         { label: "Sizing", href: "/sizing" },
         { label: "Press", href: "/press" },
+        { label: "Work", href: "/work" },
         ...(!user
           ? [
               { label: "Sign In", href: "/sign-in" },

@@ -248,3 +248,6 @@ CREATE POLICY "Public read designs" ON storage.objects FOR SELECT USING (bucket_
 CREATE POLICY "Admin insert designs" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'designs');
 CREATE POLICY "Admin update designs" ON storage.objects FOR UPDATE USING (bucket_id = 'designs');
 CREATE POLICY "Admin delete designs" ON storage.objects FOR DELETE USING (bucket_id = 'designs');
+
+-- Work page PDFs (3 entries of {title, url} stored as jsonb array in footer_settings)
+ALTER TABLE footer_settings ADD COLUMN IF NOT EXISTS work_pdfs jsonb NOT NULL DEFAULT '[{"title":"","url":""},{"title":"","url":""},{"title":"","url":""}]';

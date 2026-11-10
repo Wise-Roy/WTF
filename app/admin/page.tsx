@@ -1036,9 +1036,16 @@ function UsersPanel() {
 /* ─────────────── FOOTER TAB ─────────────── */
 type PdfKey = "terms_of_service_pdf" | "shipping_policy_pdf" | "privacy_policy_pdf" | "newsletter_pdf";
 
+const EMPTY_WORK_PDFS = [
+  { title: "", url: "" },
+  { title: "", url: "" },
+  { title: "", url: "" },
+];
+
 function FooterPanel() {
   const [links, setLinks] = useState({ instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", terms_of_service_pdf: "", shipping_policy_pdf: "", privacy_policy_pdf: "", newsletter_pdf: "" });
   const [uploadingPdf, setUploadingPdf] = useState<string | null>(null);
+  const [work, setWork] = useState<{ title: string; url: string }[]>(EMPTY_WORK_PDFS);
   const [shipping, setShipping] = useState({ shipping_fee: "500", free_shipping_threshold: "5000" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1053,6 +1060,12 @@ function FooterPanel() {
         if (!ac.signal.aborted) {
           if (d.data?.footer) {
             setLinks(d.data.footer);
+            setWork(
+              EMPTY_WORK_PDFS.map((empty, i) => {
+                const w = d.data.footer.work_pdfs?.[i];
+                return { title: w?.title || empty.title, url: w?.url || empty.url };
+              })
+            );
             setShipping({
               shipping_fee: String(d.data.footer.shipping_fee ?? 500),
               free_shipping_threshold: String(d.data.footer.free_shipping_threshold ?? 5000),
@@ -1078,7 +1091,7 @@ function FooterPanel() {
       const res = await fetch("/api/admin/footer", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...links, ...shipping }),
+        body: JSON.stringify({ ...links, ...shipping, work_pdfs: work }),
       });
       if (res.ok) showToast("Footer settings saved");
       else showToast("Save failed");
@@ -1089,12 +1102,11 @@ function FooterPanel() {
     }
   };
 
-  const handlePdfUpload = async (key: PdfKey, file: File) => {
+  const handlePdfUpload = async (key: string, file: File, apply: (url: string) => void) => {
     if (file.type !== "application/pdf") { showToast("PDF files only"); return; }
     setUploadingPdf(key);
     try {
-      const publicUrl = await uploadFile(file, "documents");
-      setLinks((prev) => ({ ...prev, [key]: publicUrl }));
+      apply(await uploadFile(file, "documents"));
       showToast("PDF uploaded — remember to save");
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Upload failed");
@@ -1175,7 +1187,7 @@ function FooterPanel() {
                         disabled={uploadingPdf !== null}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
-                          if (file) handlePdfUpload(f.key, file);
+                          if (file) handlePdfUpload(f.key, file, (url) => setLinks((prev) => ({ ...prev, [f.key]: url })));
                           e.target.value = "";
                         }}
                       />
@@ -1204,6 +1216,68 @@ function FooterPanel() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-white/10">
+              <h4 className="text-base font-bold mb-1">Work</h4>
+              <p className="text-xs text-white/40 mb-6">Up to 3 PDFs with titles, listed on the Work page.</p>
+              <div className="space-y-6">
+                {work.map((w, i) => (
+                  <div key={i} className="space-y-2">
+                    <input
+                      type="text"
+                      value={w.title}
+                      onChange={(e) =>
+                        setWork((prev) => prev.map((item, idx) => (idx === i ? { ...item, title: e.target.value } : item)))
+                      }
+                      placeholder={`Document ${i + 1} title`}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#C6FF00]/50 transition-colors"
+                    />
+                    <div className="flex items-center gap-3">
+                      <label className="cursor-pointer bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white/60 hover:border-[#C6FF00]/50 transition-colors shrink-0">
+                        {uploadingPdf === `work-${i}` ? "Uploading..." : w.url ? "Replace PDF" : "Upload PDF"}
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          className="hidden"
+                          disabled={uploadingPdf !== null}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file)
+                              handlePdfUpload(`work-${i}`, file, (url) =>
+                                setWork((prev) => prev.map((item, idx) => (idx === i ? { ...item, url } : item)))
+                              );
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      {w.url ? (
+                        <>
+                          <a
+                            href={w.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-[#C6FF00] hover:underline truncate"
+                          >
+                            View current PDF
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setWork((prev) => prev.map((item, idx) => (idx === i ? { ...item, url: "" } : item)))
+                            }
+                            className="text-xs text-red-400 hover:underline shrink-0"
+                          >
+                            Remove
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-white/30">No PDF uploaded</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

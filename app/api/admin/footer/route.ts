@@ -18,7 +18,7 @@ export async function GET() {
   if (error) {
     return NextResponse.json({
       success: true,
-      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", shipping_fee: 500, free_shipping_threshold: 5000 } },
+      data: { footer: { instagram: "", twitter: "", spotify: "", facebook: "", google_review: "", work_pdfs: [], shipping_fee: 500, free_shipping_threshold: 5000 } },
     });
   }
 
@@ -32,6 +32,12 @@ export async function PUT(req: NextRequest) {
 
   const body = await req.json();
   const { instagram, twitter, spotify, facebook, google_review, privacy_policy_pdf, terms_of_service_pdf, shipping_policy_pdf, newsletter_pdf } = body;
+  const workPdfs = Array.isArray(body.work_pdfs)
+    ? body.work_pdfs.slice(0, 3).map((w: { title?: string; url?: string }) => ({
+        title: String(w?.title ?? ""),
+        url: String(w?.url ?? ""),
+      }))
+    : [];
   const shippingFee = Number(body.shipping_fee);
   const freeShippingThreshold = Number(body.free_shipping_threshold);
 
@@ -55,6 +61,7 @@ export async function PUT(req: NextRequest) {
     terms_of_service_pdf: terms_of_service_pdf || "",
     shipping_policy_pdf: shipping_policy_pdf || "",
     newsletter_pdf: newsletter_pdf || "",
+    work_pdfs: workPdfs,
     shipping_fee: shippingFee,
     free_shipping_threshold: freeShippingThreshold,
     updated_at: new Date().toISOString(),
