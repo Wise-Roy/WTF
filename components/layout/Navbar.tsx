@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, Search } from "lucide-react";
 import { Button } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
 import { useBag } from "@/context/BagContext";
@@ -33,6 +33,36 @@ const MENU_SECTIONS = [
     ],
   },
 ];
+
+/** Product-name search; submitting lands on /silhouettes?q=… which filters by name. */
+function SearchBox({ className = "", onSubmitted }: { className?: string; onSubmitted?: () => void }) {
+  const router = useRouter();
+  const [term, setTerm] = useState("");
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = term.trim();
+    router.push(q ? `/silhouettes?q=${encodeURIComponent(q)}` : "/silhouettes");
+    onSubmitted?.();
+  };
+
+  return (
+    <form onSubmit={submit} role="search" className={`relative ${className}`}>
+      <Search
+        size={14}
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/60"
+      />
+      <input
+        type="search"
+        value={term}
+        onChange={(e) => setTerm(e.target.value)}
+        placeholder="Search designs"
+        aria-label="Search designs by name"
+        className="w-full md:w-44 lg:w-56 md:focus:w-64 bg-white/10 border border-white/20 rounded-full py-2 pl-9 pr-3 text-xs uppercase tracking-wider text-white placeholder-white/50 transition-all duration-200 focus:outline-none focus:border-[#C6FF00] focus:bg-white/15"
+      />
+    </form>
+  );
+}
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -105,7 +135,9 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav — hamburger + profile + cart */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4 lg:gap-6">
+          <SearchBox />
+
           {/* Hamburger menu trigger */}
           <div
             className="relative group"
@@ -170,7 +202,8 @@ export default function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <div className="flex md:hidden items-center gap-4">
+        <div className="flex md:hidden items-center gap-3 flex-1 justify-end ml-3 min-w-0">
+          <SearchBox className="flex-1 min-w-0 max-w-[11rem]" />
           {user && (
             <Link
               href="/profile"

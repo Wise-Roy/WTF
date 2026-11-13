@@ -117,3 +117,46 @@ html .admin-area *::after {
   /* Fixed navbar height; AnnouncementBar raises it when a promo is live */
   --nav-h: 4rem;
 }
+
+/* In @layer base so Tailwind position/other utilities still override these. */
+@layer base {
+  /* Hover glow in each button's own colour: a blurred copy of its background
+     (filled) or border (outline) sitting behind it. */
+  button,
+  .btn-glow {
+    position: relative;
+    /* isolate: keeps the -1 halo above the button own background, never behind an ancestor one */
+    isolation: isolate;
+  }
+
+  button::after,
+  .btn-glow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: inherit;
+    border: inherit;
+    border-radius: inherit;
+    filter: blur(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  button:hover::after,
+  .btn-glow:hover::after {
+    opacity: 0.9;
+  }
+
+  .admin-area button::after {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button::after,
+    .btn-glow::after {
+      transition: none;
+    }
+  }
+}

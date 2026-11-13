@@ -27,7 +27,7 @@ function ResetPasswordContent() {
         </p>
         <Link
           href="/forgot-password"
-          className="inline-block mt-6 px-6 py-3 bg-[#C6FF00] text-[#1a1a1a] text-sm font-bold uppercase tracking-widest hover:bg-[#d4ff33] transition-colors"
+          className="btn-glow inline-block mt-6 px-6 py-3 bg-[#C6FF00] text-[#1a1a1a] text-sm font-bold uppercase tracking-widest hover:bg-[#d4ff33] transition-colors"
         >
           Request New Link
         </Link>

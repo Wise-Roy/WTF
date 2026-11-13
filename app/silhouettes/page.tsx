@@ -46,6 +46,12 @@ function useFetchProducts(label: string) {
   return { products, loading, reset };
 }
 
+// Hero title + its hover "decode" animation. Swap TITLE for any other word.
+const TITLE = "SILHOUETTES";
+const SCRAMBLE_CHARS = "!<>-_\\/[]{}—=+*^?#ABCXYZ%@&";
+const TOTAL_FRAMES = 38;
+const FRAME_MS = 45;
+
 const COL_SPEEDS = [0, -0.09, 0.05];
 const MAX_SHIFT = 70;
 
@@ -107,8 +113,16 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const labelParam = searchParams.get("label") || "All";
+  const query = (searchParams.get("q") || "").trim();
   const [labels, setLabels] = useState<string[]>([]);
   const { products, loading } = useFetchProducts(labelParam);
+
+  // Navbar search lands here: substring match on the product name.
+  const shown = query
+    ? products.filter((p) =>
+        (p.prod_name || "").toLowerCase().includes(query.toLowerCase())
+      )
+    : products;
 
   useEffect(() => {
     fetch("/api/products/labels")
@@ -120,6 +134,7 @@ function ShopContent() {
   const setLabel = (label: string) => {
     const params = new URLSearchParams();
     if (label !== "All") params.set("label", label);
+    if (query) params.set("q", query);
     router.push(`/silhouettes${params.toString() ? `?${params}` : ""}`);
   };
 
@@ -151,12 +166,14 @@ function ShopContent() {
             ))}
           </div>
         ) : (
-          <ParallaxGrid products={products} />
+          <ParallaxGrid products={shown} />
         )}
 
-        {!loading && products.length === 0 && (
+        {!loading && shown.length === 0 && (
           <p className="text-center text-[#1a1a1a]/50 py-20 text-lg">
-            No designs in this category yet. Stay tuned.
+            {query
+              ? `No designs match “${query}”.`
+              : "No designs in this category yet. Stay tuned."}
           </p>
         )}
       </div>
@@ -165,39 +182,39 @@ function ShopContent() {
 }
 
 function HeroSection() {
-  const textRef = useRef<HTMLHeadingElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
+  const [text, setText] = useState(TITLE);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced || !textRef.current || !heroRef.current) return;
+  useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
-    let raf = 0;
-    const update = () => {
-      const hero = heroRef.current;
-      const text = textRef.current;
-      if (!hero || !text) return;
+  const scramble = () => {
+    if (timer.current) return; // already decoding — let it finish
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      const rect = hero.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // scrollProgress: 0 at page top, increases as user scrolls
-      const scrollProgress = Math.max(0, -rect.top / vh);
-      // Move text upward from its initial bottom position
-      const shift = scrollProgress * 500;
-      text.style.transform = `translateY(-${shift}px)`;
-
-      raf = requestAnimationFrame(update);
-    };
-
-    raf = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(raf);
-  }, []);
+    let frame = 0;
+    timer.current = setInterval(() => {
+      frame++;
+      if (frame >= TOTAL_FRAMES) {
+        setText(TITLE);
+        if (timer.current) clearInterval(timer.current);
+        timer.current = null;
+        return;
+      }
+      const revealed = Math.floor((frame / TOTAL_FRAMES) * TITLE.length);
+      setText(
+        TITLE.split("")
+          .map((c, i) =>
+            i < revealed
+              ? c
+              : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+          )
+          .join("")
+      );
+    }, FRAME_MS);
+  };
 
   return (
-    <div
-      ref={heroRef}
-      className="relative h-[50vh] bg-[#C6FF00] overflow-hidden"
-    >
+    <div className="relative h-[30vh] bg-[#C6FF00] overflow-hidden">
       <div
         className="absolute pointer-events-none select-none opacity-[0.04]"
         style={{ top: "-20%", right: "-10%", width: "600px", height: "600px", transform: "rotate(-15deg)" }}
@@ -205,16 +222,20 @@ function HeroSection() {
         <Image src="/clean_logo.png" alt="" fill className="object-contain" aria-hidden="true" style={{ filter: "brightness(0) saturate(100%) invert(21%) sepia(95%) saturate(4871%) hue-rotate(326deg) brightness(91%) contrast(88%)" }} />
       </div>
       <h1
-        ref={textRef}
-        className="absolute bottom-0 left-0 right-0 text-[#DF2877] text-center select-none will-change-transform translate-y-[40%] title-glow-pink"
+        onMouseEnter={scramble}
+        onFocus={scramble}
+        tabIndex={0}
+        aria-label={TITLE}
+        className="absolute inset-0 flex items-center justify-center px-4 pt-32 text-[#DF2877] text-center select-none title-glow-pink outline-none cursor-default"
         style={{
           fontFamily: cinzel.style.fontFamily,
           fontSize: "clamp(3rem, 10vw, 8rem)",
           lineHeight: 1.1,
           letterSpacing: "0.02em",
+          fontVariantNumeric: "tabular-nums",
         }}
       >
-        Silhouettes
+        {text}
       </h1>
     </div>
   );

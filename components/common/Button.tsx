@@ -20,7 +20,7 @@ export default function Button({
   className = "",
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-200";
+    "btn-glow inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-200";
 
   const variants = {
     primary: "bg-[#C6FF00] text-[#1a1a1a] hover:bg-[#d4ff33]",

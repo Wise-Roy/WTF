@@ -107,7 +107,7 @@ function StickyTopBar({ product }: { product: DbProduct }) {
           className={`flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] transition-all ${
             isSoldOut
               ? "bg-[#0A0A0A]/20 text-[#0A0A0A]/40 pointer-events-none"
-              : "bg-[#C6FF00] text-[#0A0A0A] hover:brightness-90 active:scale-95"
+              : "btn-glow bg-[#C6FF00] text-[#0A0A0A] hover:bg-[#d4ff33] active:scale-95"
           }`}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -331,7 +331,7 @@ A]/60 hover:text-[#0A0A0A] transition-colors">
           </h2>
           <Link
             href={`/product-story/${product.id}`}
-            className="self-start md:self-auto inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#C6FF00] text-[#0A0A0A] text-sm font-bold uppercase tracking-[0.15em] hover:brightness-90 active:scale-95 transition-all"
+            className="btn-glow self-start md:self-auto inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#C6FF00] text-[#0A0A0A] text-sm font-bold uppercase tracking-[0.15em] hover:bg-[#d4ff33] active:scale-95 transition-all"
           >
             Buy it &rarr;
           </Link>
