@@ -76,6 +76,7 @@ export interface DbProduct {
   prod_quick_info_1: string;
   prod_quick_info_2: string;
   prod_quick_info_3: string;
+  prod_sizes: string[];      // labels from SIZE_LABELS, e.g. ["S","M","L"]
   created_at: string;
   updated_at: string;
 }

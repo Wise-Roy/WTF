@@ -7,6 +7,7 @@ import Link from "next/link";
 import { DbProduct } from "@/types";
 import { useBag } from "@/context/BagContext";
 import { useAuth } from "@/context/AuthContext";
+import { SizeSelector } from "@/components/common";
 
 export default function ProductStoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -47,6 +48,38 @@ export default function ProductStoryPage() {
   }
 
   return <StoryLayout product={product} />;
+}
+
+/* ─── Size picker + size guide link ─── */
+function SizePicker({
+  sizes,
+  size,
+  setSize,
+  className = "",
+}: {
+  sizes: string[];
+  size: string;
+  setSize: (s: string) => void;
+  className?: string;
+}) {
+  if (sizes.length === 0) return null;
+
+  return (
+    <div className={className}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] font-bold uppercase tracking-[0.14em]">Size</span>
+        <Link href="/sizing" className="text-[10px] font-bold uppercase tracking-[0.14em] underline hover:text-[#DF2877] transition-colors">
+          Size Guide
+        </Link>
+      </div>
+      <SizeSelector
+        options={sizes}
+        selected={size ? [size] : []}
+        onToggle={(s) => setSize(s === size ? "" : s)}
+        className="mt-2"
+      />
+    </div>
+  );
 }
 
 /* ─── Quick Info ─── */
@@ -97,9 +130,11 @@ function StoryLayout({ product }: { product: DbProduct }) {
   const images = product.image?.length ? product.image : ["/eg.jpg"];
   const lookCount = images.length;
   const isSoldOut = product.prod_quantity <= 0;
+  const sizes = product.prod_sizes || [];
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState<string>("");
   const [toast, setToast] = useState<string | null>(null);
   const [hintVisible, setHintVisible] = useState(true);
   const [addedState, setAddedState] = useState(false);
@@ -253,14 +288,19 @@ function StoryLayout({ product }: { product: DbProduct }) {
 
   const handleAddToCart = () => {
     if (isSoldOut || addedState) return;
+    if (sizes.length > 0 && !size) {
+      setToast("SELECT A SIZE");
+      return;
+    }
     addItem({
       id: product.id,
       name: product.prod_name,
       price: product.prod_price,
       image: images[0],
+      size: size || undefined,
     });
     setAddedState(true);
-    setToast(`ADDED — ${product.prod_name} × ${quantity}`);
+    setToast(`ADDED — ${product.prod_name}${size ? ` / ${size}` : ""} × ${quantity}`);
     setTimeout(() => setAddedState(false), 1500);
   };
 
@@ -444,6 +484,9 @@ function StoryLayout({ product }: { product: DbProduct }) {
                   )}
                 </div>
 
+                {/* Size */}
+                <SizePicker sizes={sizes} size={size} setSize={setSize} className="mt-6 text-white" />
+
                 {/* Quantity */}
                 <div className="mt-8">
                   <span className="mr-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white">Quantity</span>
@@ -518,6 +561,9 @@ function StoryLayout({ product }: { product: DbProduct }) {
           isSoldOut={isSoldOut}
           quantity={quantity}
           setQuantity={setQuantity}
+          sizes={sizes}
+          size={size}
+          setSize={setSize}
           addedState={addedState}
           onAddToCart={handleAddToCart}
           onShare={handleShare}
@@ -550,6 +596,9 @@ function MobileStory({
   isSoldOut,
   quantity,
   setQuantity,
+  sizes,
+  size,
+  setSize,
   addedState,
   onAddToCart,
   onShare,
@@ -563,6 +612,9 @@ function MobileStory({
   isSoldOut: boolean;
   quantity: number;
   setQuantity: (q: number) => void;
+  sizes: string[];
+  size: string;
+  setSize: (s: string) => void;
   addedState: boolean;
   onAddToCart: () => void;
   onShare: () => void;
@@ -719,6 +771,8 @@ function MobileStory({
 
       {/* Buy panel */}
       <div className="mx-4 mt-4 bg-white border-2 border-[#1a1a1a] rounded-md p-6 mb-24" style={{ boxShadow: "5px 5px 0 #FFD9E7" }}>
+        <SizePicker sizes={sizes} size={size} setSize={setSize} className="mb-5 text-[#1a1a1a]" />
+
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/60">Quantity</span>
           <div className="inline-flex items-center border-2 border-[#1a1a1a] rounded-sm">

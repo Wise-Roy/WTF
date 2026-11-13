@@ -1,3 +1,5 @@
+import { SIZE_LABELS } from "./sizes";
+
 export interface ProductInput {
   prod_name: string;
   prod_price: number | string;
@@ -6,6 +8,7 @@ export interface ProductInput {
   prod_label: string;
   prod_rank: number | string;
   image: string[];
+  prod_sizes?: string[];
 }
 
 export interface ValidationResult {
@@ -47,6 +50,16 @@ export function validateProduct(input: ProductInput): ValidationResult {
   const rank = Number(input.prod_rank ?? 0);
   if (isNaN(rank) || rank < 0) errors.prod_rank = "Rank must be 0 or more";
   else if (!Number.isInteger(rank)) errors.prod_rank = "Rank must be a whole number";
+
+  // prod_sizes
+  const sizes = input.prod_sizes;
+  if (!Array.isArray(sizes) || sizes.length === 0) {
+    errors.prod_sizes = "Select at least one size";
+  } else if (sizes.some((s) => !SIZE_LABELS.includes(s))) {
+    errors.prod_sizes = "Invalid size";
+  } else if (new Set(sizes).size !== sizes.length) {
+    errors.prod_sizes = "Duplicate sizes";
+  }
 
   // image
   if (!Array.isArray(input.image) || input.image.length !== 5) {

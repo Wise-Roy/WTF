@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X, Minus, Plus } from "lucide-react";
-import { useBag } from "@/context/BagContext";
+import { useBag, bagItemKey } from "@/context/BagContext";
 
 export default function BagDrawer() {
   const { items, isOpen, closeBag, removeItem, updateQuantity, subtotal } =
@@ -79,7 +79,7 @@ export default function BagDrawer() {
             <div className="space-y-4">
               {items.map((item) => (
                 <div
-                  key={item.id}
+                  key={bagItemKey(item)}
                   className="flex gap-4 border border-[#1a1a1a]/10 p-3 bg-[#FFF3B0]"
                 >
                   <div className="relative w-16 h-20 shrink-0 bg-[#FFF9D6] overflow-hidden">
@@ -94,13 +94,18 @@ export default function BagDrawer() {
                     <p className="text-xs font-bold uppercase tracking-wider text-[#1a1a1a] truncate">
                       {item.name}
                     </p>
+                    {item.size && (
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]/60 mt-1">
+                        Size {item.size}
+                      </p>
+                    )}
                     <p className="text-sm font-bold text-[#1a1a1a] mt-1">
                       &#8377;{item.price.toLocaleString()}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
+                          updateQuantity(bagItemKey(item), item.quantity - 1)
                         }
                         className="w-6 h-6 border border-[#1a1a1a]/20 flex items-center justify-center text-xs text-[#1a1a1a]/70 hover:border-[#C6FF00] hover:text-[#88AF00] transition-colors"
                       >
@@ -111,7 +116,7 @@ export default function BagDrawer() {
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
+                          updateQuantity(bagItemKey(item), item.quantity + 1)
                         }
                         className="w-6 h-6 border border-[#1a1a1a]/20 flex items-center justify-center text-xs text-[#1a1a1a]/70 hover:border-[#C6FF00] hover:text-[#88AF00] transition-colors"
                       >
@@ -120,7 +125,7 @@ export default function BagDrawer() {
                     </div>
                   </div>
                   <button
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeItem(bagItemKey(item))}
                     className="text-[#1a1a1a]/30 hover:text-[#1a1a1a] self-start transition-colors"
                   >
                     <X size={14} />

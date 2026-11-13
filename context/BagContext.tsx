@@ -7,7 +7,13 @@ export interface BagItem {
   name: string;
   price: number;
   image: string;
+  size?: string;
   quantity: number;
+}
+
+/** Same product in two sizes is two bag lines. */
+export function bagItemKey(item: { id: string; size?: string }) {
+  return `${item.id}__${item.size || ""}`;
 }
 
 interface BagContextType {
@@ -16,8 +22,8 @@ interface BagContextType {
   openBag: () => void;
   closeBag: () => void;
   addItem: (item: Omit<BagItem, "quantity">) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (key: string) => void;
+  updateQuantity: (key: string, quantity: number) => void;
   clearBag: () => void;
   itemCount: number;
   subtotal: number;
@@ -61,11 +67,12 @@ export function BagProvider({ children }: { children: React.ReactNode }) {
   const closeBag = useCallback(() => setIsOpen(false), []);
 
   const addItem = useCallback((item: Omit<BagItem, "quantity">) => {
+    const key = bagItemKey(item);
     setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const existing = prev.find((i) => bagItemKey(i) === key);
       if (existing) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          bagItemKey(i) === key ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
       return [...prev, { ...item, quantity: 1 }];
@@ -73,16 +80,16 @@ export function BagProvider({ children }: { children: React.ReactNode }) {
     setIsOpen(true);
   }, []);
 
-  const removeItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
+  const removeItem = useCallback((key: string) => {
+    setItems((prev) => prev.filter((i) => bagItemKey(i) !== key));
   }, []);
 
-  const updateQuantity = useCallback((id: string, quantity: number) => {
+  const updateQuantity = useCallback((key: string, quantity: number) => {
     if (quantity <= 0) {
-      setItems((prev) => prev.filter((i) => i.id !== id));
+      setItems((prev) => prev.filter((i) => bagItemKey(i) !== key));
     } else {
       setItems((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, quantity } : i))
+        prev.map((i) => (bagItemKey(i) === key ? { ...i, quantity } : i))
       );
     }
   }, []);

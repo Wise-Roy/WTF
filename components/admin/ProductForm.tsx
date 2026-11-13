@@ -6,6 +6,7 @@ import Image from "next/image";
 import { DbProduct } from "@/types";
 import { validateProduct } from "@/lib/product-validation";
 import { uploadFile } from "@/lib/upload-client";
+import { SizeSelector } from "@/components/common";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 
@@ -44,6 +45,8 @@ export default function ProductForm({ product }: ProductFormProps) {
     product?.image?.[3] || null,
     product?.image?.[4] || null,
   ]);
+
+  const [sizes, setSizes] = useState<string[]>(product?.prod_sizes || []);
 
   const [uploading, setUploading] = useState<boolean[]>([false, false, false, false, false]);
   const [saving, setSaving] = useState(false);
@@ -119,6 +122,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       prod_quick_info_2: form.prod_quick_info_2,
       prod_quick_info_3: form.prod_quick_info_3,
       image: imageUrls.length === 5 ? imageUrls : [],
+      prod_sizes: sizes,
     };
 
     const { valid, errors: validationErrors } = validateProduct(body);
@@ -220,6 +224,24 @@ export default function ProductForm({ product }: ProductFormProps) {
           <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">Care <span className="text-white/30">(optional)</span></label>
           <input name="prod_care" value={form.prod_care} onChange={handleChange} className={inputClass} placeholder="e.g. Cold wash, hang dry" />
         </div>
+      </div>
+
+      {/* Available sizes */}
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+          Available Sizes <span className="text-white/30">(from the size chart — XS to 4XL)</span>
+        </label>
+        <div className="text-white">
+          <SizeSelector
+            selected={sizes}
+            onToggle={(size) =>
+              setSizes((prev) =>
+                prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+              )
+            }
+          />
+        </div>
+        {errors.prod_sizes && <p className={errorClass}>{errors.prod_sizes}</p>}
       </div>
 
       {/* Chapter Descriptions (for product page) */}

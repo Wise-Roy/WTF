@@ -91,6 +91,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   }, [isTouch]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
+    // Sized products need a size, so let the card's link open the story page instead
+    if (product.prod_sizes?.length) return;
     e.preventDefault();
     e.stopPropagation();
     if (isSoldOut || added) return;

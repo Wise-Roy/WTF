@@ -59,3 +59,5 @@ export function recommendSize(input: {
 
   return { status: "size", size, drivers, deadOn }
 }
+
+export const SIZE_LABELS: string[] = SIZES.map((s) => s.label)

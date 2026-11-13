@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin";
 import { validateProduct } from "@/lib/product-validation";
+import { SIZE_LABELS } from "@/lib/sizes";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
     prod_quick_info_1: ((body.prod_quick_info_1 as string) || "").trim(),
     prod_quick_info_2: ((body.prod_quick_info_2 as string) || "").trim(),
     prod_quick_info_3: ((body.prod_quick_info_3 as string) || "").trim(),
+    prod_sizes: SIZE_LABELS.filter((s) => (body.prod_sizes as string[]).includes(s)),
   }).select().single();
 
   if (error) {

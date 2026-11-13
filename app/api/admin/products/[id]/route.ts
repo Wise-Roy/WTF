@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin";
+import { SIZE_LABELS } from "@/lib/sizes";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,17 @@ export async function PUT(
   if (body.prod_quick_info_1 !== undefined) updates.prod_quick_info_1 = (body.prod_quick_info_1 as string).trim();
   if (body.prod_quick_info_2 !== undefined) updates.prod_quick_info_2 = (body.prod_quick_info_2 as string).trim();
   if (body.prod_quick_info_3 !== undefined) updates.prod_quick_info_3 = (body.prod_quick_info_3 as string).trim();
+
+  if (body.prod_sizes !== undefined) {
+    const sizes = body.prod_sizes;
+    if (!Array.isArray(sizes) || sizes.length === 0 || sizes.some((s: unknown) => typeof s !== "string" || !SIZE_LABELS.includes(s))) {
+      return NextResponse.json(
+        { success: false, message: "Validation failed", errors: { prod_sizes: "Select at least one size" } },
+        { status: 400 }
+      );
+    }
+    updates.prod_sizes = SIZE_LABELS.filter((s) => sizes.includes(s));
+  }
 
   if (body.prod_rank !== undefined) {
     const rank = Number(body.prod_rank);
