@@ -8,6 +8,7 @@ import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
 import { useBag } from "@/context/BagContext";
+import AnnouncementBar from "./AnnouncementBar";
 
 const MENU_SECTIONS = [
   {
@@ -90,6 +91,7 @@ export default function Navbar() {
           : "bg-transparent border-b border-transparent"
       }`}
     >
+      <AnnouncementBar />
       <div className="mx-auto max-w-7xl flex items-center justify-between px-6 md:px-12 lg:px-20 h-16">
         <Link href="/">
           <Image
@@ -106,7 +108,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6">
           {/* Hamburger menu trigger */}
           <div
-            className="relative"
+            className="relative group"
             onMouseEnter={openMega}
             onMouseLeave={closeMega}
           >
@@ -114,7 +116,14 @@ export default function Navbar() {
               className="text-white hover:text-[#C6FF00] transition-colors p-1"
               aria-label="Menu"
             >
-              <Menu size={24} />
+              <span className="relative block h-6 w-6">
+                {["-translate-y-[7px]", "translate-y-0", "translate-y-[7px]"].map((offset) => (
+                  <span
+                    key={offset}
+                    className={`absolute left-0 top-1/2 -mt-[1px] h-[2px] w-6 rounded-full bg-current transition-transform duration-300 ease-out group-hover:translate-y-0 ${offset}`}
+                  />
+                ))}
+              </span>
             </button>
 
             {/* Mega dropdown */}

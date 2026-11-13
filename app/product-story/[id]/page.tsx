@@ -272,7 +272,7 @@ function StoryLayout({ product }: { product: DbProduct }) {
   return (
     <div className="bg-[#FFF9D6] min-h-screen">
       {/* Breadcrumb */}
-      <div className="sticky top-16 z-30 bg-[#FFF9D6] border-b border-[#1a1a1a]/10">
+      <div className="sticky top-[var(--nav-h)] z-30 bg-[#FFF9D6] border-b border-[#1a1a1a]/10">
         <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20 py-3 flex items-center justify-between text-xs uppercase tracking-widest text-[#1a1a1a]/60">
           <Link href="/collections" className="hover:text-[#DF2877] transition-colors">
             &larr; Back to Collection

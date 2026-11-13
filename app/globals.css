@@ -112,3 +112,8 @@ html .admin-area *::after {
 .title-glow-pink {
   text-shadow: 0 2px 30px rgba(223, 40, 119, 0.55);
 }
+
+:root {
+  /* Fixed navbar height; AnnouncementBar raises it when a promo is live */
+  --nav-h: 4rem;
+}

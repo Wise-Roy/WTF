@@ -1459,8 +1459,8 @@ function DesignerHeroPanel() {
   );
 }
 
-/* ─────────────── OFFERS TAB ─────────────── */
-function OffersPanel() {
+/* ─────────────── OFFER MODAL ─────────────── */
+function OfferModalPanel() {
   const [form, setForm] = useState({
     is_enabled: false,
     header: "",
@@ -1748,6 +1748,340 @@ function OffersPanel() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ─────────────── ANNOUNCEMENT BAR OFFERS ─────────────── */
+interface BarOffer {
+  id: string;
+  is_enabled: boolean;
+  header: string;
+  product_id: string;
+  original_price: number;
+  discounted_price: number;
+  end_time: string;
+}
+
+const barInputClass =
+  "w-full bg-white/5 border border-white/10 rounded px-3 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#C6FF00] focus:outline-none transition-colors";
+
+function BarOfferCard({
+  offer,
+  products,
+  onSaved,
+  onCancel,
+  showToast,
+}: {
+  offer: BarOffer | null;
+  products: DbProduct[];
+  onSaved: () => void;
+  onCancel: () => void;
+  showToast: (msg: string) => void;
+}) {
+  const [form, setForm] = useState({
+    is_enabled: offer?.is_enabled ?? true,
+    header: offer?.header ?? "",
+    product_id: offer?.product_id ?? "",
+    discounted_price: offer?.discounted_price ? String(offer.discounted_price) : "",
+    end_time: offer?.end_time ?? "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const selectedProduct = products.find((p) => p.id === form.product_id);
+  // An enabled offer already took the product's price down, so the offer's own record is the original
+  const originalPrice = offer?.is_enabled && offer.product_id === form.product_id
+    ? offer.original_price
+    : selectedProduct?.prod_price ?? 0;
+  const discount = Number(form.discounted_price);
+  const discountPct =
+    originalPrice > 0 && discount > 0 && discount < originalPrice
+      ? Math.round((1 - discount / originalPrice) * 100)
+      : 0;
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(offer ? `/api/admin/offers/${offer.id}` : "/api/admin/offers", {
+        method: offer ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, discounted_price: Number(form.discounted_price) || 0 }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        showToast(offer ? "Offer saved" : "Offer added");
+        onSaved();
+      } else {
+        showToast(d.message || "Save failed");
+      }
+    } catch {
+      showToast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!offer) {
+      onCancel();
+      return;
+    }
+    if (!confirm(`Delete "${offer.header || "this offer"}"?`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/offers/${offer.id}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("Offer deleted");
+        onSaved();
+      } else {
+        showToast("Delete failed");
+      }
+    } catch {
+      showToast("Delete failed");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="border border-white/10 rounded-lg p-4 sm:p-5 bg-white/[0.02]">
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="min-w-0">
+          <p className="text-sm font-bold truncate">{form.header || "New offer"}</p>
+          <p className="text-xs text-white/30 mt-0.5">
+            {form.is_enabled ? "Showing in announcement bar" : "Hidden"}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setForm((p) => ({ ...p, is_enabled: !p.is_enabled }))}
+          className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
+            form.is_enabled ? "bg-[#C6FF00]" : "bg-white/20"
+          }`}
+          aria-label="Toggle offer"
+        >
+          <span
+            className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+              form.is_enabled ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+            Bar Text {form.is_enabled && <span className="text-red-400">*</span>}
+          </label>
+          <input
+            value={form.header}
+            onChange={(e) => setForm((p) => ({ ...p, header: e.target.value }))}
+            className={barInputClass}
+            placeholder="e.g. Festive Drop — Limited Stock"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+            Product {form.is_enabled && <span className="text-red-400">*</span>}
+          </label>
+          <select
+            value={form.product_id}
+            onChange={(e) => setForm((p) => ({ ...p, product_id: e.target.value }))}
+            className={barInputClass}
+          >
+            <option value="" className="bg-[#1a1a1a]">Select a product...</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id} className="bg-[#1a1a1a]">
+                {p.prod_name} — ₹{p.prod_price}
+              </option>
+            ))}
+          </select>
+          {originalPrice > 0 && (
+            <p className="text-xs text-white/30 mt-1">
+              Original price: ₹{originalPrice.toLocaleString("en-IN")}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+            Discounted Price (₹) {form.is_enabled && <span className="text-red-400">*</span>}
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={form.discounted_price}
+            onChange={(e) => setForm((p) => ({ ...p, discounted_price: e.target.value }))}
+            className={barInputClass}
+            placeholder="1999"
+          />
+          {discountPct > 0 && <p className="text-xs text-[#C6FF00] mt-1">{discountPct}% off</p>}
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+            End Time
+          </label>
+          <input
+            type="datetime-local"
+            value={form.end_time}
+            onChange={(e) => setForm((p) => ({ ...p, end_time: e.target.value }))}
+            className={barInputClass}
+          />
+          <p className="text-xs text-white/30 mt-1">
+            {form.end_time
+              ? `Hides after ${new Date(form.end_time).toLocaleString()}`
+              : "Leave blank to keep showing until disabled"}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3 mt-5">
+        <button
+          onClick={handleSave}
+          disabled={saving || deleting}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          {saving ? "Saving..." : offer ? "Save" : "Add Offer"}
+        </button>
+        <button
+          onClick={handleDelete}
+          disabled={saving || deleting}
+          className="px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded border border-white/10 text-white/50 hover:text-red-400 hover:border-red-400/40 transition disabled:opacity-50"
+        >
+          {offer ? (deleting ? "Deleting..." : "Delete") : "Cancel"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function BarOffersPanel() {
+  const [offers, setOffers] = useState<BarOffer[]>([]);
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [adding, setAdding] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const [offerRes, prodRes] = await Promise.all([
+          fetch("/api/admin/offers", { signal: ac.signal }),
+          fetch("/api/admin/products", { signal: ac.signal }),
+        ]);
+        const offerData = await offerRes.json();
+        const prodData = await prodRes.json();
+        if (!ac.signal.aborted) {
+          setOffers(offerData.data?.offers || []);
+          setProducts(prodData.data?.products || []);
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, [refreshKey]);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const refresh = () => {
+    setAdding(false);
+    setRefreshKey((k) => k + 1);
+  };
+
+  return (
+    <div>
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 bg-[#C6FF00] text-[#1a1a1a] px-6 py-3 rounded-lg shadow-lg text-sm font-bold animate-[fadeIn_0.2s_ease-out]">
+          {toast}
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h2 className="text-xl font-bold">Announcement Bar Offers</h2>
+          <p className="text-xs text-white/30 mt-1">
+            Every enabled offer rotates through the bar at the top of the site.
+          </p>
+        </div>
+        <button
+          onClick={() => setAdding(true)}
+          disabled={adding || loading}
+          className="bg-[#C6FF00] text-[#1a1a1a] px-5 py-2.5 text-sm font-bold uppercase tracking-wider rounded hover:brightness-90 transition disabled:opacity-50"
+        >
+          Add Offer
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-40 bg-white/5 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4 max-w-3xl">
+          {adding && (
+            <BarOfferCard
+              offer={null}
+              products={products}
+              onSaved={refresh}
+              onCancel={() => setAdding(false)}
+              showToast={showToast}
+            />
+          )}
+          {offers.map((o) => (
+            <BarOfferCard
+              key={o.id}
+              offer={o}
+              products={products}
+              onSaved={refresh}
+              onCancel={refresh}
+              showToast={showToast}
+            />
+          ))}
+          {!offers.length && !adding && (
+            <p className="text-sm text-white/30 py-8 text-center border border-dashed border-white/10 rounded-lg">
+              No bar offers yet. Add one to show it at the top of the site.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────── OFFERS TAB ─────────────── */
+function OffersPanel() {
+  const [sub, setSub] = useState<"modal" | "bar">("modal");
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+        {([["modal", "Offer Modal"], ["bar", "Offers"]] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setSub(key)}
+            className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+              sub === key ? "bg-[#C6FF00] text-[#1a1a1a]" : "bg-white/5 text-white/50 hover:text-white"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {sub === "modal" ? <OfferModalPanel /> : <BarOffersPanel />}
     </div>
   );
 }

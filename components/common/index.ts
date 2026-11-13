@@ -9,3 +9,4 @@ export { default as PageHeader } from "./PageHeader";
 export { default as ProductSkeleton } from "./ProductSkeleton";
 export { default as SectionFade } from "./SectionFade";
 export { default as PolicyPdfPage } from "./PolicyPdfPage";
+export { default as Carousel } from "./Carousel";

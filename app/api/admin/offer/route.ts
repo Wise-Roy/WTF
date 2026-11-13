@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getProductPrice, offerValidationError, syncOfferPrice } from "@/lib/offers";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("offer_settings")
     .select("*")
+    .eq("placement", "modal")
     .limit(1)
     .single();
 
@@ -45,46 +47,20 @@ export async function PUT(req: NextRequest) {
   const { is_enabled, header, description, product_id, discounted_price, image_path, end_time } = body;
 
   // When enabling, look up the product to get original price
-  let original_price = Number(body.original_price) || 0;
+  const original_price = product_id
+    ? await getProductPrice(product_id)
+    : Number(body.original_price) || 0;
 
-  if (product_id) {
-    const { data: product } = await supabaseAdmin
-      .from("products")
-      .select("prod_price")
-      .eq("id", product_id)
-      .single();
-    if (product) {
-      original_price = product.prod_price;
-    }
-  }
-
-  // Validate when enabling
-  if (is_enabled) {
-    if (!header?.trim()) {
-      return NextResponse.json({ success: false, message: "Header is required when offer is enabled" }, { status: 400 });
-    }
-    if (!description?.trim()) {
-      return NextResponse.json({ success: false, message: "Description is required when offer is enabled" }, { status: 400 });
-    }
-    if (!product_id) {
-      return NextResponse.json({ success: false, message: "Product selection is required" }, { status: 400 });
-    }
-    const discPrice = Number(discounted_price);
-    if (!discPrice || discPrice <= 0) {
-      return NextResponse.json({ success: false, message: "Discounted price must be greater than zero" }, { status: 400 });
-    }
-    if (discPrice >= original_price) {
-      return NextResponse.json({ success: false, message: "Discounted price must be lower than original product price" }, { status: 400 });
-    }
-    if (!image_path) {
-      return NextResponse.json({ success: false, message: "Image is required when offer is enabled" }, { status: 400 });
-    }
+  const invalid = offerValidationError(body, original_price, "modal");
+  if (invalid) {
+    return NextResponse.json({ success: false, message: invalid }, { status: 400 });
   }
 
   // Get existing offer to check previous state
   const { data: existing } = await supabaseAdmin
     .from("offer_settings")
     .select("id, image_path, is_enabled, product_id, original_price")
+    .eq("placement", "modal")
     .limit(1)
     .single();
 
@@ -97,6 +73,7 @@ export async function PUT(req: NextRequest) {
     discounted_price: Number(discounted_price) || 0,
     image_path: image_path || "",
     end_time: end_time || "",
+    placement: "modal",
     updated_at: new Date().toISOString(),
   };
 
@@ -120,28 +97,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ success: false, message: result.error.message }, { status: 500 });
   }
 
-  // Sync product price based on offer state
-  if (is_enabled && product_id) {
-    // Set product price to discounted price
-    await supabaseAdmin
-      .from("products")
-      .update({ prod_price: Number(discounted_price), updated_at: new Date().toISOString() })
-      .eq("id", product_id);
-
-    // If previously enabled on a different product, restore that product's price
-    if (existing?.is_enabled && existing.product_id && existing.product_id !== product_id && existing.original_price) {
-      await supabaseAdmin
-        .from("products")
-        .update({ prod_price: existing.original_price, updated_at: new Date().toISOString() })
-        .eq("id", existing.product_id);
-    }
-  } else if (!is_enabled && existing?.is_enabled && existing.product_id && existing.original_price) {
-    // Offer disabled — restore original price
-    await supabaseAdmin
-      .from("products")
-      .update({ prod_price: existing.original_price, updated_at: new Date().toISOString() })
-      .eq("id", existing.product_id);
-  }
+  await syncOfferPrice(
+    { is_enabled: !!is_enabled, product_id: product_id || "", discounted_price: payload.discounted_price },
+    existing ?? null
+  );
 
   // Clean up old image if replaced
   if (existing?.image_path && existing.image_path !== image_path && image_path) {

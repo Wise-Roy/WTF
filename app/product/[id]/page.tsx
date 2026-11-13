@@ -92,7 +92,7 @@ function StickyTopBar({ product }: { product: DbProduct }) {
   const isSoldOut = product.prod_quantity <= 0;
 
   return (
-    <div className="sticky top-16 z-40" style={{ background: "rgba(255,194,212,0.78)", backdropFilter: "blur(20px) saturate(140%)", borderBottom: "1px solid rgba(10,10,10,0.15)" }}>
+    <div className="sticky top-[var(--nav-h)] z-40" style={{ background: "rgba(255,194,212,0.78)", backdropFilter: "blur(20px) saturate(140%)", borderBottom: "1px solid rgba(10,10,10,0.15)" }}>
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-10 py-3 flex items-center justify-between">
         {/* Left: Back */}
        <Link href="/collections" className="flex items-center gap-2 group">
