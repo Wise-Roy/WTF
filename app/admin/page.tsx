@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star, Layers, Newspaper } from "lucide-react";
+import { Package, FileText, Users, Globe, Music, ImageIcon, Tag, Palette, Star, Layers, Newspaper, ShoppingBag } from "lucide-react";
 import { DbProduct, DbMusician } from "@/types";
 import { uploadFile } from "@/lib/upload-client";
 
-type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character" | "collection-hero" | "press";
+type Tab = "products" | "about" | "musicians" | "users" | "footer" | "designer-hero" | "offers" | "design-images" | "main-character" | "collection-hero" | "press" | "purchases";
 
 const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "products", label: "Products", icon: Package },
@@ -15,6 +15,7 @@ const TABS: { key: Tab; label: string; icon: typeof Package }[] = [
   { key: "designer-hero", label: "Hero Section", icon: ImageIcon },
   { key: "musicians", label: "Musicians", icon: Music },
   { key: "users", label: "Users", icon: Users },
+  { key: "purchases", label: "Purchases", icon: ShoppingBag },
   { key: "footer", label: "Footer", icon: Globe },
   { key: "offers", label: "Offers", icon: Tag },
   { key: "design-images", label: "Design Page", icon: Palette },
@@ -772,6 +773,120 @@ function MusiciansPanel() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────── PURCHASES TAB ─────────────── */
+interface Purchase {
+  id: string;
+  order_number: string;
+  items: { name: string; size: string; price: number; quantity: number }[];
+  total: number;
+  paid_at: string;
+  razorpay_payment_id: string;
+  name: string;
+  email: string;
+}
+
+function PurchasesPanel() {
+  const [mode, setMode] = useState<"test" | "live">("live");
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        const r = await fetch(`/api/admin/purchases?mode=${mode}`, { signal: ac.signal });
+        const d = await r.json();
+        if (!ac.signal.aborted) {
+          setPurchases(d.data?.purchases || []);
+          setLoading(false);
+        }
+      } catch {
+        if (!ac.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, [mode]);
+
+  const revenue = purchases.reduce((sum, p) => sum + p.total, 0);
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <h2 className="text-xl font-bold">Purchases</h2>
+        <div className="flex items-center gap-4">
+          <span className="text-white/40 text-sm">
+            {!loading && `${purchases.length} orders · ₹${revenue}`}
+          </span>
+          <div role="group" aria-label="Payment mode" className="flex border border-white/10 rounded overflow-hidden">
+            {(["live", "test"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => { if (m !== mode) { setLoading(true); setMode(m); } }}
+                aria-pressed={mode === m}
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                  mode === m ? "bg-[#C6FF00] text-[#1a1a1a]" : "text-white/50 hover:text-white"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 bg-white/5 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : purchases.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-white/40 text-lg">No {mode} purchases yet</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/10 text-left text-white/50 uppercase tracking-wider text-xs">
+                <th className="py-3 pr-4">Order</th>
+                <th className="py-3 pr-4">Customer</th>
+                <th className="py-3 pr-4">Products</th>
+                <th className="py-3 pr-4">Amount</th>
+                <th className="py-3 pr-4">Payment ID</th>
+                <th className="py-3">Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {purchases.map((p) => (
+                <tr key={p.id} className="border-b border-white/5 hover:bg-white/5 align-top">
+                  <td className="py-3 pr-4 font-mono text-xs">{p.order_number}</td>
+                  <td className="py-3 pr-4">
+                    <div className="font-medium">{p.name || <span className="text-white/20">—</span>}</div>
+                    <div className="text-white/40 text-xs">{p.email}</div>
+                  </td>
+                  <td className="py-3 pr-4 text-white/60 text-xs">
+                    {p.items.map((l, i) => (
+                      <div key={i}>
+                        {l.name}{l.size ? ` (${l.size})` : ""} ×{l.quantity}
+                      </div>
+                    ))}
+                  </td>
+                  <td className="py-3 pr-4 font-mono">₹{p.total}</td>
+                  <td className="py-3 pr-4 text-white/40 font-mono text-xs">{p.razorpay_payment_id}</td>
+                  <td className="py-3 text-white/40 text-xs">
+                    {p.paid_at ? new Date(p.paid_at).toLocaleString() : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -2681,6 +2796,7 @@ export default function AdminPage() {
         {activeTab === "designer-hero" && <DesignerHeroPanel />}
         {activeTab === "musicians" && <MusiciansPanel />}
         {activeTab === "users" && <UsersPanel />}
+        {activeTab === "purchases" && <PurchasesPanel />}
         {activeTab === "footer" && <FooterPanel />}
         {activeTab === "offers" && <OffersPanel />}
         {activeTab === "design-images" && (

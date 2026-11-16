@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { DbProduct } from "@/types";
 import ProductCard from "@/components/common/ProductCard";
-import { Heart, MessageSquare, User } from "lucide-react";
+import { Heart, MessageSquare, ShoppingBag, User } from "lucide-react";
 
-type Tab = "profile" | "wishlist" | "feedback";
+type Tab = "profile" | "purchases" | "wishlist" | "feedback";
 
 interface Profile {
   name: string;
@@ -26,6 +26,17 @@ interface WishlistItem {
   product_id: string;
   created_at: string;
   products: DbProduct;
+}
+
+interface PurchaseOrder {
+  id: string;
+  order_number: string;
+  items: { id: string; name: string; size: string; price: number; quantity: number }[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  paid_at: string;
+  payment_mode: "test" | "live" | null;
 }
 
 interface FeedbackItem {
@@ -63,6 +74,7 @@ export default function ProfilePage() {
 
   const tabs: { key: Tab; label: string; icon: typeof User }[] = [
     { key: "profile", label: "My Profile", icon: User },
+    { key: "purchases", label: "Purchases", icon: ShoppingBag },
     { key: "wishlist", label: "Favourites", icon: Heart },
     { key: "feedback", label: "Feedback", icon: MessageSquare },
   ];
@@ -112,6 +124,7 @@ export default function ProfilePage() {
         {/* Tab content */}
         <div className="mt-6 border border-[#1a1a1a]/10 bg-[#FFF3B0] p-4 sm:p-6 md:p-8">
           {activeTab === "profile" && <ProfileTab />}
+          {activeTab === "purchases" && <PurchasesTab />}
           {activeTab === "wishlist" && <WishlistTab />}
           {activeTab === "feedback" && <FeedbackTab />}
         </div>
@@ -248,6 +261,103 @@ function ProfileTab() {
         {saving ? "Saving..." : saved ? "Saved!" : "Save Details"}
       </button>
     </form>
+  );
+}
+
+/* ─── PURCHASES TAB ─── */
+function PurchasesTab() {
+  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/orders")
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setOrders(d.orders || []); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const inr = (n: number) =>
+    `₹${Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
+
+  if (loading) {
+    return (
+      <p className="text-xs uppercase tracking-wider text-[#1a1a1a]/40 animate-pulse">
+        Loading purchases...
+      </p>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <ShoppingBag size={40} className="mx-auto text-[#1a1a1a]/20 mb-4" />
+        <p className="text-sm uppercase tracking-wider text-[#1a1a1a]/40">
+          No purchases yet.
+        </p>
+        <p className="text-xs text-[#1a1a1a]/30 mt-2">
+          Orders you pay for will show up here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wider text-[#1a1a1a]/50 mb-6">
+        {orders.length} {orders.length === 1 ? "order" : "orders"}
+      </p>
+      <div className="space-y-4">
+        {orders.map((order) => (
+          <div key={order.id} className="border border-[#1a1a1a]/10 bg-[#FFF9D6] p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#1a1a1a]">
+                  {order.order_number}
+                </span>
+                {order.payment_mode !== "live" && (
+                  <span className="bg-[#1a1a1a]/10 text-[#1a1a1a]/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                    Test
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.14em] text-[#1a1a1a]/50">
+                {order.paid_at
+                  ? new Date(order.paid_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+                  : ""}
+              </span>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              {order.items.map((line, i) => (
+                <div key={i} className="flex justify-between gap-4 text-xs text-[#1a1a1a]/80">
+                  <span className="uppercase tracking-wider truncate">
+                    {line.name}
+                    <span className="text-[#1a1a1a]/50">
+                      {line.size ? ` · Size ${line.size}` : ""} · Qty {line.quantity}
+                    </span>
+                  </span>
+                  <span className="shrink-0">{inr(line.price * line.quantity)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-dashed border-[#1a1a1a]/20 mt-4 pt-3 space-y-1 text-xs uppercase tracking-wider text-[#1a1a1a]/60">
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>{Number(order.shipping) === 0 ? "FREE" : inr(order.shipping)}</span>
+              </div>
+              <div className="flex justify-between text-sm font-bold text-[#1a1a1a]">
+                <span>Total</span>
+                <span>{inr(order.total)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export interface BagItem {
   id: string;
@@ -43,19 +44,34 @@ const BagContext = createContext<BagContextType>({
 });
 
 const STORAGE_KEY = "wtf_bag";
+const OWNER_KEY = "wtf_bag_owner";
 
 export function BagProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<BagItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
+
+  // A bag belongs to whoever filled it: logging out or switching accounts empties it,
+  // while a guest's bag carries over into their login so checkout -> sign-in keeps it.
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try { setItems(JSON.parse(stored)); } catch {}
+    if (authLoading) return;
+    const owner = localStorage.getItem(OWNER_KEY);
+    if (owner && owner !== userId) {
+      localStorage.removeItem(STORAGE_KEY);
+      setItems([]);
+    } else if (!hydrated) {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try { setItems(JSON.parse(stored)); } catch {}
+      }
     }
+    if (userId) localStorage.setItem(OWNER_KEY, userId);
+    else localStorage.removeItem(OWNER_KEY);
     setHydrated(true);
-  }, []);
+  }, [authLoading, userId, hydrated]);
 
   useEffect(() => {
     if (hydrated) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { signToken } from "@/lib/signed-token";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,7 @@ export async function POST(req: NextRequest) {
 
   // Set admin session cookie (24h)
   const cookieStore = await cookies();
-  const payload = Buffer.from(
-    JSON.stringify({ email: adminEmail, exp: Date.now() + 24 * 60 * 60 * 1000 })
-  ).toString("base64");
+  const payload = signToken({ email: adminEmail, exp: Date.now() + 24 * 60 * 60 * 1000 });
 
   cookieStore.set("admin_session", payload, {
     httpOnly: true,
