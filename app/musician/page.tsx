@@ -61,11 +61,11 @@ function HeroIntro() {
 
       {/* Intro text */}
       <div ref={textRef} className="relative z-10 max-w-3xl px-8 text-center">
-        <p className="font-heading text-2xl md:text-4xl lg:text-5xl text-white/90 leading-[1.3] tracking-wide">
+        <p className="font-heading text-2xl md:text-4xl lg:text-5xl text-[#C6FF00] leading-[1.3] tracking-wide">
           Music plays a central role in igniting my fumes and these artists
           aren&rsquo;t just inspos but dream collaborators.
         </p>
-        <p className="mt-8 font-body text-lg md:text-xl text-white/50 leading-relaxed italic">
+        <p className="mt-8 font-body text-lg md:text-xl text-[#C6FF00]/70 leading-relaxed italic">
           Their creativity lives on in the clothes I create, every track, every
           EP, every LP.
         </p>
@@ -80,7 +80,7 @@ function HeroIntro() {
           className="w-full h-full"
           style={{
             background:
-              "radial-gradient(ellipse 80% 70% at 40% 80%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.1) 55%, transparent 75%)",
+              "radial-gradient(ellipse 80% 70% at 40% 80%, rgba(223,40,119,0.7) 0%, rgba(223,40,119,0.35) 30%, rgba(223,40,119,0.1) 55%, transparent 75%)",
             filter: "blur(15px)",
           }}
         />
@@ -95,7 +95,7 @@ function HeroIntro() {
           className="w-full h-full"
           style={{
             background:
-              "radial-gradient(ellipse 80% 70% at 60% 80%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.1) 55%, transparent 75%)",
+              "radial-gradient(ellipse 80% 70% at 60% 80%, rgba(223,40,119,0.7) 0%, rgba(223,40,119,0.35) 30%, rgba(223,40,119,0.1) 55%, transparent 75%)",
             filter: "blur(15px)",
           }}
         />
@@ -495,7 +495,7 @@ function SpotifyPlaylistSection({ spotifyUrl }: { spotifyUrl: string }) {
         <p className="font-body text-sm uppercase tracking-[0.2em] text-white/40 mb-3 text-center">
           Curated by the designer
         </p>
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-[0.04em] text-white mb-10 text-center">
+        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-[0.04em] text-[#C6FF00] mb-10 text-center">
           The Playlist
         </h2>
 

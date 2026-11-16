@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     prod_quick_info_2: ((body.prod_quick_info_2 as string) || "").trim(),
     prod_quick_info_3: ((body.prod_quick_info_3 as string) || "").trim(),
     prod_sizes: SIZE_LABELS.filter((s) => (body.prod_sizes as string[]).includes(s)),
+    prod_launch_year: body.prod_launch_year ? Number(body.prod_launch_year) : null,
   }).select().single();
 
   if (error) {

@@ -81,7 +81,7 @@ export default function Navbar() {
       heading: "More",
       links: [
         { label: "Sizing", href: "/sizing" },
-        { label: "Press", href: "/press" },
+        { label: "Press & Gallery", href: "/press" },
         { label: "Work", href: "/work" },
         ...(!user
           ? [

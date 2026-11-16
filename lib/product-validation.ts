@@ -9,6 +9,7 @@ export interface ProductInput {
   prod_rank: number | string;
   image: string[];
   prod_sizes?: string[];
+  prod_launch_year?: number | string | null;
 }
 
 export interface ValidationResult {
@@ -61,6 +62,10 @@ export function validateProduct(input: ProductInput): ValidationResult {
     errors.prod_sizes = "Duplicate sizes";
   }
 
+  // prod_launch_year (optional)
+  const launchYearError = validateLaunchYear(input.prod_launch_year);
+  if (launchYearError) errors.prod_launch_year = launchYearError;
+
   // image
   if (!Array.isArray(input.image) || input.image.length !== 5) {
     errors.image = "Exactly 5 images are required";
@@ -69,4 +74,12 @@ export function validateProduct(input: ProductInput): ValidationResult {
   }
 
   return { valid: Object.keys(errors).length === 0, errors };
+}
+
+/** Empty means "not set"; otherwise a whole year in the column's CHECK range. */
+export function validateLaunchYear(value: unknown): string | null {
+  if (value === undefined || value === null || value === "") return null;
+  const year = Number(value);
+  if (!Number.isInteger(year) || year < 1900 || year > 2100) return "Enter a year like 2026";
+  return null;
 }

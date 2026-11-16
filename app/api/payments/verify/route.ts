@@ -21,16 +21,16 @@ type PaidOrder = {
 };
 
 /** Store notification plus the customer's receipt; one failing must not block the other. */
-async function sendPurchaseEmails(order: PaidOrder, siteUrl: string) {
+async function sendPurchaseEmails(order: PaidOrder, buyerEmail: string, siteUrl: string) {
   const [{ data: profile }, { data: user }] = await Promise.all([
     supabaseAdmin
       .from("profiles")
       .select("name, house_flat, street, address_line1, city, state, zip, country")
       .eq("user_id", order.user_id)
       .maybeSingle(),
-    supabaseAdmin.from("users").select("email, full_name").eq("id", order.user_id).maybeSingle(),
+    supabaseAdmin.from("users").select("full_name").eq("id", order.user_id).maybeSingle(),
   ]);
-  const name = profile?.name || user?.full_name || user?.email || "Unknown customer";
+  const name = profile?.name || user?.full_name || buyerEmail;
   const isTest = order.payment_mode !== "live";
   const lines = order.items ?? [];
   const lineLabel = (l: OrderLine) => `${l.name}${l.size ? ` (${l.size})` : ""}`;
@@ -46,14 +46,14 @@ async function sendPurchaseEmails(order: PaidOrder, siteUrl: string) {
       subject: `${isTest ? "[TEST] " : ""}New purchase ${order.order_number} — ₹${order.total} by ${name}`,
       text:
         (isTest ? "TEST PAYMENT — no real money was charged.\n\n" : "") +
-        `Name: ${name}\nEmail: ${user?.email ?? "—"}\nOrder: ${order.order_number}\n\nProducts:\n${products}\n\nAmount: ₹${order.total}`,
+        `Name: ${name}\nEmail: ${buyerEmail}\nOrder: ${order.order_number}\n\nProducts:\n${products}\n\nAmount: ₹${order.total}`,
     }),
   ];
 
   const templateId = process.env.RESEND_PURCHASE_TEMPLATE_ID;
   if (!templateId) {
     console.error("RESEND_PURCHASE_TEMPLATE_ID not set; customer receipt skipped");
-  } else if (user?.email) {
+  } else {
     const address = [
       profile?.house_flat, profile?.street, profile?.address_line1,
       profile?.city, profile?.state, profile?.zip, profile?.country,
@@ -62,7 +62,7 @@ async function sendPurchaseEmails(order: PaidOrder, siteUrl: string) {
     sends.push(
       resend.emails.send({
         from: PURCHASE_INBOX,
-        to: user.email,
+        to: buyerEmail,
         subject: `${isTest ? "[TEST] " : ""}Thanks for your order ${order.order_number}`,
         // shortcut: the template has one product row, so multi-item orders are joined into it; add a loop in the template to list rows
         template: {
@@ -172,6 +172,8 @@ export async function POST(req: NextRequest) {
   try {
     await sendPurchaseEmails(
       { ...paid, subtotal: Number(paid.subtotal), shipping: Number(paid.shipping), total: Number(paid.total) },
+      // Verify only matches orders owned by session.id, so this is the buyer's own address
+      session.email,
       req.nextUrl.origin
     );
   } catch (err) {

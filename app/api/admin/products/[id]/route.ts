@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateLaunchYear } from "@/lib/product-validation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin";
 import { SIZE_LABELS } from "@/lib/sizes";
@@ -45,6 +46,17 @@ export async function PUT(
       );
     }
     updates.prod_sizes = SIZE_LABELS.filter((s) => sizes.includes(s));
+  }
+
+  if (body.prod_launch_year !== undefined) {
+    const yearError = validateLaunchYear(body.prod_launch_year);
+    if (yearError) {
+      return NextResponse.json(
+        { success: false, message: "Validation failed", errors: { prod_launch_year: yearError } },
+        { status: 400 }
+      );
+    }
+    updates.prod_launch_year = body.prod_launch_year ? Number(body.prod_launch_year) : null;
   }
 
   if (body.prod_rank !== undefined) {

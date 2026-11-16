@@ -24,8 +24,7 @@ export default function LatestDrop() {
         <Tagline>Latest Releases</Tagline>
         <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}>Extra, Extra !</SectionHeading>
         <p className="mt-6 max-w-2xl text-lg text-black/70 leading-relaxed">
-          Six new designs. Hand-drawn, numbered, and never restocked. Drop 01 is
-          live — grab yours before they vanish into the fumes.
+          Hot off the drawing board, get em&apos; before they vanish into the Fumes!
         </p>
         <Button href="/silhouettes" className="mt-8">
           Shop all

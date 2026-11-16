@@ -164,7 +164,7 @@ function BrandStory() {
     <section className="bg-toxic px-6 md:px-16 lg:px-24 py-24 md:py-32">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.8fr] gap-12 md:gap-20 items-start">
         {/* Left — image with star corner */}
-        <div className="relative aspect-[3/4] w-full max-w-[320px] overflow-visible">
+        <div className="relative aspect-square w-full max-w-[320px] overflow-visible">
           {/* Image container — no bottom-right corner border */}
           <div className="absolute inset-0 overflow-hidden border border-black/10 border-b-0 border-r-0">
             <Image

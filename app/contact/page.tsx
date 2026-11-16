@@ -82,7 +82,7 @@ export default function ContactPage() {
           <Tagline>Get in touch</Tagline>
           <SectionHeading className="mt-6">Contact us</SectionHeading>
           <p className="mt-6 max-w-2xl text-lg text-[#1a1a1a]/70">
-            Got a question, collab idea, or just want to talk weird? We&apos;re listening.
+            Got a question, collab idea or just wanna vent? I&apos;m all ears.
           </p>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function ContactPage() {
                 <Input
                   name="email"
                   type="email"
-                  placeholder="you@weird.com"
+                  placeholder="We'd love to have you!"
                   value={formData.email}
                   onChange={handleChange}
                   required

@@ -12,9 +12,7 @@ import {
 const LINES = [
   "Curated Drops",
   "Collections",
-  "Every piece is numbered,",
-  "limited, and never restocked.",
-  "Once it's gone, it's gone.",
+  "Explore my fashion discography",
 ];
 
 function ParallaxLine({

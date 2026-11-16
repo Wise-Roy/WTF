@@ -61,7 +61,7 @@ export default function JoinCult() {
           <Input
             name="email"
             type="email"
-            placeholder="you@weird.com"
+            placeholder="We'd love to have you!"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

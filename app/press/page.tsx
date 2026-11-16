@@ -94,7 +94,7 @@ export default function PressPage() {
             className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-wider leading-tight mb-12 drop-shadow-lg title-glow-lime"
             style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}
           >
-            Press
+            Press &amp; Gallery
           </h1>
 
           {loading ? (

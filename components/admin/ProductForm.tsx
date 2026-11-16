@@ -27,6 +27,7 @@ export default function ProductForm({ product }: ProductFormProps) {
     prod_description: product?.prod_description || "",
     prod_label: product?.prod_label || "New",
     prod_rank: product?.prod_rank?.toString() || "0",
+    prod_launch_year: product?.prod_launch_year?.toString() || "",
     prod_fabric: product?.prod_fabric || "",
     prod_fit: product?.prod_fit || "",
     prod_care: product?.prod_care || "",
@@ -112,6 +113,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       prod_description: form.prod_description,
       prod_label: form.prod_label,
       prod_rank: parseInt(form.prod_rank, 10),
+      prod_launch_year: form.prod_launch_year ? Number(form.prod_launch_year) : null,
       prod_fabric: form.prod_fabric,
       prod_fit: form.prod_fit,
       prod_care: form.prod_care,
@@ -208,6 +210,12 @@ export default function ProductForm({ product }: ProductFormProps) {
           <input name="prod_rank" type="number" min="0" step="1" value={form.prod_rank} onChange={handleChange} className={inputClass} />
           {errors.prod_rank && <p className={errorClass}>{errors.prod_rank}</p>}
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="prod_launch_year" className="block text-xs uppercase tracking-wider text-white/50 mb-2">Year of Launch</label>
+        <input id="prod_launch_year" name="prod_launch_year" type="number" min="1900" max="2100" step="1" value={form.prod_launch_year} onChange={handleChange} className={inputClass} placeholder="e.g. 2026" />
+        {errors.prod_launch_year && <p className={errorClass}>{errors.prod_launch_year}</p>}
       </div>
 
       <div>

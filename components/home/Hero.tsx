@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/components/common";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-const WORDS = ["FUMES", "NOISE", "CHAOS", "RHYTHM", "ENERGY", "VIBE"] as const;
+const WORDS = ["FUMES", "NOISE", "CHAOS", "RHYTHM", "ENERGY", "VIBE", "BADDIE", "BODY", "SOUND", "CITY", "SKYLINE", "SELF"] as const;
 const INTERVAL = 2800;
 
 export default function Hero() {
@@ -157,8 +157,8 @@ export default function Hero() {
         </h1>
 
         <p className="mt-6 font-body text-base md:text-lg text-[#F5F5F5]/70 max-w-[55ch] leading-normal">
-          Wxrship The Fumes is streetwear for the ones who chose to stand out.
-          Limited drops. Original art. No restocks. Join the cult or stay normal.
+          WXRSHIP THE FUMES is a GenZ fashion label for the ones who choose brat over basic.
+          Sustainability, Sass and Style — Welcome to a drip cult unlike any other.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full">

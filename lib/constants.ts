@@ -105,17 +105,17 @@ export const VALUE_PROPS: ValueProp[] = [
   {
     icon: "Flame",
     title: "Slow Fashion",
-    description: "Every piece is part of a numbered drop. When it's gone, it's gone. No restocks, no regrets.",
+    description: "Limited Edition. Intentional. Planet Conscious.",
   },
   {
     icon: "Brush",
-    title: "One of a Kind",
+    title: "One in a Million",
     description: "Every design is original — drawn, not templated. You won't see this anywhere else.",
   },
   {
     icon: "Users",
     title: "Cult, not Customer",
-    description: "We don't have customers. We have believers. Join the movement or watch from the outside.",
+    description: "We don't have customers. We have believers. Join the movement.",
   },
 ];
 

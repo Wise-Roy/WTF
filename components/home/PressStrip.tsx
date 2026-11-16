@@ -47,15 +47,15 @@ export default function PressStrip() {
   return (
     <SectionWrapper scheme="acid" className="!bg-transparent">
       <div ref={headerRef} className="text-left">
-        <Tagline className="bg-[#1a1a1a] text-black">Press</Tagline>
+        <Tagline className="bg-[#1a1a1a] text-black">Press &amp; Gallery</Tagline>
         <SectionHeading className="mt-6" style={{ WebkitTextStroke: "1.5px #C6FF00", color: "black" }}>
-          Behind the Collection
+          For Ur Eyes
         </SectionHeading>
         <p className="mt-6 max-w-2xl text-lg text-[#1a1a1a]/80 leading-relaxed">
           A visual archive of the ideas, inspirations, and moments that shape our garments.
         </p>
         <Button href="/press" className="mt-8 bg-[#1a1a1a] text-black hover:bg-[#333]">
-          View press
+          View press &amp; gallery
         </Button>
       </div>
 

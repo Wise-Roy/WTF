@@ -258,7 +258,7 @@ function SpotifyPlaylistSection({ spotifyUrl }: { spotifyUrl: string }) {
         <p className="font-body text-sm uppercase tracking-[0.2em] text-white/40 mb-3 text-center">
           Curated by the designer
         </p>
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-[0.04em] text-white mb-10 text-center">
+        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-[0.04em] text-[#C6FF00] mb-10 text-center">
           The Playlist
         </h2>
 

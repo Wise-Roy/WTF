@@ -67,7 +67,7 @@ acid (flagship) → dark (cult) → pink (CTA/join).
   "Drop 01 · Verified buyer".
 - JOIN THE CULT: pink band. Tagline "Join the Cult", headline "Never miss
   a drop", email capture form (field name "email", placeholder
-  "you@weird.com", button "Get early access", success "You're in. Welcome
+  "We'd love to have you!", button "Get early access", success "You're in. Welcome
   to the cult."), microcopy "No spam. Just drops."
 
 ## Chrome

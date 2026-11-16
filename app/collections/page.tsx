@@ -40,7 +40,7 @@ function useFetchProducts(label: string) {
 }
 
 function CollectionCard({ product }: { product: DbProduct }) {
-  const { id, image, prod_name, prod_quantity } = product;
+  const { id, image, prod_name, prod_quantity, prod_launch_year } = product;
   const isSoldOut = prod_quantity <= 0;
   const img = image?.[0] || "/eg.jpg";
   const cardRef = useRef<HTMLDivElement>(null);
@@ -76,10 +76,15 @@ function CollectionCard({ product }: { product: DbProduct }) {
           )}
 
           {/* Hover overlay with product name */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <h3 className="text-[#C6FF00] text-2xl max-sm:text-lg font-extrabold uppercase tracking-wider text-center px-4 drop-shadow-lg">
               {prod_name}
             </h3>
+            {prod_launch_year && (
+              <p className="text-white text-sm max-sm:text-xs font-bold uppercase tracking-[0.25em] drop-shadow-lg">
+                Launched {prod_launch_year}
+              </p>
+            )}
           </div>
         </div>
       </Link>
