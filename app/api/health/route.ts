@@ -8,12 +8,9 @@ export async function GET() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "(missing)";
 
   try {
-    // Simple query to verify Supabase connectivity
-    const { error } = await supabase.from("_health_check_dummy").select("*").limit(1);
-
-    // 42P01 = relation does not exist, PGRST205 = not in schema cache
-    // Both mean the connection itself succeeded
-    const connected = !error || error.code === "42P01" || error.code === "PGRST205";
+    // Real table so the query reaches Postgres; keep-alive cron relies on this to stop Supabase idling.
+    const { error } = await supabase.from("products").select("id").limit(1);
+    const connected = !error;
     const latency = Date.now() - start;
 
     if (connected) {

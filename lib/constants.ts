@@ -148,3 +148,8 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 
 export const CATEGORIES = ["All", "Hoodies", "Tees", "Accessories"] as const;
 export type Category = (typeof CATEGORIES)[number];
+
+// CDN serves cached copy instantly and refreshes in background, so idle-day visits skip the cold Supabase query.
+export const PUBLIC_CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=86400",
+} as const;

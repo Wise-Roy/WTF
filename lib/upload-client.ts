@@ -31,6 +31,8 @@ export async function uploadFile(
     headers: {
       "Content-Type": file.type,
       "x-upsert": "false",
+      // File names are unique UUIDs, so a year-long CDN cache never serves a stale image.
+      "cache-control": "max-age=31536000",
     },
     body: file,
   });

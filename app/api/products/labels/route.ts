@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -15,5 +16,5 @@ export async function GET() {
 
   const labels = [...new Set((data || []).map((r) => r.prod_label))].sort();
 
-  return NextResponse.json({ success: true, data: { labels } });
+  return NextResponse.json({ success: true, data: { labels } }, { headers: PUBLIC_CACHE_HEADERS });
 }

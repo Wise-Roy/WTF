@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -17,5 +18,5 @@ export async function GET() {
     });
   }
 
-  return NextResponse.json({ success: true, data: { footer: data } });
+  return NextResponse.json({ success: true, data: { footer: data } }, { headers: PUBLIC_CACHE_HEADERS });
 }

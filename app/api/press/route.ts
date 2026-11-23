@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -18,5 +19,5 @@ export async function GET() {
     ? data.press_images.filter(Boolean)
     : [];
 
-  return NextResponse.json({ success: true, data: { images } });
+  return NextResponse.json({ success: true, data: { images } }, { headers: PUBLIC_CACHE_HEADERS });
 }

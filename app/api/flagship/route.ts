@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -35,5 +36,5 @@ export async function GET() {
         product_name: product.prod_name,
       },
     },
-  });
+  }, { headers: PUBLIC_CACHE_HEADERS });
 }
