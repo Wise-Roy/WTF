@@ -3,6 +3,7 @@ export { default as MarqueeBand } from "./MarqueeBand";
 export { default as LatestDrop } from "./LatestDrop";
 export { default as WTFWay } from "./WTFWay";
 export { default as FlagshipSpotlight } from "./FlagshipSpotlight";
+export { default as FeaturedIn } from "./FeaturedIn";
 export { default as PressStrip } from "./PressStrip";
 
 export { default as JoinCult } from "./JoinCult";

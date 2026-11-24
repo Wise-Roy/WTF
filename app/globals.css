@@ -27,6 +27,27 @@ body {
   }
 }
 
+/* Two identical halves, so shifting by -50% loops seamlessly */
+@keyframes featured-scroll {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.featured-marquee {
+  animation: featured-scroll linear infinite;
+}
+
+.featured-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-marquee {
+    animation: none;
+  }
+}
+
 .star-cursor-canvas {
   position: fixed;
   top: 0;

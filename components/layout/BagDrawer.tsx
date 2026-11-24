@@ -90,6 +90,7 @@ export default function BagDrawer() {
         prefill: { email: user.email },
         theme: { color: "#C6FF00" },
         handler: async (response: RazorpayResponse) => {
+          lastError = null;
           try {
             const vr = await fetch("/api/payments/verify", {
               method: "POST",
@@ -107,13 +108,18 @@ export default function BagDrawer() {
             setPaying(false);
           }
         },
-        modal: { ondismiss: () => setPaying(false) },
+        modal: {
+          // Only a dismissal after a failed attempt is a failure; the bag is untouched so a retry starts fresh
+          ondismiss: () => {
+            setPaying(false);
+            if (lastError !== null) setFailure(lastError);
+          },
+        },
       });
-      // Swap Razorpay's own error screen for ours; the bag is untouched so a retry starts fresh
+      // Razorpay offers in-modal retries, so a failed attempt is not final until the modal is dismissed
+      let lastError: string | null = null;
       rzp.on("payment.failed", (r) => {
-        rzp.close();
-        setPaying(false);
-        setFailure(r.error?.description || "");
+        lastError = r.error?.description || "";
       });
       rzp.open();
     } catch (err) {

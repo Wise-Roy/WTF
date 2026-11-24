@@ -2208,12 +2208,14 @@ function ImageSlotsPanel({
   cols,
   title,
   description,
+  fit = "cover",
 }: {
   endpoint: string;
   count: number;
   cols: number;
   title: string;
   description: string;
+  fit?: "cover" | "contain";
 }) {
   const empty = () => Array<string>(count).fill("");
   const [images, setImages] = useState<string[]>(empty);
@@ -2328,7 +2330,7 @@ function ImageSlotsPanel({
                 <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-white/5 border border-white/10">
                   {url ? (
                     <>
-                      <Image src={url} alt={`${title} ${idx + 1}`} fill className="object-cover" />
+                      <Image src={url} alt={`${title} ${idx + 1}`} fill className={fit === "contain" ? "object-contain p-3" : "object-cover"} />
                       <button
                         type="button"
                         onClick={() => handleRemove(idx)}
@@ -2816,6 +2818,18 @@ export default function AdminPage() {
             title="Press Images"
             description="Upload 10 images for the Press page gallery. Old images are automatically cleaned up from storage on save."
           />
+        )}
+        {activeTab === "press" && (
+          <div className="mt-16 pt-10 border-t border-white/10">
+            <ImageSlotsPanel
+              endpoint="/api/admin/featured"
+              count={12}
+              cols={6}
+              fit="contain"
+              title="Featured In"
+              description="Upload press logos for the Featured In band on the home page. One logo stays still; two or more scroll. Transparent PNG/SVG-style logos look best."
+            />
+          </div>
         )}
         {activeTab === "collection-hero" && <CollectionHeroPanel />}
         {activeTab === "main-character" && <MainCharacterPanel />}

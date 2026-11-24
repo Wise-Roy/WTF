@@ -439,7 +439,7 @@ function WishlistTab() {
               {removing === item.product_id ? (
                 <div className="h-4 w-4 border-2 border-[#1a1a1a]/30 border-t-transparent rounded-full animate-spin" />
               ) : (
-                <Heart size={16} className="text-[#DF2877] fill-[#DF2877]" />
+                <Heart size={16} className="text-[#DF2877] fill-[#C6FF00]" />
               )}
             </button>
           </div>
